@@ -35,7 +35,7 @@ export default function Navbar() {
       >
         <div
           className={
-            `relative mt-3 flex items-center justify-between rounded-full border ` +
+            `relative mt-5 sm:mt-6 lg:mt-8 flex items-center justify-between rounded-full border ` +
             `backdrop-blur-md px-4 py-2 sm:px-5 sm:py-2.5 ` +
             `transition-all duration-300 ` +
             (isScrolled
