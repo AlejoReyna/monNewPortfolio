@@ -166,7 +166,7 @@ export default function Services() {
                 key={service.title}
                 data-service-card
                 data-index={index}
-                className="group relative overflow-hidden rounded-2xl border border-white/5 bg-white/[0.02] p-6 backdrop-blur-sm transition-all hover:border-white/10 hover:bg-white/[0.05] hover:shadow-2xl"
+                className="group relative overflow-hidden rounded-2xl border border-white/5 bg-white/[0.02] p-6 backdrop-blur-sm transition-all hover:border-white/10 hover:bg-white/[0.05] hover:shadow-2xl glow-ring"
                 style={{
                   transform: `translateY(${translateY}px)` ,
                   opacity,
@@ -183,7 +183,8 @@ export default function Services() {
 
                 {/* Icon */}
                 <div className="relative">
-                  <div className="mb-4 inline-flex items-center justify-center rounded-xl border border-white/10 bg-black/30 p-3 text-white/80 shadow-inner shadow-white/5 transition-colors group-hover:text-white">
+                  <div className="mb-4 inline-flex items-center justify-center rounded-xl border border-white/10 bg-black/30 p-3 text-white/80 shadow-inner shadow-white/5 transition-colors group-hover:text-white will-change-transform group-hover:scale-105"
+                       style={{ transition: 'transform 300ms cubic-bezier(0.4,0,0.2,1)' }}>
                     {service.icon({ className: "h-6 w-6" })}
                   </div>
                 </div>

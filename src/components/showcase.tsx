@@ -318,9 +318,9 @@ export default function Showcase() {
             <div className="pointer-events-none absolute bottom-8 left-1/2 z-30 -translate-x-1/2">
               <div className="flex items-center gap-3">
                 <span className="text-xs font-medium text-gray-500">Scroll Progress</span>
-                <div className="relative h-1 w-48 overflow-hidden rounded-full bg-white/10">
+                  <div className="relative h-1 w-48 overflow-hidden rounded-full bg-white/10">
                   <div
-                    className="absolute inset-y-0 left-0 bg-gradient-to-r from-white/80 to-white/40 transition-all duration-300"
+                      className="absolute inset-y-0 left-0 bg-gradient-to-r from-sky-400/80 via-cyan-300/70 to-violet-400/70 transition-all duration-300"
                     style={{ 
                       width: `${clamp(easedScrollProgress * 100, 2, 100)}%`,
                     }}

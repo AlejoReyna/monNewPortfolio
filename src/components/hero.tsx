@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/image";
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 type HeroProps = {
   title?: string;
@@ -15,11 +15,16 @@ export default function Hero({
 }: HeroProps) {
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [mounted, setMounted] = useState(false);
+  const spotlightRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     setMounted(true);
     const handleMouseMove = (e: MouseEvent) => {
       setMousePos({ x: e.clientX, y: e.clientY });
+      if (spotlightRef.current) {
+        spotlightRef.current.style.setProperty('--x', `${e.clientX}px`);
+        spotlightRef.current.style.setProperty('--y', `${e.clientY}px`);
+      }
     };
     window.addEventListener('mousemove', handleMouseMove);
     return () => window.removeEventListener('mousemove', handleMouseMove);
@@ -40,9 +45,15 @@ export default function Hero({
           </div>
         </div>
 
+        {/* Aurora backdrop */}
+        <div className="aurora absolute inset-0" />
+
         {/* Gradient Orbs */}
-        <div className="absolute top-20 left-20 w-72 h-72 bg-gray-600 rounded-full mix-blend-multiply filter blur-xl opacity-10 animate-pulse"></div>
-        <div className="absolute bottom-20 right-20 w-72 h-72 bg-gray-500 rounded-full mix-blend-multiply filter blur-xl opacity-10 animate-pulse" style={{ animationDelay: '1s' }}></div>
+        <div className="absolute top-20 left-20 w-72 h-72 bg-gray-600 rounded-full mix-blend-multiply filter blur-2xl opacity-10 animate-pulse"></div>
+        <div className="absolute bottom-20 right-20 w-72 h-72 bg-gray-500 rounded-full mix-blend-multiply filter blur-2xl opacity-10 animate-pulse" style={{ animationDelay: '1s' }}></div>
+
+        {/* Cursor spotlight layer */}
+        <div ref={spotlightRef} className="cursor-spotlight" />
       </div>
 
       {/* Main Content */}
@@ -62,7 +73,7 @@ export default function Hero({
               fill 
               unoptimized 
               priority 
-              className="rounded-xl object-contain bg-transparent drop-shadow-2xl" 
+              className="z-10 rounded-xl object-contain bg-transparent brightness-110 contrast-105 saturate-110" 
             />
           </div>
         </div>
@@ -91,7 +102,7 @@ export default function Hero({
           <h1 className="text-4xl lg:text-6xl font-bold text-white mb-6 leading-tight">
             Hi! I&apos;m{' '}
             <span className="relative">
-              <span className="bg-gradient-to-r from-white via-gray-200 to-gray-400 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-white via-gray-200 to-gray-400 bg-clip-text text-transparent shimmer-text">
                 {title}
               </span>
               <div className="absolute -bottom-2 left-0 w-full h-1 bg-gradient-to-r from-gray-400 to-gray-600 rounded-full transform scale-x-0 animate-[scaleX_1s_ease-out_1s_forwards]"></div>
@@ -125,7 +136,7 @@ export default function Hero({
           <div className="flex flex-col sm:flex-row gap-4">
             <a 
               href="#projects"
-              className="group relative px-6 py-3 bg-gradient-to-r from-gray-800 to-gray-900 text-white font-semibold rounded-full overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-gray-500/25 text-center border border-gray-700 text-sm"
+              className="group relative px-6 py-3 bg-gradient-to-r from-gray-800 to-gray-900 text-white font-semibold rounded-full overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-gray-500/25 text-center border border-gray-700 text-sm glow-ring"
             >
               <span className="relative z-10">View my work</span>
               <div className="absolute inset-0 bg-gradient-to-r from-gray-700 to-gray-800 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
@@ -134,7 +145,7 @@ export default function Hero({
             
             <a 
               href="#contact"
-              className="group px-6 py-3 border-2 border-gray-600 text-gray-300 font-semibold rounded-full hover:bg-gray-600 hover:text-white transition-all duration-300 hover:scale-105 backdrop-blur-sm text-center text-sm"
+              className="group px-6 py-3 border-2 border-gray-600 text-gray-300 font-semibold rounded-full hover:bg-gray-600 hover:text-white transition-all duration-300 hover:scale-105 backdrop-blur-sm text-center text-sm glow-ring"
             >
               <span className="flex items-center justify-center gap-2">
                 Contact me
@@ -165,7 +176,7 @@ export default function Hero({
               fill 
               unoptimized 
               priority 
-              className="rounded-xl object-contain bg-transparent drop-shadow-2xl" 
+              className="z-10 rounded-xl object-contain bg-transparent brightness-110 contrast-105 saturate-110" 
             />
           </div>
         </div>

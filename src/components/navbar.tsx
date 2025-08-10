@@ -6,10 +6,14 @@ import Link from "next/link";
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [progress, setProgress] = useState(0);
 
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 8);
+      const total = document.documentElement.scrollHeight - window.innerHeight;
+      const p = total > 0 ? window.scrollY / total : 0;
+      setProgress(Math.min(Math.max(p, 0), 1));
     };
     handleScroll();
     window.addEventListener("scroll", handleScroll, { passive: true });
@@ -18,6 +22,13 @@ export default function Navbar() {
 
   return (
     <header className="fixed inset-x-0 top-0 z-[60]">
+      {/* Top scroll progress bar */}
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-0.5 bg-white/5">
+        <div
+          className="h-full bg-gradient-to-r from-sky-400 via-cyan-300 to-violet-400"
+          style={{ width: `${progress * 100}%`, transition: "width 120ms linear" }}
+        />
+      </div>
       {/* Glass/gradient background matching hero */}
       <div
         className={`mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 transition-colors duration-300`}
@@ -46,7 +57,7 @@ export default function Navbar() {
           <div className="relative z-10 flex min-w-0 items-center gap-2">
             <Link href="#top" className="group inline-flex items-center gap-2">
               <span className="inline-block h-2 w-2 rounded-full bg-gradient-to-r from-gray-300 via-gray-400 to-gray-500 group-hover:from-white group-hover:to-gray-400 transition-colors"></span>
-              <span className="text-sm font-semibold tracking-wide text-white/90 group-hover:text-white">Alexis</span>
+              <span className="text-sm font-semibold tracking-wide text-white/90 group-hover:text-white shimmer-text">Alexis</span>
             </Link>
           </div>
 
@@ -72,7 +83,7 @@ export default function Navbar() {
           <div className="relative z-10 flex items-center gap-2">
             <a
               href="#contact"
-              className="hidden sm:inline-flex items-center gap-2 rounded-full border border-white/15 bg-gradient-to-r from-gray-800/60 to-gray-900/60 px-4 py-1.5 text-sm font-medium text-gray-100 shadow-inner shadow-white/5 transition-all hover:from-gray-700/70 hover:to-gray-800/70 hover:shadow-white/10"
+              className="relative hidden sm:inline-flex items-center gap-2 rounded-full gradient-border bg-gradient-to-r from-gray-800/60 to-gray-900/60 px-4 py-1.5 text-sm font-medium text-gray-100 shadow-inner shadow-white/5 transition-all hover:from-gray-700/70 hover:to-gray-800/70 hover:shadow-white/10"
             >
               <span>Let’s talk</span>
               <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">
