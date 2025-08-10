@@ -136,7 +136,7 @@ export default function Hero({
           <div className="flex flex-col sm:flex-row gap-4">
             <a 
               href="#projects"
-              className="group relative px-6 py-3 bg-gradient-to-r from-gray-800 to-gray-900 text-white font-semibold rounded-full overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-gray-500/25 text-center border border-gray-700 text-sm glow-ring"
+              className="group relative gradient-border px-6 py-3 bg-gradient-to-r from-gray-800 to-gray-900 text-white font-semibold rounded-full overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-gray-500/25 text-center border border-transparent text-sm"
             >
               <span className="relative z-10">View my work</span>
               <div className="absolute inset-0 bg-gradient-to-r from-gray-700 to-gray-800 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
@@ -145,7 +145,7 @@ export default function Hero({
             
             <a 
               href="#contact"
-              className="group px-6 py-3 border-2 border-gray-600 text-gray-300 font-semibold rounded-full hover:bg-gray-600 hover:text-white transition-all duration-300 hover:scale-105 backdrop-blur-sm text-center text-sm glow-ring"
+              className="group relative gradient-border px-6 py-3 text-gray-300 font-semibold rounded-full bg-transparent hover:bg-gray-600 hover:text-white transition-all duration-300 hover:scale-105 backdrop-blur-sm text-center text-sm border border-transparent"
             >
               <span className="flex items-center justify-center gap-2">
                 Contact me
