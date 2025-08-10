@@ -57,7 +57,7 @@ export default function Navbar() {
           <div className="relative z-10 flex min-w-0 items-center gap-2">
             <Link href="#top" className="group inline-flex items-center gap-2">
               <span className="inline-block h-2 w-2 rounded-full bg-gradient-to-r from-gray-300 via-gray-400 to-gray-500 group-hover:from-white group-hover:to-gray-400 transition-colors"></span>
-              <span className="text-sm font-semibold tracking-wide text-white/90 group-hover:text-white shimmer-text">Alexis</span>
+              <span className="text-sm font-semibold tracking-wide text-white/90 group-hover:text-white shimmer-text">No logo yet</span>
             </Link>
           </div>
 
@@ -67,7 +67,6 @@ export default function Navbar() {
               { href: "/", label: "Home" },
               { href: "#services", label: "Services" },
               { href: "#projects", label: "Projects" },
-              { href: "#contact", label: "Contact" },
             ].map((item) => (
               <Link
                 key={item.label}

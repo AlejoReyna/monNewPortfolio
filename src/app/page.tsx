@@ -2,6 +2,7 @@ import Hero from "@/components/hero";
 import Showcase from "@/components/showcase";
 import Services from "@/components/services";
 import MiniGame from "@/components/mini-game";
+import LetsTalk from "@/components/lets-talk";
 
 export default function Home() {
   return (
@@ -10,6 +11,7 @@ export default function Home() {
       <Services />
       <Showcase />
       <MiniGame />
+      <LetsTalk />
     </main>
   );
 }
