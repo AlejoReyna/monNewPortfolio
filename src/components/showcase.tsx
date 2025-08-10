@@ -20,13 +20,11 @@ export const projects: Project[] = [
         repo: "https://github.com/AlejoReyna/MortalKombat"
     },
     {
-        title: "Inverater - Real Estate Investment Platform",
-        info: "A Mexican real estate investment platform that democratizes property investment opportunities. The company focuses on making real estate investments accessible to a broader audience beyond traditional consolidated investors, targeting individuals ready to enter or expand their investment portfolio in Mexico's growing real estate market.",
-        video: "/videos/preview-inverater.mp4",
-        url: "https://inverater.com",
-        repo: "",
-        isSpecial: true,
-        specialLabel: "Got my first job in tech!"
+        title: "This cafeteria doesn't exist, and it's awesome",
+        info: "A simulated website of a cafeteria, giving users the option to simulate buying coffee bags and looking for information about the cafeteria itself. Features interactive shopping cart, product catalog, and realistic cafe atmosphere simulation.",
+        video: "/videos/preview-cafeteria.mp4",
+        url: "https://this-cafeteria-doesnt-exist.vercel.app",
+        repo: ""
     },
     {
         title: "Birdlypay - A hackathon project",
@@ -50,9 +48,30 @@ export const projects: Project[] = [
         repo: "https://github.com/AlejoReyna/PokeFolio"
     },
     {
+        title: "mpBot - a ETH Mérida 2024 project",
+        info: "Este proyecto implementa un bot de Telegram utilizando el framework Next.js y la biblioteca Telegraf. El bot está diseñado para proporcionar recomendaciones de inversión y información sobre Meta Pool, un servicio de staking. También integra la API de OpenAI para responder preguntas generales sobre DeFi.",
+        video: "/videos/preview-mpbot.mp4",
+        url: "",
+        repo: ""
+    },
+    {
         title: "Inverater - Full Stack Developer",
         info: "A real estate investment platform in Mexico that democratizes access to property investments. The platform connects investors with real estate opportunities, making property investment accessible to a broader audience through technology.",
         video: "/videos/preview-inverater.mp4",
+        url: "",
+        repo: ""
+    },
+    {
+        title: "Plebes | A real NFT project",
+        info: "Plebes is a multichain DAO refining non-plutocratic governance and funding open-source, AI, creativity, and public goods through Bitcoin ordinal auctions.",
+        video: "/videos/preview-plebes.mp4",
+        url: "",
+        repo: ""
+    },
+    {
+        title: "Wedding invitation - not sent yet",
+        info: "This project card will be updated as soon as the invitation is sent. Stay tuned for what promises to be a unique and memorable digital wedding experience.",
+        video: "/videos/preview-wedding.mp4",
         url: "",
         repo: ""
     }
@@ -314,22 +333,29 @@ function TimelineItem({ project, index, isLast, quarter, year, isFirstJob }: Tim
 export default function Showcase() {
     const [headerRef, headerInView] = useIntersectionObserver();
     
-    // Generate quarters for 2024-2025
+    // Generate quarters for 2024-2025 with year separator
     const timelineData = projects.map((project, index) => {
-        // Last project (Inverater job) should be Q1 2025, others are Q1-Q4 2024
-        if (index === projects.length - 1) {
+        // First 7 projects are in 2024 (including Inverater as the last one)
+        if (index < 7) {
             return {
                 ...project,
-                quarter: 'Q1',
+                quarter: `Q${(index % 4) + 1}`,
+                year: 2024
+            };
+        }
+        // Last 2 projects are in 2025
+        else {
+            return {
+                ...project,
+                quarter: `Q${((index - 7) % 4) + 1}`,
                 year: 2025
             };
         }
-        return {
-            ...project,
-            quarter: `Q${index + 1}`,
-            year: 2024
-        };
     });
+
+    // Split timeline data by year
+    const projects2024 = timelineData.filter(p => p.year === 2024);
+    const projects2025 = timelineData.filter(p => p.year === 2025);
 
     return (
         <section id="projects" className="relative min-h-screen bg-gradient-to-b from-black via-gray-950 to-black py-24 overflow-hidden">
@@ -364,27 +390,52 @@ export default function Showcase() {
 
                 {/* Timeline */}
                 <div className="relative">
-                    {/* Year Marker */}
+                    {/* 2024 Year Marker */}
                     <div className="flex items-center justify-center mb-16">
                         <div className="relative px-8 py-4 rounded-2xl bg-gradient-to-r from-cyan-500/20 to-violet-500/20 border border-cyan-500/30 backdrop-blur-sm">
                             <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-cyan-500/10 to-violet-500/10 animate-pulse" />
                             <span className="relative text-2xl md:text-3xl font-bold bg-gradient-to-r from-cyan-300 to-violet-300 bg-clip-text text-transparent">
-                                2024 - 2025
+                                2024
                             </span>
                         </div>
                     </div>
 
-                    {/* Timeline Items */}
+                    {/* 2024 Timeline Items */}
                     <div className="relative">
-                        {timelineData.map((project, index) => (
+                        {projects2024.map((project, index) => (
                             <TimelineItem
-                                key={index}
+                                key={`2024-${index}`}
                                 project={project}
                                 index={index}
-                                isLast={index === timelineData.length - 1}
+                                isLast={false}
                                 quarter={project.quarter}
                                 year={project.year}
-                                isFirstJob={index === timelineData.length - 1} // Last project is the first job
+                                isFirstJob={index === projects2024.length - 1} // Last project in 2024 is the job (Inverater)
+                            />
+                        ))}
+                    </div>
+
+                    {/* 2025 Year Marker */}
+                    <div className="flex items-center justify-center mb-16 mt-24">
+                        <div className="relative px-8 py-4 rounded-2xl bg-gradient-to-r from-emerald-500/20 to-blue-500/20 border border-emerald-500/30 backdrop-blur-sm">
+                            <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-emerald-500/10 to-blue-500/10 animate-pulse" />
+                            <span className="relative text-2xl md:text-3xl font-bold bg-gradient-to-r from-emerald-300 to-blue-300 bg-clip-text text-transparent">
+                                2025
+                            </span>
+                        </div>
+                    </div>
+
+                    {/* 2025 Timeline Items */}
+                    <div className="relative">
+                        {projects2025.map((project, index) => (
+                            <TimelineItem
+                                key={`2025-${index}`}
+                                project={project}
+                                index={projects2024.length + index}
+                                isLast={index === projects2025.length - 1}
+                                quarter={project.quarter}
+                                year={project.year}
+                                isFirstJob={false} // No job markers in 2025 since current job is in 2024
                             />
                         ))}
                     </div>
