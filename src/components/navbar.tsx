@@ -56,8 +56,15 @@ export default function Navbar() {
           {/* Left: Brand */}
           <div className="relative z-10 flex min-w-0 items-center gap-2">
             <Link href="#top" className="group inline-flex items-center gap-2">
-              <span className="inline-block h-2 w-2 rounded-full bg-gradient-to-r from-gray-300 via-gray-400 to-gray-500 group-hover:from-white group-hover:to-gray-400 transition-colors"></span>
-              <span className="text-sm font-semibold tracking-wide text-white/90 group-hover:text-white shimmer-text">No logo yet</span>
+              <div className="flex items-center font-mono text-base font-bold tracking-tight">
+                <span className="text-cyan-400 group-hover:text-cyan-300 transition-colors duration-200">&lt;</span>
+                <span className="mx-1 bg-gradient-to-r from-white via-gray-100 to-gray-200 bg-clip-text text-transparent group-hover:from-white group-hover:via-white group-hover:to-gray-100 transition-all duration-200">
+                  Alexis Reyna
+                </span>
+                <span className="text-cyan-400 group-hover:text-cyan-300 transition-colors duration-200">/&gt;</span>
+              </div>
+              {/* Optional: Cursor blink effect */}
+              <div className="ml-1 inline-block h-4 w-0.5 bg-cyan-400 opacity-0 group-hover:opacity-100 group-hover:animate-pulse transition-opacity duration-200"></div>
             </Link>
           </div>
 

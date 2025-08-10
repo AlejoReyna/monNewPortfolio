@@ -3,7 +3,7 @@ export default function Footer() {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="relative mt-24 border-t border-white/10 bg-gradient-to-b from-black via-gray-950 to-black">
+    <footer className="relative border-t border-white/10 bg-gradient-to-b from-black via-gray-950 to-black">
       {/* Background gradient orbs */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
         <div
