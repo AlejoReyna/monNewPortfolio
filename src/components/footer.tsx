@@ -23,8 +23,13 @@ export default function Footer() {
           {/* Brand */}
           <div>
             <div className="inline-flex items-center gap-2">
-              <span className="inline-block h-2 w-2 rounded-full bg-gradient-to-r from-gray-300 via-gray-400 to-gray-500" />
-              <span className="text-sm font-semibold tracking-wide text-white">Alexis</span>
+              <div className="flex items-center font-mono text-lg font-bold tracking-tight">
+                <span className="text-cyan-400 transition-colors duration-200">&lt;</span>
+                <span className="mx-1 bg-gradient-to-r from-white via-gray-100 to-gray-200 bg-clip-text text-transparent transition-all duration-200">
+                  Alexis Reyna
+                </span>
+                <span className="text-cyan-400 transition-colors duration-200">/&gt;</span>
+              </div>
             </div>
             <p className="mt-3 max-w-xs text-sm leading-relaxed text-gray-400">
               Fullstack Developer — construyo interfaces limpias, rápidas y accesibles con foco en producto.
