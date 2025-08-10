@@ -83,7 +83,7 @@ export default function Navbar() {
           <div className="relative z-10 flex items-center gap-2">
             <a
               href="#contact"
-              className="relative hidden sm:inline-flex items-center gap-2 rounded-full gradient-border bg-gradient-to-r from-gray-800/60 to-gray-900/60 px-4 py-1.5 text-sm font-medium text-gray-100 shadow-inner shadow-white/5 transition-all hover:from-gray-700/70 hover:to-gray-800/70 hover:shadow-white/10"
+              className="relative hidden sm:inline-flex items-center gap-2 rounded-full gradient-border bg-gradient-to-r from-slate-800/80 via-blue-900/60 to-violet-900/70 px-4 py-1.5 text-sm font-medium text-white shadow-inner shadow-cyan-400/10 transition-all hover:from-slate-700/90 hover:via-blue-800/70 hover:to-violet-800/80 hover:shadow-cyan-400/20 hover:scale-[1.02]"
             >
               <span>Let’s talk</span>
               <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">
