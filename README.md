@@ -1,6 +1,11 @@
+## Alexis Reyna — Developer Portfolio
 
-## My 2025 updated portfolio
+- Live: https://my-portfolio-tau-lovat-90.vercel.app/
+- Stack: Next.js 15 (App Router), React 19, TypeScript, Tailwind CSS v4, next/font (Geist)
 
+---
+
+## Overview
 
 This portfolio is a modern, bilingual (EN/ES) single‑page experience with:
 
@@ -167,8 +172,7 @@ const servicesEn: Service[] = [ { title: 'Web Apps', description: 'Modern apps..
 // showcase.tsx (projects excerpt)
 export const projects = [
   { title: "Presale website of the videogame 'Mortal Kombat 1'", info: "Simulates preorder flow...", video: "/videos/preview-mk.mp4", url: "https://next-mk.vercel.app/", repo: "https://github.com/AlejoReyna/MortalKombat" },
-  { title: "PokeFolio - My developer portfolio", info: "Pokemon-themed portfolio...", video: "/videos/preview-pokefolio.mp4", url: "https://pokefolio.vercel.app/", repo: "https://github.com/AlejoReyna/PokeFolio" },
-  // ...
+  // ... other projects
 ];
 ```
 
@@ -261,6 +265,8 @@ Images: `next.config.ts` allows remote icons from `raw.githubusercontent.com` (u
 - Contact form is client‑only; wire to an API route or service (Resend, Formspree, etc.).
 - Some `projects` entries have empty `url`/`repo` — already handled to hide buttons when missing.
 - Remote tech icons may be rate‑limited; mirror locally if needed and update `next.config.ts`.
-- Music continuity (from your prior project note) would require a persistent audio layer at the layout level or a service worker/audio worklet to avoid restarts on navigation.
+
+
+
 
 
