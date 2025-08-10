@@ -51,7 +51,7 @@ export default function Hero({
         {/* Mobile Background Character - Only visible on mobile */}
         <div className="md:hidden absolute inset-0 z-10 flex items-center justify-center">
           <div 
-            className="relative w-full max-w-[400px] aspect-[768/1211] opacity-80"
+            className="relative w-full max-w-[400px] aspect-[768/1211]"
             style={mounted ? {
               transform: `translate(${(mousePos.x - (typeof window !== 'undefined' ? window.innerWidth / 2 : 0)) / 200}px, ${(mousePos.y - (typeof window !== 'undefined' ? window.innerHeight / 2 : 0)) / 200}px)`
             } : {}}
@@ -62,7 +62,7 @@ export default function Hero({
               fill 
               unoptimized 
               priority 
-              className="rounded-xl object-contain bg-transparent" 
+              className="rounded-xl object-contain bg-transparent drop-shadow-2xl" 
             />
           </div>
         </div>
@@ -89,7 +89,7 @@ export default function Hero({
 
           {/* Main Title */}
           <h1 className="text-4xl lg:text-6xl font-bold text-white mb-6 leading-tight">
-            Hi! I'm{' '}
+            Hi! I&apos;m{' '}
             <span className="relative">
               <span className="bg-gradient-to-r from-white via-gray-200 to-gray-400 bg-clip-text text-transparent">
                 {title}
