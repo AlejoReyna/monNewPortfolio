@@ -449,33 +449,6 @@ export default function Showcase() {
                     </div>
                 </div>
 
-                {/* Call to Action */}
-                <div className="text-center mt-20">
-                    <div className="inline-flex flex-col items-center gap-6 p-8 rounded-2xl bg-gradient-to-br from-white/5 to-white/[0.02] border border-white/10 backdrop-blur-sm">
-                        <div>
-                            <h3 className="text-2xl font-bold text-white mb-2">
-                                Ready to create something amazing?
-                            </h3>
-                            <p className="text-gray-400">
-                                Let's collaborate and build the next innovative solution together.
-                            </p>
-                        </div>
-                        <div className="flex gap-4">
-                            <a
-                                href="#contact"
-                                className="px-8 py-3 bg-gradient-to-r from-cyan-500 to-violet-500 text-white font-semibold rounded-full hover:from-cyan-400 hover:to-violet-400 transition-all duration-300 hover:shadow-lg hover:shadow-cyan-500/25 hover:scale-105"
-                            >
-                                Start a Project
-                            </a>
-                            <a
-                                href="#services"
-                                className="px-8 py-3 border border-white/20 text-gray-300 font-semibold rounded-full hover:bg-white/10 hover:text-white transition-all duration-300"
-                            >
-                                View Services
-                            </a>
-                        </div>
-                    </div>
-                </div>
             </div>
         </section>
     );
