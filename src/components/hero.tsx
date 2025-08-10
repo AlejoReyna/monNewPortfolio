@@ -113,7 +113,7 @@ export default function Hero({
         href="#toggle-lang"
         onClick={(e) => { e.preventDefault(); toggleWithFade(); }}
         aria-label={isEs ? "Click for English" : "Click aquí para ver en español"}
-        className="absolute left-0 top-24 z-40 -translate-x-6 sm:-translate-x-8 hover:translate-x-0 transition-transform duration-300 bg-gray-800/70 text-gray-200 text-[11px] sm:text-xs font-medium px-3 py-1.5 rounded-r-full border border-gray-700/60 backdrop-blur-sm shadow-md shadow-black/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/60"
+        className="absolute left-0 top-24 z-40 translate-x-0 bg-gray-800/70 text-gray-200 text-[11px] sm:text-xs font-medium px-3 py-1.5 rounded-r-full border border-gray-700/60 backdrop-blur-sm shadow-md shadow-black/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/60"
       >
         {isEs ? 'Click for English' : 'Click aquí para ver en español'}
       </a>

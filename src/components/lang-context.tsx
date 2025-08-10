@@ -17,17 +17,12 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
   const [language, setLanguage] = useState<Language>("en");
   const [isFading, setIsFading] = useState(false);
 
-  // Initialize from localStorage or browser language
+  // Initialize: force English to avoid post-mount flips caused by stored values
   useEffect(() => {
+    setLanguage("en");
     try {
-      const stored = window.localStorage.getItem("app_lang");
-      if (stored === "en" || stored === "es") {
-        setLanguage(stored);
-        return;
-      }
+      window.localStorage.setItem("app_lang", "en");
     } catch {}
-    const browserLang = typeof navigator !== "undefined" ? navigator.language : "en";
-    setLanguage(browserLang.toLowerCase().startsWith("es") ? "es" : "en");
   }, []);
 
   useEffect(() => {
