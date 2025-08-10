@@ -79,7 +79,6 @@ export const projects: Project[] = [
 
 // Custom Intersection Observer Hook (sin dependencias externas)
 function useIntersectionObserver(options: IntersectionObserverInit = {}) {
-    const [isIntersecting, setIsIntersecting] = useState(false);
     const [hasTriggered, setHasTriggered] = useState(false);
     const ref = useRef<HTMLDivElement>(null);
 
@@ -89,11 +88,7 @@ function useIntersectionObserver(options: IntersectionObserverInit = {}) {
 
         const observer = new IntersectionObserver(
             ([entry]) => {
-                const isVisible = entry.isIntersecting;
-                setIsIntersecting(isVisible);
-                
-                // Trigger once logic
-                if (isVisible && !hasTriggered) {
+                if (entry.isIntersecting && !hasTriggered) {
                     setHasTriggered(true);
                 }
             },
@@ -116,13 +111,12 @@ function useIntersectionObserver(options: IntersectionObserverInit = {}) {
 interface TimelineItemProps {
     project: Project;
     index: number;
-    isLast: boolean;
     quarter: string;
     year: number;
     isFirstJob?: boolean;
 }
 
-function TimelineItem({ project, index, isLast, quarter, year, isFirstJob }: TimelineItemProps) {
+function TimelineItem({ project, index, quarter, year, isFirstJob }: TimelineItemProps) {
     const [ref, inView] = useIntersectionObserver();
     const [isPlaying, setIsPlaying] = useState(false);
     const videoRef = useRef<HTMLVideoElement>(null);
@@ -403,7 +397,6 @@ export default function Showcase() {
                                 key={`2024-${index}`}
                                 project={project}
                                 index={index}
-                                isLast={false}
                                 quarter={project.quarter}
                                 year={project.year}
                                 isFirstJob={index === projects2024.length - 1} // Last project in 2024 is the job (Inverater)
@@ -428,7 +421,6 @@ export default function Showcase() {
                                 key={`2025-${index}`}
                                 project={project}
                                 index={projects2024.length + index}
-                                isLast={index === projects2025.length - 1}
                                 quarter={project.quarter}
                                 year={project.year}
                                 isFirstJob={false} // No job markers in 2025 since current job is in 2024

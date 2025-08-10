@@ -30,8 +30,6 @@ export default function Hero({
 }: HeroProps) {
   const { language, toggleWithFade } = useLanguage();
   const isEs = language === 'es';
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
-  const [mounted, setMounted] = useState(false);
   const spotlightRef = useRef<HTMLDivElement | null>(null);
   const [typedIndex, setTypedIndex] = useState(0);
   const [subtitleTypedIndex, setSubtitleTypedIndex] = useState(0);
@@ -53,9 +51,7 @@ export default function Hero({
   }, [language]);
 
   useEffect(() => {
-    setMounted(true);
     const handleMouseMove = (e: MouseEvent) => {
-      setMousePos({ x: e.clientX, y: e.clientY });
       if (spotlightRef.current) {
         spotlightRef.current.style.setProperty('--x', `${e.clientX}px`);
         spotlightRef.current.style.setProperty('--y', `${e.clientY}px`);
@@ -80,7 +76,12 @@ export default function Hero({
     return () => clearTimeout(timeout);
   }, [typedIndex, fullLength, subtitleTypedIndex, subtitleText]);
 
-  const technologies = [
+  type Technology = {
+    name: string;
+    gradient: string;
+  } & ({ iconUrl: string } | { icon: string });
+
+  const technologies: Technology[] = [
     {
       name: 'TypeScript',
       gradient: 'from-blue-600 to-blue-400',
@@ -178,16 +179,16 @@ export default function Hero({
                       border: '1px solid transparent',
                     }}
                   >
-                    {('iconUrl' in tech && tech.iconUrl) ? (
+                    {'iconUrl' in tech ? (
                       <Image
-                        src={(tech as any).iconUrl}
+                        src={tech.iconUrl}
                         alt={`${tech.name} icon`}
                         width={16}
                         height={16}
                         className="h-4 w-4 object-contain"
                       />
                     ) : (
-                      <span className="text-sm">{(tech as any).icon}</span>
+                      <span className="text-sm">{tech.icon}</span>
                     )}
                     {tech.name}
                   </span>
@@ -202,16 +203,16 @@ export default function Hero({
                     }}
                     aria-hidden="true"
                   >
-                    {('iconUrl' in tech && tech.iconUrl) ? (
+                    {'iconUrl' in tech ? (
                       <Image
-                        src={(tech as any).iconUrl}
+                        src={tech.iconUrl}
                         alt={`${tech.name} icon`}
                         width={16}
                         height={16}
                         className="h-4 w-4 object-contain"
                       />
                     ) : (
-                      <span className="text-sm">{(tech as any).icon}</span>
+                      <span className="text-sm">{tech.icon}</span>
                     )}
                     {tech.name}
                   </span>

@@ -302,7 +302,7 @@ export default function MiniGame() {
     return () => {
       el!.removeEventListener("click", onTapRestart);
     };
-  }, [best, isRunning, score]);
+  }, [best, isRunning, score, isEs]);
 
   return (
     <section
