@@ -144,9 +144,6 @@ function TimelineItem({ project, index, isLast, quarter, year, isFirstJob }: Tim
             ref={ref}
             className={`relative flex items-center w-full mb-16 md:mb-24`}
         >
-            {/* Timeline Line */}
-            <div className="absolute left-1/2 transform -translate-x-1/2 w-0.5 bg-gradient-to-b from-cyan-500/50 to-violet-500/50 h-full -z-10" />
-            
             {/* Timeline Node */}
             <div className={`absolute left-1/2 transform -translate-x-1/2 w-4 h-4 rounded-full border-2 transition-all duration-700 ${
                 inView 
@@ -322,10 +319,7 @@ function TimelineItem({ project, index, isLast, quarter, year, isFirstJob }: Tim
                 </div>
             )}
 
-            {/* Timeline Continuation */}
-            {!isLast && (
-                <div className="absolute left-1/2 transform -translate-x-1/2 top-full w-0.5 h-16 bg-gradient-to-b from-cyan-500/50 to-violet-500/30" />
-            )}
+            {/* Timeline Continuation removed: now handled by a single central line */}
         </div>
     );
 }
@@ -390,6 +384,8 @@ export default function Showcase() {
 
                 {/* Timeline */}
                 <div className="relative">
+                    {/* Central continuous timeline line */}
+                    <div className="pointer-events-none absolute left-1/2 transform -translate-x-1/2 top-0 bottom-0 w-0.5 bg-gradient-to-b from-cyan-500/50 via-violet-500/30 to-cyan-500/50 -z-10" />
                     {/* 2024 Year Marker */}
                     <div className="flex items-center justify-center mb-16">
                         <div className="relative px-8 py-4 rounded-2xl bg-gradient-to-r from-cyan-500/20 to-violet-500/20 border border-cyan-500/30 backdrop-blur-sm">
