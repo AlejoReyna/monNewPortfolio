@@ -161,7 +161,7 @@ export default function Hero({
         {/* Right Side - Character (Desktop Only) */}
         <div className="hidden md:block relative w-full max-w-[624px] sm:max-w-[696px] md:max-w-[768px] lg:max-w-[864px] aspect-[768/1211]">
           <div 
-            className="relative transform transition-transform duration-300 hover:scale-105 h-full w-full"
+            className="relative transform h-full w-full"
             style={mounted ? {
               transform: `translate(${(mousePos.x - (typeof window !== 'undefined' ? window.innerWidth / 2 : 0)) / 100}px, ${(mousePos.y - (typeof window !== 'undefined' ? window.innerHeight / 2 : 0)) / 100}px)`
             } : {}}
