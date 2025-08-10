@@ -1,6 +1,7 @@
 import Hero from "@/components/hero";
 import Showcase from "@/components/showcase";
 import Services from "@/components/services";
+import MiniGame from "@/components/mini-game";
 
 export default function Home() {
   return (
@@ -8,6 +9,7 @@ export default function Home() {
       <Hero />
       <Services />
       <Showcase />
+      <MiniGame />
     </main>
   );
 }
