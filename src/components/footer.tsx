@@ -16,30 +16,6 @@ export default function Footer() {
         />
       </div>
 
-      {/* Top CTA */}
-      <div className="relative z-10 mx-auto max-w-7xl px-6">
-        <div className="-translate-y-8 rounded-2xl border border-white/10 bg-white/[0.02] p-6 backdrop-blur-sm md:-translate-y-12 md:p-8">
-          <div className="flex flex-col items-start justify-between gap-6 md:flex-row md:items-center">
-            <div>
-              <h3 className="text-2xl font-semibold text-white md:text-3xl">
-                ¿Listo para construir algo increíble?
-              </h3>
-              <p className="mt-1 text-gray-400">
-                Diseño y desarrollo experiencias web modernas, rápidas y accesibles.
-              </p>
-            </div>
-            <a
-              href="#contact"
-              className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-gradient-to-r from-gray-800/60 to-gray-900/60 px-5 py-2.5 text-sm font-medium text-gray-100 shadow-inner shadow-white/5 transition-all hover:from-gray-700/70 hover:to-gray-800/70 hover:shadow-white/10"
-            >
-              <span>Hablemos</span>
-              <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
-              </svg>
-            </a>
-          </div>
-        </div>
-      </div>
 
       {/* Main content */}
       <div className="relative z-10 mx-auto max-w-7xl px-6 pb-10 pt-8">
