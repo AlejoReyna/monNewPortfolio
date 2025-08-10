@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, FormEvent } from "react";
+import { useLanguage } from "@/components/lang-context";
 
 type Interest =
   | "UI/UX design"
@@ -10,6 +11,8 @@ type Interest =
   | "Other";
 
 export default function LetsTalk() {
+  const { language } = useLanguage();
+  const isEs = language === 'es';
   const [selectedInterest, setSelectedInterest] = useState<Interest | null>(
     "UI/UX design"
   );
@@ -73,11 +76,23 @@ export default function LetsTalk() {
             id="contact-title"
             className="text-4xl font-bold text-white sm:text-5xl"
           >
-            Let’s discuss
-            <br />
-            on something <span className="bg-gradient-to-r from-pink-300 via-fuchsia-300 to-violet-300 bg-clip-text text-transparent">cool</span>
-            <br />
-            together
+            {isEs ? (
+              <>
+                Hablemos
+                <br />
+                de algo <span className="bg-gradient-to-r from-pink-300 via-fuchsia-300 to-violet-300 bg-clip-text text-transparent">genial</span>
+                <br />
+                juntos
+              </>
+            ) : (
+              <>
+                Let’s discuss
+                <br />
+                on something <span className="bg-gradient-to-r from-pink-300 via-fuchsia-300 to-violet-300 bg-clip-text text-transparent">cool</span>
+                <br />
+                together
+              </>
+            )}
           </h2>
 
           <ul className="mt-2 space-y-4 text-purple-100">
@@ -143,7 +158,7 @@ export default function LetsTalk() {
           >
             <fieldset>
               <legend className="mb-3 block text-sm font-medium text-purple-100">
-                I’m interested in…
+                {isEs ? 'Me interesa…' : 'I’m interested in…'}
               </legend>
               <div className="flex flex-wrap gap-2">
                 {interests.map((interest) => {
@@ -171,40 +186,40 @@ export default function LetsTalk() {
             <div className="mt-6 space-y-5">
               <div>
                 <label htmlFor="name" className="sr-only">
-                  Your name
+                  {isEs ? 'Tu nombre' : 'Your name'}
                 </label>
                 <input
                   id="name"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  placeholder="Your name"
+                  placeholder={isEs ? 'Tu nombre' : 'Your name'}
                   className="w-full rounded-md border border-purple-300/30 bg-purple-800/30 px-4 py-3 text-white placeholder-purple-300 outline-none ring-0 transition focus:border-purple-300/50 focus:bg-purple-700/40"
                   required
                 />
               </div>
               <div>
                 <label htmlFor="email" className="sr-only">
-                  Your email
+                  {isEs ? 'Tu correo' : 'Your email'}
                 </label>
                 <input
                   id="email"
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Your email"
+                  placeholder={isEs ? 'Tu correo' : 'Your email'}
                   className="w-full rounded-md border border-purple-300/30 bg-purple-800/30 px-4 py-3 text-white placeholder-purple-300 outline-none transition focus:border-purple-300/50 focus:bg-purple-700/40"
                   required
                 />
               </div>
               <div>
                 <label htmlFor="message" className="sr-only">
-                  Your message
+                  {isEs ? 'Tu mensaje' : 'Your message'}
                 </label>
                 <textarea
                   id="message"
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
-                  placeholder="Your message"
+                  placeholder={isEs ? 'Tu mensaje' : 'Your message'}
                   rows={5}
                   className="w-full resize-y rounded-md border border-purple-300/30 bg-purple-800/30 px-4 py-3 text-white placeholder-purple-300 outline-none transition focus:border-purple-300/50 focus:bg-purple-700/40"
                   required
@@ -213,14 +228,14 @@ export default function LetsTalk() {
 
               <div className="flex items-center justify-between">
                 <p className="text-xs text-purple-200">
-                  By sending, you agree to be contacted about your request.
+                  {isEs ? 'Al enviar aceptas ser contactado respecto a tu solicitud.' : 'By sending, you agree to be contacted about your request.'}
                 </p>
                 <button
                   type="submit"
                   disabled={isSubmitting || !name || !email || !message}
                   className="group relative inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-pink-600 to-fuchsia-600 px-5 py-2.5 text-sm font-semibold text-white shadow-lg transition-all hover:scale-[1.02] hover:shadow-xl disabled:opacity-60"
                 >
-                  <span>{isSubmitting ? "Sending…" : "Send Message"}</span>
+                  <span>{isSubmitting ? (isEs ? 'Enviando…' : 'Sending…') : (isEs ? 'Enviar mensaje' : 'Send Message')}</span>
                   <svg className="h-4 w-4 transition-transform group-hover:translate-x-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 12h14M12 5l7 7-7 7" />
                   </svg>
@@ -228,7 +243,7 @@ export default function LetsTalk() {
               </div>
 
               {submitted && (
-                <p className="mt-2 text-sm text-emerald-400">Thanks! I’ll get back to you shortly.</p>
+                <p className="mt-2 text-sm text-emerald-400">{isEs ? '¡Gracias! Me pondré en contacto pronto.' : 'Thanks! I’ll get back to you shortly.'}</p>
               )}
             </div>
           </form>

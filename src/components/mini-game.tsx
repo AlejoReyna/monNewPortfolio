@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useLanguage } from "@/components/lang-context";
 
 type Enemy = {
   x: number;
@@ -19,6 +20,8 @@ const BASE_WIDTH = 640;
 const BASE_HEIGHT = 360;
 
 export default function MiniGame() {
+  const { language } = useLanguage();
+  const isEs = language === 'es';
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const rafRef = useRef<number | null>(null);
   const lastTimeRef = useRef<number | null>(null);
@@ -193,6 +196,10 @@ export default function MiniGame() {
     }
 
     function render(ctx2: CanvasRenderingContext2D) {
+      const LABEL_SCORE = isEs ? 'Puntaje' : 'Score';
+      const LABEL_BEST = isEs ? 'Mejor' : 'Best';
+      const LABEL_GAME_OVER = isEs ? 'Fin del juego' : 'Game Over';
+      const LABEL_RESTART = isEs ? 'Espacio / Tocar para reiniciar' : 'Press Space / Tap to Restart';
       // clear
       ctx2.clearRect(0, 0, BASE_WIDTH, BASE_HEIGHT);
 
@@ -238,8 +245,8 @@ export default function MiniGame() {
       // score
       ctx2.fillStyle = "rgba(255,255,255,0.9)";
       ctx2.font = "bold 16px ui-sans-serif, system-ui, -apple-system";
-      ctx2.fillText(`Score: ${Math.floor(score)}`, 12, 22);
-      ctx2.fillText(`Best: ${best}`, 12, 42);
+      ctx2.fillText(`${LABEL_SCORE}: ${Math.floor(score)}`, 12, 22);
+      ctx2.fillText(`${LABEL_BEST}: ${best}`, 12, 42);
 
       if (!isRunning) {
         ctx2.fillStyle = "rgba(0,0,0,0.5)";
@@ -247,9 +254,9 @@ export default function MiniGame() {
         ctx2.fillStyle = "white";
         ctx2.font = "bold 24px ui-sans-serif, system-ui, -apple-system";
         ctx2.textAlign = "center";
-        ctx2.fillText("Game Over", BASE_WIDTH / 2, BASE_HEIGHT / 2 - 12);
+        ctx2.fillText(LABEL_GAME_OVER, BASE_WIDTH / 2, BASE_HEIGHT / 2 - 12);
         ctx2.font = "16px ui-sans-serif, system-ui, -apple-system";
-        ctx2.fillText("Press Space / Tap to Restart", BASE_WIDTH / 2, BASE_HEIGHT / 2 + 16);
+        ctx2.fillText(LABEL_RESTART, BASE_WIDTH / 2, BASE_HEIGHT / 2 + 16);
         ctx2.textAlign = "start";
       }
     }
@@ -306,11 +313,13 @@ export default function MiniGame() {
       <div className="mx-auto max-w-3xl text-center">
         <h2 className="text-3xl font-bold tracking-tight text-white sm:text-5xl">
           <span className="bg-gradient-to-r from-white via-white to-gray-300 bg-clip-text text-transparent">
-            Mini‑Game
+            {isEs ? 'Mini‑Juego' : 'Mini‑Game'}
           </span>
         </h2>
         <p className="mx-auto mt-3 max-w-xl text-sm text-gray-400 sm:text-base">
-          Mueve la barra para esquivar los bloques. Usa ← → / A D o toca para moverte.
+          {isEs
+            ? 'Mueve la barra para esquivar los bloques. Usa ← → / A D o toca para moverte.'
+            : 'Move the paddle to dodge blocks. Use ← → / A D or tap to move.'}
         </p>
       </div>
 
@@ -335,9 +344,9 @@ export default function MiniGame() {
             <span className="hidden sm:inline">o</span>
             <kbd className="rounded-md border border-white/10 bg-white/5 px-2 py-1">A</kbd>
             <kbd className="rounded-md border border-white/10 bg-white/5 px-2 py-1">D</kbd>
-            <span>• Tap/Click para moverte</span>
+            <span>{isEs ? '• Toca/Clic para moverte' : '• Tap/Click to move'}</span>
             <span className="hidden sm:inline">•</span>
-            <span>Espacio para reiniciar</span>
+            <span>{isEs ? 'Espacio para reiniciar' : 'Space to restart'}</span>
           </div>
 
           {!isReady && (

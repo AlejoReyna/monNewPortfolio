@@ -319,7 +319,7 @@ export default function Showcase() {
                   </button>
                   
                   <div className="flex gap-2">
-                    <a
+                <a
                       href={project.link}
                       className="p-2 text-gray-400 hover:text-white transition-colors rounded-full hover:bg-white/10"
                       onClick={(e) => e.stopPropagation()}
@@ -328,7 +328,7 @@ export default function Showcase() {
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                       </svg>
                     </a>
-                    <a
+                <a
                       href={project.github}
                       className="p-2 text-gray-400 hover:text-white transition-colors rounded-full hover:bg-white/10"
                       onClick={(e) => e.stopPropagation()}

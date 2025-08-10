@@ -1,9 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useLanguage } from "@/components/lang-context";
 import Link from "next/link";
 
 export default function Navbar() {
+  const { language } = useLanguage();
+  const isEs = language === 'es';
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -71,9 +74,9 @@ export default function Navbar() {
           {/* Center: Nav links (desktop) */}
           <nav className="relative z-10 hidden items-center gap-1 sm:flex">
             {[
-              { href: "/", label: "Home" },
-              { href: "#services", label: "Services" },
-              { href: "#projects", label: "Projects" },
+              { href: "/", label: isEs ? "Inicio" : "Home" },
+              { href: "#services", label: isEs ? "Servicios" : "Services" },
+              { href: "#projects", label: isEs ? "Proyectos" : "Projects" },
             ].map((item) => (
               <Link
                 key={item.label}
@@ -91,7 +94,7 @@ export default function Navbar() {
               href="#contact"
               className="relative hidden sm:inline-flex items-center gap-2 rounded-full gradient-border bg-gradient-to-r from-slate-800/80 via-blue-900/60 to-violet-900/70 px-4 py-1.5 text-sm font-medium text-white shadow-inner shadow-cyan-400/10 transition-all hover:from-slate-700/90 hover:via-blue-800/70 hover:to-violet-800/80 hover:shadow-cyan-400/20 hover:scale-[1.02]"
             >
-              <span>Let’s talk</span>
+              <span>{isEs ? 'Hablemos' : 'Let’s talk'}</span>
               <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
               </svg>
@@ -128,10 +131,10 @@ export default function Navbar() {
         >
           <div className="mx-2 mt-2 rounded-2xl border border-white/10 bg-black/40 backdrop-blur-md p-2">
             {[
-              { href: "/", label: "Home" },
-              { href: "#services", label: "Services" },
-              { href: "#projects", label: "Projects" },
-              { href: "#contact", label: "Contact" },
+              { href: "/", label: isEs ? "Inicio" : "Home" },
+              { href: "#services", label: isEs ? "Servicios" : "Services" },
+              { href: "#projects", label: isEs ? "Proyectos" : "Projects" },
+              { href: "#contact", label: isEs ? "Contacto" : "Contact" },
             ].map((item) => (
               <Link
                 key={item.label}

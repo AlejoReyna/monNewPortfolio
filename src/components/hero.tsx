@@ -1,6 +1,7 @@
 "use client";
 import Image from "next/image";
 import { useState, useEffect, useRef } from 'react';
+import { useLanguage } from "@/components/lang-context";
 
 type HeroProps = {
   title?: string;
@@ -27,6 +28,8 @@ export default function Hero({
   subtitle = "Full-stack developer creating intuitive user experiences and powerful backend architectures for modern businesses.",
   className,
 }: HeroProps) {
+  const { language, toggleWithFade } = useLanguage();
+  const isEs = language === 'es';
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [mounted, setMounted] = useState(false);
   const spotlightRef = useRef<HTMLDivElement | null>(null);
@@ -34,11 +37,20 @@ export default function Hero({
   const [subtitleTypedIndex, setSubtitleTypedIndex] = useState(0);
 
   // Typewriter setup
-  const prefixText = "Hey, I'm ";
+  const prefixText = isEs ? "Hola, soy " : "Hey, I'm ";
   const nameText = title;
   const fullLength = prefixText.length + nameText.length;
   const finalTitle = `${prefixText}${nameText}`;
-  const isSubtitleDone = typedIndex >= fullLength && subtitleTypedIndex >= subtitle.length;
+  const subtitleText = isEs
+    ? "Desarrollador full‑stack creando experiencias intuitivas y arquitecturas backend potentes para negocios modernos."
+    : subtitle;
+  const isSubtitleDone = typedIndex >= fullLength && subtitleTypedIndex >= subtitleText.length;
+
+  // Reset typewriter when language changes
+  useEffect(() => {
+    setTypedIndex(0);
+    setSubtitleTypedIndex(0);
+  }, [language]);
 
   useEffect(() => {
     setMounted(true);
@@ -63,10 +75,10 @@ export default function Hero({
   // Start subtitle typewriter after title completes
   useEffect(() => {
     if (typedIndex < fullLength) return;
-    if (subtitleTypedIndex >= subtitle.length) return;
+    if (subtitleTypedIndex >= subtitleText.length) return;
     const timeout = setTimeout(() => setSubtitleTypedIndex((v) => v + 1), 30);
     return () => clearTimeout(timeout);
-  }, [typedIndex, fullLength, subtitleTypedIndex, subtitle]);
+  }, [typedIndex, fullLength, subtitleTypedIndex, subtitleText]);
 
   const technologies = [
     {
@@ -98,11 +110,12 @@ export default function Hero({
     <section className={`relative min-h-screen bg-gradient-to-br from-black via-gray-900 to-black overflow-hidden ${className}`}>
       {/* Side language tab */}
       <a
-        href="#es"
-        aria-label="Click aquí para ver en español"
+        href="#toggle-lang"
+        onClick={(e) => { e.preventDefault(); toggleWithFade(); }}
+        aria-label={isEs ? "Click for English" : "Click aquí para ver en español"}
         className="absolute left-0 top-24 z-40 -translate-x-6 sm:-translate-x-8 hover:translate-x-0 transition-transform duration-300 bg-gray-800/70 text-gray-200 text-[11px] sm:text-xs font-medium px-3 py-1.5 rounded-r-full border border-gray-700/60 backdrop-blur-sm shadow-md shadow-black/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/60"
       >
-        Click aquí para ver en español
+        {isEs ? 'Click for English' : 'Click aquí para ver en español'}
       </a>
       {/* Animated Background Elements */}
       <div className="absolute inset-0">
@@ -240,13 +253,13 @@ export default function Hero({
           {/* Description */}
           <div className="text-lg lg:text-xl text-gray-300 mb-8 font-light relative">
             {/* Placeholder to reserve final height */}
-            <p className="opacity-0 select-none text-gray-400">{subtitle}</p>
+            <p className="opacity-0 select-none text-gray-400">{subtitleText}</p>
             {/* Overlay typed content */}
             <div className="absolute inset-0">
               <span className="text-gray-400">
-                {subtitle.slice(0, subtitleTypedIndex)}
+                {subtitleText.slice(0, subtitleTypedIndex)}
               </span>
-              {typedIndex >= fullLength && subtitleTypedIndex < subtitle.length && (
+              {typedIndex >= fullLength && subtitleTypedIndex < subtitleText.length && (
                 <span className="ml-[1px] inline-block w-[2px] h-[1em] align-[-0.1em] bg-gray-300/80 animate-pulse" />
               )}
             </div>
@@ -259,7 +272,7 @@ export default function Hero({
                 href="#projects"
                 className="group relative gradient-border px-6 py-3 bg-gradient-to-r from-gray-800 to-gray-900 text-white font-semibold rounded-full overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-gray-500/25 text-center border border-transparent text-sm"
               >
-                <span className="relative z-10">View my work</span>
+                <span className="relative z-10">{isEs ? 'Ver mi trabajo' : 'View my work'}</span>
                 <div className="absolute inset-0 bg-gradient-to-r from-gray-700 to-gray-800 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 <div className="absolute -top-1 -left-1 w-full h-full border-2 border-gray-600 rounded-full opacity-0 group-hover:opacity-100 group-hover:scale-110 transition-all duration-300"></div>
               </a>
@@ -269,7 +282,7 @@ export default function Hero({
                 className="group relative gradient-border px-6 py-3 text-gray-300 font-semibold rounded-full bg-transparent hover:bg-gray-600 hover:text-white transition-all duration-300 hover:scale-105 backdrop-blur-sm text-center text-sm border border-transparent"
               >
                 <span className="flex items-center justify-center gap-2">
-                  Contact me
+                  {isEs ? 'Contáctame' : 'Contact me'}
                   <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                   </svg>

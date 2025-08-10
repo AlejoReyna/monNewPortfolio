@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, type ReactElement } from "react";
+import { useLanguage } from "@/components/lang-context";
 
 type Service = {
   title: string;
@@ -10,7 +11,7 @@ type Service = {
   icon: (props: { className?: string }) => ReactElement;
 };
 
-const services: Service[] = [
+const servicesEs: Service[] = [
   {
     title: "Web Apps",
     description:
@@ -85,10 +86,87 @@ const services: Service[] = [
   },
 ];
 
+const servicesEn: Service[] = [
+  {
+    title: "Web Apps",
+    description:
+      "Modern apps with Next.js, React and TypeScript: fast, accessible and scalable.",
+    highlights: ["SSR/SSG", "Performance", "Accessibility"],
+    gradientFromTo: "from-sky-500/20 to-cyan-500/10",
+    icon: ({ className }) => (
+      <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 5h18M3 9h18M7 13h10M9 17h6" />
+      </svg>
+    ),
+  },
+  {
+    title: "UI/UX & Interactions",
+    description:
+      "Clean interfaces with micro‑interactions and smooth transitions for memorable experiences.",
+    highlights: ["Animations", "Design Systems", "Responsive"],
+    gradientFromTo: "from-violet-500/20 to-fuchsia-500/10",
+    icon: ({ className }) => (
+      <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 7h16M4 12h10M4 17h7" />
+      </svg>
+    ),
+  },
+  {
+    title: "APIs & Backends",
+    description:
+      "Robust APIs with Node.js and best practices: authentication, caching and scalability.",
+    highlights: ["REST/GraphQL", "Auth", "Observability"],
+    gradientFromTo: "from-amber-500/20 to-orange-500/10",
+    icon: ({ className }) => (
+      <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 3v18m9-9H3" />
+      </svg>
+    ),
+  },
+  {
+    title: "Performance & SEO",
+    description:
+      "Audits and Core Web Vitals optimization to improve ranking and conversion.",
+    highlights: ["CWV", "Lighthouse 95+", "Technical SEO"],
+    gradientFromTo: "from-emerald-500/20 to-teal-500/10",
+    icon: ({ className }) => (
+      <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 12l7-9 7 9-7 9-7-9z" />
+      </svg>
+    ),
+  },
+  {
+    title: "E2E Integrations",
+    description:
+      "Third‑party integrations (Stripe, Supabase, CMS) with security and great DX.",
+    highlights: ["Stripe", "CMS", "Supabase"],
+    gradientFromTo: "from-indigo-500/20 to-cyan-500/10",
+    icon: ({ className }) => (
+      <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 12h12M6 12l4 4m-4-4l4-4" />
+      </svg>
+    ),
+  },
+  {
+    title: "Consulting",
+    description:
+      "Technical mentoring, code reviews and roadmap to accelerate your product.",
+    highlights: ["Architecture", "Best practices", "Scalability"],
+    gradientFromTo: "from-pink-500/20 to-rose-500/10",
+    icon: ({ className }) => (
+      <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 9h8m-8 4h5M5 21l2-4h10l2 4M12 3v4" />
+      </svg>
+    ),
+  },
+];
+
 export default function Services() {
+  const { language } = useLanguage();
+  const isEs = language === 'es';
   const sectionRef = useRef<HTMLDivElement | null>(null);
   const [visibleCards, setVisibleCards] = useState<boolean[]>(
-    () => new Array(services.length).fill(false)
+    () => new Array((isEs ? servicesEs : servicesEn).length).fill(false)
   );
 
   useEffect(() => {
@@ -143,11 +221,13 @@ export default function Services() {
       <div className="relative z-10 mx-auto max-w-6xl px-6 text-center">
         <h2 className="text-4xl font-bold tracking-tight text-white sm:text-6xl">
           <span className="bg-gradient-to-r from-white via-white to-gray-300 bg-clip-text text-transparent">
-            Servicios
+            {isEs ? 'Servicios' : 'Services'}
           </span>
         </h2>
         <p className="mx-auto mt-4 max-w-2xl text-base text-gray-400 sm:text-lg">
-          Soluciones end‑to‑end con foco en rendimiento, accesibilidad y una UX impecable.
+          {isEs
+            ? 'Soluciones end‑to‑end con foco en rendimiento, accesibilidad y una UX impecable.'
+            : 'End‑to‑end solutions focused on performance, accessibility, and outstanding UX.'}
         </p>
         <div className="mx-auto mt-6 h-px w-24 bg-gradient-to-r from-transparent via-white/40 to-transparent" />
       </div>
@@ -155,7 +235,7 @@ export default function Services() {
       {/* Grid */}
       <div ref={sectionRef} className="relative z-10 mx-auto mt-14 max-w-6xl px-6">
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {services.map((service, index) => {
+          {(isEs ? servicesEs : servicesEn).map((service, index) => {
             const isVisible = visibleCards[index];
             const translateY = isVisible ? 0 : 40;
             const opacity = isVisible ? 1 : 0;
@@ -211,7 +291,7 @@ export default function Services() {
 
                 {/* CTA */}
                 <div className="relative z-10 mt-5 inline-flex items-center gap-2 text-sm font-medium text-white/70 transition-all group-hover:text-white">
-                  <span>Más info</span>
+                  <span>{isEs ? 'Más info' : 'More info'}</span>
                   <svg className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
                   </svg>
