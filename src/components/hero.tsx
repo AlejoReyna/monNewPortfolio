@@ -108,7 +108,7 @@ export default function Hero({
   ];
 
   return (
-    <section className={`relative min-h-screen bg-gradient-to-br from-black via-gray-900 to-black overflow-hidden ${className}`}>
+    <section className={`relative min-h-screen overflow-hidden ${className}`}>
       {/* Side language tab */}
       <a
         href="#toggle-lang"
@@ -118,46 +118,18 @@ export default function Hero({
       >
         {isEs ? 'Click for English' : 'Click aquí para ver en español'}
       </a>
-      {/* Animated Background Elements */}
-      <div className="absolute inset-0">
-        {/* Grid Pattern */}
-        <div className="absolute inset-0 opacity-5">
-          <div className="grid grid-cols-12 gap-4 h-full">
-            {[...Array(144)].map((_, i) => (
-              <div key={i} className="border border-gray-300"></div>
-            ))}
-          </div>
-        </div>
-
-        {/* Aurora backdrop */}
-        <div className="aurora absolute inset-0" />
-
-        {/* Gradient Orbs */}
-        <div className="absolute top-20 left-20 w-72 h-72 bg-gray-600 rounded-full mix-blend-multiply filter blur-2xl opacity-10 animate-pulse"></div>
-        <div className="absolute bottom-20 right-20 w-72 h-72 bg-gray-500 rounded-full mix-blend-multiply filter blur-2xl opacity-10 animate-pulse" style={{ animationDelay: '1s' }}></div>
-
-        {/* Cursor spotlight layer */}
-        <div ref={spotlightRef} className="cursor-spotlight" />
+      {/* Playful midnight background with drifting pastel blobs */}
+      <div className="absolute inset-0 bg-gradient-to-br from-slate-950 via-sky-950 to-slate-950">
+        <div className="absolute top-8 -left-16 w-72 h-72 bg-cyan-400/30 rounded-full blur-3xl animate-[drift_22s_ease-in-out_infinite_alternate]"></div>
+        <div className="absolute bottom-10 -right-16 w-80 h-80 bg-pink-400/25 rounded-full blur-3xl animate-[drift_26s_ease-in-out_infinite_alternate]" style={{ animationDelay: '2s' }}></div>
+        <div className="absolute top-[40%] left-[60%] w-64 h-64 bg-amber-300/20 rounded-full blur-3xl animate-[drift_28s_ease-in-out_infinite_alternate]" style={{ animationDelay: '4s' }}></div>
+        <div className="absolute top-[65%] left-[22%] w-56 h-56 bg-lime-300/20 rounded-full blur-3xl animate-[drift_24s_ease-in-out_infinite_alternate]" style={{ animationDelay: '1s' }}></div>
       </div>
 
       {/* Main Content */}
       <div className="relative z-10 mx-auto grid max-w-6xl items-center gap-8 md:gap-12 px-6 sm:px-8 py-20 md:py-28 min-h-screen md:grid-cols-2">
         
-        {/* Mobile Background Character - Only visible on mobile */}
-        <div className="md:hidden absolute inset-0 z-10 flex items-center justify-center">
-          <div 
-            className="relative w-full max-w-[400px] aspect-[768/1211]"
-          >
-            <Image 
-              src="/16.gif" 
-              alt="Avatar animado" 
-              fill 
-              unoptimized 
-              priority 
-              className="z-10 rounded-xl object-contain bg-transparent brightness-110 contrast-105 saturate-110" 
-            />
-          </div>
-        </div>
+        {/* Mobile Background Character removed */}
 
         {/* Left Side - Text Content */}
         <div className="space-y-6 relative z-20 md:-mt-6 lg:-mt-10">
@@ -166,7 +138,7 @@ export default function Hero({
           <div className="relative z-30">
 
           {/* Main Title */}
-          <h1 className="text-4xl lg:text-6xl font-bold text-white mb-6 leading-tight text-center md:text-left" aria-label={`Hey, I'm ${title}`}>
+          <h1 className="text-4xl lg:text-6xl font-bold text-white mb-6 leading-tight text-center md:text-left hero-title" aria-label={`Hey, I'm ${title}`}>
             <span className="relative block">
               {/* Placeholder to reserve final height */}
               <span className="opacity-0 select-none">{finalTitle}</span>
@@ -178,7 +150,7 @@ export default function Hero({
                 <span
                   className={
                     typedIndex >= fullLength
-                      ? "bg-gradient-to-r from-sky-400 via-cyan-300 to-violet-400 bg-clip-text text-transparent"
+                      ? "bg-gradient-to-r from-sky-400 via-emerald-300 to-amber-300 bg-clip-text text-transparent"
                       : "text-white"
                   }
                 >
@@ -195,8 +167,22 @@ export default function Hero({
             </span>
           </h1>
 
+          {/* Mobile circular avatar */}
+          <div className="md:hidden flex justify-center mb-8">
+            <div className="relative w-32 h-32">
+              <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full blur animate-pulse"></div>
+              <Image 
+                src="/avatar.jpg"
+                alt="Alexis"
+                width={128}
+                height={128}
+                className="relative rounded-full border-4 border-black/50"
+              />
+            </div>
+          </div>
+
           {/* Description */}
-          <div className="text-lg lg:text-xl text-gray-300 mb-8 font-light relative text-center md:text-left max-w-xl md:max-w-none mx-auto md:mx-0">
+          <div className="text-lg lg:text-xl text-gray-300 mb-8 font-light relative text-center md:text-left max-w-xl md:max-w-none mx-auto md:mx-0 hero-subtitle">
             {/* Placeholder to reserve final height */}
             <p className="opacity-0 select-none text-gray-400">{subtitleText}</p>
             {/* Overlay typed content */}
@@ -212,37 +198,30 @@ export default function Hero({
 
           {/* CTA Buttons (replacing metrics), centered */}
           <div className={`mb-8 transition-all duration-700 ${isSubtitleDone ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2 pointer-events-none'}`}>
-            <div className="flex flex-col sm:flex-row justify-center md:justify-start items-center gap-4">
+            <div className="flex flex-col sm:flex-row justify-center md:justify-start items-center gap-4 w-full">
               <a 
                 href="#projects"
-                className="group relative gradient-border px-6 py-3 bg-gradient-to-r from-gray-800 to-gray-900 text-white font-semibold rounded-full overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-gray-500/25 text-center border border-transparent text-sm"
+                className="w-full sm:w-auto px-8 py-4 text-base sm:text-lg bg-gradient-to-r from-purple-600 to-blue-600 text-white font-bold rounded-2xl shadow-2xl hover:shadow-purple-500/30 transform hover:scale-105 transition-all duration-300 text-center"
               >
-                <span className="relative z-10">{isEs ? 'Ver mi trabajo' : 'View my work'}</span>
-                <div className="absolute inset-0 bg-gradient-to-r from-gray-700 to-gray-800 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                <div className="absolute -top-1 -left-1 w-full h-full border-2 border-gray-600 rounded-full opacity-0 group-hover:opacity-100 group-hover:scale-110 transition-all duration-300"></div>
+                {isEs ? 'Ver mi trabajo' : 'View my work'}
               </a>
               
               <a 
                 href="#contact"
-                className="group relative gradient-border px-6 py-3 text-gray-300 font-semibold rounded-full bg-transparent hover:bg-gray-600 hover:text-white transition-all duration-300 hover:scale-105 backdrop-blur-sm text-center text-sm border border-transparent"
+                className="w-full sm:w-auto px-8 py-4 text-base sm:text-lg bg-white/10 backdrop-blur-xl border border-white/20 text-white font-bold rounded-2xl hover:bg-white/20 transform hover:scale-105 transition-all duration-300 text-center"
               >
-                <span className="flex items-center justify-center gap-2">
-                  {isEs ? 'Contáctame' : 'Contact me'}
-                  <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                  </svg>
-                </span>
+                {isEs ? 'Contáctame' : 'Contact me'}
               </a>
             </div>
           </div>
 
-          {/* Floating Tech Stack - moved below CTAs (Hidden on mobile) */}
-          <div className={`${isSubtitleDone ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2 pointer-events-none'} mt-2 hidden md:block transition-all duration-700`}>
+          {/* Floating Tech Stack - visible on mobile with horizontal scroll */}
+          <div className={`${isSubtitleDone ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2 pointer-events-none'} mt-2 block transition-all duration-700`}>
             <div
-              className="relative overflow-hidden rounded-full border border-gray-700/40 bg-gray-800/20"
-              style={{ WebkitMaskImage: 'linear-gradient(to right, transparent, black 10%, black 90%, transparent)', maskImage: 'linear-gradient(to right, transparent, black 10%, black 90%, transparent)' }}
+              className="relative overflow-x-auto md:overflow-hidden rounded-full border border-gray-700/40 bg-gray-800/20 -mx-6 px-6 md:mx-0 md:px-0"
+              style={{ WebkitMaskImage: 'linear-gradient(to right, transparent, black 6%, black 94%, transparent)', maskImage: 'linear-gradient(to right, transparent, black 6%, black 94%, transparent)' }}
             >
-              <div className={`flex items-center gap-3 whitespace-nowrap will-change-transform ${isSubtitleDone ? 'animate-[marquee_30s_linear_infinite]' : ''}`}>
+              <div className={`flex items-center gap-3 whitespace-nowrap will-change-transform md:${isSubtitleDone ? 'animate-[marquee_30s_linear_infinite]' : ''}`}>
                 {technologies.map((tech) => (
                   <span
                     key={`${tech.name}-a`}
@@ -351,6 +330,11 @@ export default function Hero({
             0% { transform: translateX(0); }
             100% { transform: translateX(-50%); }
           }
+        @keyframes drift {
+          0% { transform: translate3d(0, 0, 0) scale(1); }
+          50% { transform: translate3d(10px, -16px, 0) scale(1.05); }
+          100% { transform: translate3d(-12px, 12px, 0) scale(1); }
+        }
       `}</style>
     </section>
   );
