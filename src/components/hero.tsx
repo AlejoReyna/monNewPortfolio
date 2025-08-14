@@ -141,7 +141,7 @@ export default function Hero({
       </div>
 
       {/* Main Content */}
-      <div className="relative z-10 mx-auto grid max-w-6xl items-center gap-10 px-6 py-24 min-h-screen md:grid-cols-2">
+      <div className="relative z-10 mx-auto grid max-w-6xl items-center gap-8 md:gap-12 px-6 sm:px-8 py-20 md:py-28 min-h-screen md:grid-cols-2">
         
         {/* Mobile Background Character - Only visible on mobile */}
         <div className="md:hidden absolute inset-0 z-10 flex items-center justify-center">
@@ -164,65 +164,9 @@ export default function Hero({
           
           {/* Content Wrapper */}
           <div className="relative z-30">
-          {/* Floating Tech Stack - Hidden on mobile (Marquee) */}
-          <div className={`mb-8 hidden md:block transition-all duration-700 ${isSubtitleDone ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2 pointer-events-none'}`}>
-            <div className="relative overflow-hidden">
-
-              {/* Track (duplicated for seamless loop) */}
-              <div className={`flex items-center gap-3 whitespace-nowrap will-change-transform ${isSubtitleDone ? 'animate-[marquee_30s_linear_infinite]' : ''}`}>
-                {technologies.map((tech) => (
-                  <span
-                    key={`${tech.name}-a`}
-                    className="inline-flex items-center gap-1.5 px-5 py-1 text-xs font-medium text-gray-300 rounded-full mr-2 backdrop-blur-sm hover:scale-110 transition-transform duration-300 cursor-pointer"
-                    style={{
-                      background: `linear-gradient(rgb(31 41 55 / 0.5), rgb(31 41 55 / 0.5)) padding-box, linear-gradient(to right, ${getGradientColors(tech.gradient)}) border-box`,
-                      border: '1px solid transparent',
-                    }}
-                  >
-                    {'iconUrl' in tech ? (
-                      <Image
-                        src={tech.iconUrl}
-                        alt={`${tech.name} icon`}
-                        width={16}
-                        height={16}
-                        className="h-4 w-4 object-contain"
-                      />
-                    ) : (
-                      <span className="text-sm">{tech.icon}</span>
-                    )}
-                    {tech.name}
-                  </span>
-                ))}
-                {technologies.map((tech) => (
-                  <span
-                    key={`${tech.name}-b`}
-                    className="inline-flex items-center gap-1.5 px-5 py-1 text-xs font-medium text-gray-300 rounded-full mr-2 backdrop-blur-sm hover:scale-110 transition-transform duration-300 cursor-pointer"
-                    style={{
-                      background: `linear-gradient(rgb(31 41 55 / 0.5), rgb(31 41 55 / 0.5)) padding-box, linear-gradient(to right, ${getGradientColors(tech.gradient)}) border-box`,
-                      border: '1px solid transparent',
-                    }}
-                    aria-hidden="true"
-                  >
-                    {'iconUrl' in tech ? (
-                      <Image
-                        src={tech.iconUrl}
-                        alt={`${tech.name} icon`}
-                        width={16}
-                        height={16}
-                        className="h-4 w-4 object-contain"
-                      />
-                    ) : (
-                      <span className="text-sm">{tech.icon}</span>
-                    )}
-                    {tech.name}
-                  </span>
-                ))}
-              </div>
-            </div>
-          </div>
 
           {/* Main Title */}
-          <h1 className="text-4xl lg:text-6xl font-bold text-white mb-6 leading-tight" aria-label={`Hey, I'm ${title}`}>
+          <h1 className="text-4xl lg:text-6xl font-bold text-white mb-6 leading-tight text-center md:text-left" aria-label={`Hey, I'm ${title}`}>
             <span className="relative block">
               {/* Placeholder to reserve final height */}
               <span className="opacity-0 select-none">{finalTitle}</span>
@@ -252,7 +196,7 @@ export default function Hero({
           </h1>
 
           {/* Description */}
-          <div className="text-lg lg:text-xl text-gray-300 mb-8 font-light relative">
+          <div className="text-lg lg:text-xl text-gray-300 mb-8 font-light relative text-center md:text-left max-w-xl md:max-w-none mx-auto md:mx-0">
             {/* Placeholder to reserve final height */}
             <p className="opacity-0 select-none text-gray-400">{subtitleText}</p>
             {/* Overlay typed content */}
@@ -267,8 +211,8 @@ export default function Hero({
           </div>
 
           {/* CTA Buttons (replacing metrics), centered */}
-          <div className={`mb-12 transition-all duration-700 ${isSubtitleDone ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2 pointer-events-none'}`}>
-            <div className="flex flex-col sm:flex-row justify-center items-center gap-4">
+          <div className={`mb-8 transition-all duration-700 ${isSubtitleDone ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2 pointer-events-none'}`}>
+            <div className="flex flex-col sm:flex-row justify-center md:justify-start items-center gap-4">
               <a 
                 href="#projects"
                 className="group relative gradient-border px-6 py-3 bg-gradient-to-r from-gray-800 to-gray-900 text-white font-semibold rounded-full overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-gray-500/25 text-center border border-transparent text-sm"
@@ -289,6 +233,64 @@ export default function Hero({
                   </svg>
                 </span>
               </a>
+            </div>
+          </div>
+
+          {/* Floating Tech Stack - moved below CTAs (Hidden on mobile) */}
+          <div className={`${isSubtitleDone ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2 pointer-events-none'} mt-2 hidden md:block transition-all duration-700`}>
+            <div
+              className="relative overflow-hidden rounded-full border border-gray-700/40 bg-gray-800/20"
+              style={{ WebkitMaskImage: 'linear-gradient(to right, transparent, black 10%, black 90%, transparent)', maskImage: 'linear-gradient(to right, transparent, black 10%, black 90%, transparent)' }}
+            >
+              <div className={`flex items-center gap-3 whitespace-nowrap will-change-transform ${isSubtitleDone ? 'animate-[marquee_30s_linear_infinite]' : ''}`}>
+                {technologies.map((tech) => (
+                  <span
+                    key={`${tech.name}-a`}
+                    className="inline-flex items-center gap-1.5 px-4 py-1 text-xs font-medium text-gray-300 rounded-full mr-2 backdrop-blur-sm hover:scale-110 transition-transform duration-300 cursor-pointer"
+                    style={{
+                      background: `linear-gradient(rgb(31 41 55 / 0.5), rgb(31 41 55 / 0.5)) padding-box, linear-gradient(to right, ${getGradientColors(tech.gradient)}) border-box`,
+                      border: '1px solid transparent',
+                    }}
+                  >
+                    {'iconUrl' in tech ? (
+                      <Image
+                        src={tech.iconUrl}
+                        alt={`${tech.name} icon`}
+                        width={16}
+                        height={16}
+                        className="h-4 w-4 object-contain"
+                      />
+                    ) : (
+                      <span className="text-sm">{tech.icon}</span>
+                    )}
+                    {tech.name}
+                  </span>
+                ))}
+                {technologies.map((tech) => (
+                  <span
+                    key={`${tech.name}-b`}
+                    className="inline-flex items-center gap-1.5 px-4 py-1 text-xs font-medium text-gray-300 rounded-full mr-2 backdrop-blur-sm hover:scale-110 transition-transform duration-300 cursor-pointer"
+                    style={{
+                      background: `linear-gradient(rgb(31 41 55 / 0.5), rgb(31 41 55 / 0.5)) padding-box, linear-gradient(to right, ${getGradientColors(tech.gradient)}) border-box`,
+                      border: '1px solid transparent',
+                    }}
+                    aria-hidden="true"
+                  >
+                    {'iconUrl' in tech ? (
+                      <Image
+                        src={tech.iconUrl}
+                        alt={`${tech.name} icon`}
+                        width={16}
+                        height={16}
+                        className="h-4 w-4 object-contain"
+                      />
+                    ) : (
+                      <span className="text-sm">{tech.icon}</span>
+                    )}
+                    {tech.name}
+                  </span>
+                ))}
+              </div>
             </div>
           </div>
 
@@ -318,10 +320,15 @@ export default function Hero({
       </div>
 
       {/* Scroll Indicator */}
-      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 text-gray-400 animate-bounce">
-        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-        </svg>
+      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 text-gray-400/80">
+        <div className="flex flex-col items-center gap-2">
+          <div className="w-5 h-8 rounded-full border border-gray-500/50 flex items-start justify-center p-1">
+            <div className="w-1 h-2 bg-gray-400/80 rounded-full animate-bounce"></div>
+          </div>
+          <svg className="w-4 h-4 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ animationDelay: '0.15s' }}>
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          </svg>
+        </div>
       </div>
 
       {/* Custom Styles */}
