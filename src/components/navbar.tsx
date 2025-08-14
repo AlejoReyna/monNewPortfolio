@@ -59,7 +59,7 @@ export default function Navbar() {
           {/* Left: Brand */}
           <div className="relative z-10 flex min-w-0 items-center gap-2">
             <Link href="#top" className="group inline-flex items-center gap-2">
-              <div className="flex items-center font-mono text-base font-bold tracking-tight">
+              <div className="flex items-center font-mono text-base font-extralight tracking-tight">
                 <span className="text-cyan-400 group-hover:text-cyan-300 transition-colors duration-200">&lt;</span>
                 <span className="mx-1 bg-gradient-to-r from-white via-gray-100 to-gray-200 bg-clip-text text-transparent group-hover:from-white group-hover:via-white group-hover:to-gray-100 transition-all duration-200">
                   Alexis Reyna
@@ -72,7 +72,7 @@ export default function Navbar() {
           </div>
 
           {/* Center: Nav links (desktop) */}
-          <nav className="relative z-10 hidden items-center gap-1 sm:flex">
+          <nav className="relative z-10 hidden items-center gap-1 sm:flex font-mono font-extralight">
             {[
               { href: "/", label: isEs ? "Inicio" : "Home" },
               { href: "#services", label: isEs ? "Servicios" : "Services" },
@@ -81,7 +81,7 @@ export default function Navbar() {
               <Link
                 key={item.label}
                 href={item.href}
-                className="rounded-full px-3 py-1.5 text-sm text-gray-300 transition-colors hover:text-white hover:bg-white/5 border border-transparent hover:border-white/10"
+                className="rounded-full px-3 py-1.5 text-sm text-gray-300 transition-colors hover:text-white hover:bg-white/5 border border-transparent hover:border-white/10 font-mono font-extralight"
               >
                 {item.label}
               </Link>
@@ -92,7 +92,7 @@ export default function Navbar() {
           <div className="relative z-10 flex items-center gap-2">
             <a
               href="#contact"
-              className="relative hidden sm:inline-flex items-center gap-2 rounded-full gradient-border bg-gradient-to-r from-slate-800/80 via-blue-900/60 to-violet-900/70 px-4 py-1.5 text-sm font-medium text-white shadow-inner shadow-cyan-400/10 transition-all hover:from-slate-700/90 hover:via-blue-800/70 hover:to-violet-800/80 hover:shadow-cyan-400/20 hover:scale-[1.02]"
+              className="relative hidden sm:inline-flex items-center gap-2 rounded-full gradient-border bg-gradient-to-r from-slate-800/80 via-blue-900/60 to-violet-900/70 px-4 py-1.5 text-sm font-mono font-bold tracking-tight text-white shadow-inner shadow-cyan-400/10 transition-all hover:from-slate-700/90 hover:via-blue-800/70 hover:to-violet-800/80 hover:shadow-cyan-400/20 hover:scale-[1.02]"
             >
               <span>{isEs ? 'Hablemos' : 'Let’s talk'}</span>
               <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">
@@ -140,7 +140,7 @@ export default function Navbar() {
                 key={item.label}
                 href={item.href}
                 onClick={() => setIsOpen(false)}
-                className="block rounded-xl px-3 py-2 text-sm text-gray-200 transition-colors hover:bg-white/5"
+                className="block rounded-xl px-3 py-2 text-sm text-gray-200 transition-colors hover:bg-white/5 font-mono font-extralight"
               >
                 {item.label}
               </Link>

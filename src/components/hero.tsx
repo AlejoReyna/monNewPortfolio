@@ -138,7 +138,7 @@ export default function Hero({
           <div className="relative z-30">
 
           {/* Main Title */}
-          <h1 className="text-4xl lg:text-6xl font-bold text-white mb-6 leading-tight text-center md:text-left hero-title" aria-label={`Hey, I'm ${title}`}>
+          <h1 className="text-4xl lg:text-6xl font-bold text-white mb-6 leading-tight text-center md:text-left hero-title font-mono tracking-tight" aria-label={`Hey, I'm ${title}`}>
             <span className="relative block">
               {/* Placeholder to reserve final height */}
               <span className="opacity-0 select-none">{finalTitle}</span>
@@ -150,7 +150,7 @@ export default function Hero({
                 <span
                   className={
                     typedIndex >= fullLength
-                      ? "bg-gradient-to-r from-sky-400 via-emerald-300 to-amber-300 bg-clip-text text-transparent"
+                      ? "bg-gradient-to-r from-sky-400 via-blue-500 to-indigo-500 bg-clip-text text-transparent"
                       : "text-white"
                   }
                 >
@@ -182,16 +182,16 @@ export default function Hero({
           </div>
 
           {/* Description */}
-          <div className="text-lg lg:text-xl text-gray-300 mb-8 font-light relative text-center md:text-left max-w-xl md:max-w-none mx-auto md:mx-0 hero-subtitle">
+          <div className="text-lg lg:text-xl text-gray-300 mb-8 font-extralight font-mono relative text-center md:text-left max-w-xl md:max-w-none mx-auto md:mx-0 hero-subtitle">
             {/* Placeholder to reserve final height */}
             <p className="opacity-0 select-none text-gray-400">{subtitleText}</p>
             {/* Overlay typed content */}
             <div className="absolute inset-0">
-              <span className="text-gray-400">
+              <span className="text-sky-200">
                 {subtitleText.slice(0, subtitleTypedIndex)}
               </span>
               {typedIndex >= fullLength && subtitleTypedIndex < subtitleText.length && (
-                <span className="ml-[1px] inline-block w-[2px] h-[1em] align-[-0.1em] bg-gray-300/80 animate-pulse" />
+                <span className="ml-[1px] inline-block w-[2px] h-[1em] align-[-0.1em] bg-sky-200/80 animate-pulse" />
               )}
             </div>
           </div>
