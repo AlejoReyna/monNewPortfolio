@@ -278,7 +278,7 @@ export default function Hero({
         </div>
 
         {/* Right Side - Character (Desktop Only) */}
-        <div className="hidden md:block relative w-full max-w-[624px] sm:max-w-[696px] md:max-w-[768px] lg:max-w-[864px] aspect-[768/1211]">
+        <div className="hidden md:block relative w-full max-w-[811px] sm:max-w-[905px] md:max-w-[998px] lg:max-w-[1123px] aspect-[768/1211] mt-32">
           <div 
             className="relative transform h-full w-full"
           >
@@ -293,6 +293,7 @@ export default function Hero({
               unoptimized 
               priority 
               className="z-10 rounded-xl object-contain bg-transparent brightness-110 contrast-105 saturate-110" 
+              style={{ transform: 'scale(1.3)' }}
             />
           </div>
         </div>
