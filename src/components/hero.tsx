@@ -76,34 +76,39 @@ export default function Hero({
     return () => clearTimeout(timeout);
   }, [typedIndex, fullLength, subtitleTypedIndex, subtitleText]);
 
+  // ===== TIPO Y DATOS DEL CAROUSEL =====
+  // Tipo que define la estructura de cada tecnología en el carousel
+  // Puede tener iconUrl (imagen) O icon (emoji/símbolo)
   type Technology = {
     name: string;
     gradient: string;
   } & ({ iconUrl: string } | { icon: string });
 
+  // Array de tecnologías que se muestran en el carousel
+  // Cada tecnología tiene: nombre, gradiente de color, y icono (URL o emoji)
   const technologies: Technology[] = [
     {
       name: 'TypeScript',
-      gradient: 'from-blue-600 to-blue-400',
+      gradient: 'from-blue-600 to-blue-400', // Gradiente azul para TypeScript
       iconUrl:
         'https://raw.githubusercontent.com/marwin1991/profile-technology-icons/refs/heads/main/icons/typescript.png',
     },
     {
       name: 'Ruby',
-      gradient: 'from-red-500 to-pink-400',
+      gradient: 'from-red-500 to-pink-400', // Gradiente rojo-rosa para Ruby
       iconUrl:
         'https://raw.githubusercontent.com/marwin1991/profile-technology-icons/refs/heads/main/icons/ruby.png',
     },
     {
       name: 'AWS',
-      gradient: 'from-orange-500 to-red-400',
+      gradient: 'from-orange-500 to-red-400', // Gradiente naranja-rojo para AWS
       iconUrl:
         'https://raw.githubusercontent.com/marwin1991/profile-technology-icons/refs/heads/main/icons/aws.png',
     },
     {
       name: 'Crypto',
-      gradient: 'from-yellow-500 to-orange-400',
-      icon: '₿',
+      gradient: 'from-yellow-500 to-orange-400', // Gradiente amarillo-naranja para Crypto
+      icon: '₿', // Emoji de Bitcoin en lugar de imagen
     },
   ];
 
@@ -211,23 +216,47 @@ export default function Hero({
             </div>
           </div>
 
-          {/* Floating Tech Stack - visible on mobile with horizontal scroll */}
-          <div className={`${isSubtitleDone ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2 pointer-events-none'} mt-2 block transition-all duration-700`}>
+          {/* ===== CAROUSEL DE TECNOLOGÍAS ===== */}
+          {/* 
+            Este carousel muestra las tecnologías que manejo de forma animada.
+            Funciona de manera diferente en móvil vs desktop:
+            - Móvil: Scroll horizontal manual
+            - Desktop: Animación automática infinita (marquee)
+            
+            NOTA: Actualmente oculto - cambiar 'hidden' por 'block' para mostrarlo
+          */}
+          <div className="hidden mt-2 block transition-all duration-700">
+            
+            {/* Contenedor principal del carousel */}
             <div
               className="relative overflow-x-auto md:overflow-hidden rounded-full border border-gray-700/40 bg-gray-800/20 -mx-6 px-6 md:mx-0 md:px-0"
-              style={{ WebkitMaskImage: 'linear-gradient(to right, transparent, black 6%, black 94%, transparent)', maskImage: 'linear-gradient(to right, transparent, black 6%, black 94%, transparent)' }}
+              style={{ 
+                // Máscara de gradiente para crear efecto de desvanecimiento en los bordes
+                // En móvil: permite scroll horizontal con desvanecimiento suave
+                WebkitMaskImage: 'linear-gradient(to right, transparent, black 6%, black 94%, transparent)', 
+                maskImage: 'linear-gradient(to right, transparent, black 6%, black 94%, transparent)' 
+              }}
             >
+              
+              {/* Contenedor interno con los elementos del carousel */}
               <div className={`flex items-center gap-3 whitespace-nowrap will-change-transform md:${isSubtitleDone ? 'animate-[marquee_30s_linear_infinite]' : ''}`}>
+                
+                {/* ===== PRIMERA ITERACIÓN - Elementos originales ===== */}
                 {technologies.map((tech) => (
                   <span
                     key={`${tech.name}-a`}
                     className="inline-flex items-center gap-1.5 px-4 py-1 text-xs font-medium text-gray-300 rounded-full mr-2 backdrop-blur-sm hover:scale-110 transition-transform duration-300 cursor-pointer"
                     style={{
+                      // Fondo con gradiente personalizado usando la función helper
+                      // padding-box: color de fondo interno
+                      // border-box: gradiente en el borde
                       background: `linear-gradient(rgb(31 41 55 / 0.5), rgb(31 41 55 / 0.5)) padding-box, linear-gradient(to right, ${getGradientColors(tech.gradient)}) border-box`,
                       border: '1px solid transparent',
                     }}
                   >
+                    {/* Renderizado condicional del icono */}
                     {'iconUrl' in tech ? (
+                      // Si tiene URL de icono, renderiza imagen
                       <Image
                         src={tech.iconUrl}
                         alt={`${tech.name} icon`}
@@ -236,11 +265,20 @@ export default function Hero({
                         className="h-4 w-4 object-contain"
                       />
                     ) : (
+                      // Si no tiene URL, renderiza emoji/símbolo
                       <span className="text-sm">{tech.icon}</span>
                     )}
                     {tech.name}
                   </span>
                 ))}
+                
+                {/* ===== SEGUNDA ITERACIÓN - Duplicados para efecto infinito ===== */}
+                {/* 
+                  En desktop, se duplican los elementos para crear el efecto de carousel infinito.
+                  Los elementos duplicados tienen aria-hidden="true" para accesibilidad.
+                  La animación marquee mueve todo el contenedor hacia la izquierda,
+                  y cuando termina, se reinicia sin saltos visibles.
+                */}
                 {technologies.map((tech) => (
                   <span
                     key={`${tech.name}-b`}
@@ -249,7 +287,7 @@ export default function Hero({
                       background: `linear-gradient(rgb(31 41 55 / 0.5), rgb(31 41 55 / 0.5)) padding-box, linear-gradient(to right, ${getGradientColors(tech.gradient)}) border-box`,
                       border: '1px solid transparent',
                     }}
-                    aria-hidden="true"
+                    aria-hidden="true" // Oculto para lectores de pantalla
                   >
                     {'iconUrl' in tech ? (
                       <Image
@@ -307,8 +345,9 @@ export default function Hero({
         </div>
       </div>
 
-      {/* Custom Styles */}
+      {/* ===== ESTILOS CSS PERSONALIZADOS ===== */}
       <style jsx>{`
+        /* Animación de entrada desde abajo hacia arriba */
         @keyframes fadeInUp {
           from {
             opacity: 0;
@@ -319,15 +358,26 @@ export default function Hero({
             transform: translateY(0);
           }
         }
+        
+        /* Animación de la línea debajo del título */
         @keyframes scaleX {
           from { transform: scaleX(0); }
           to { transform: scaleX(1); }
         }
-          @keyframes marquee {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(-50%); }
-          }
-
+        
+        /* ===== ANIMACIÓN DEL CAROUSEL INFINITO ===== */
+        /* 
+          Esta animación mueve el contenedor del carousel hacia la izquierda.
+          Al mover exactamente -50%, se crea el efecto infinito porque:
+          1. Los elementos originales se mueven fuera de la vista
+          2. Los elementos duplicados (que están después) toman su lugar
+          3. Cuando la animación termina, se reinicia sin saltos visibles
+          4. La duración de 30s hace que el movimiento sea suave y no distraiga
+        */
+        @keyframes marquee {
+          0% { transform: translateX(0); }
+          100% { transform: translateX(-50%); }
+        }
       `}</style>
     </section>
   );
