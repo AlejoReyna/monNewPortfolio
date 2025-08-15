@@ -119,25 +119,35 @@ export default function Hero({
         href="#toggle-lang"
         onClick={(e) => { e.preventDefault(); toggleWithFade(); }}
         aria-label={isEs ? "Click for English" : "Click aquí para ver en español"}
-        className="absolute left-0 top-24 z-40 translate-x-0 bg-gray-800/70 text-gray-200 text-[11px] sm:text-xs font-medium px-3 py-1.5 rounded-r-full border border-gray-700/60 backdrop-blur-sm shadow-md shadow-black/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/60"
+        className="absolute left-0 top-24 z-50 translate-x-0 bg-gray-800/70 text-gray-200 text-[11px] sm:text-xs font-medium px-3 py-1.5 rounded-r-full border border-gray-700/60 backdrop-blur-sm shadow-md shadow-black/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/60"
       >
         {isEs ? 'Click for English' : 'Click aquí para ver en español'}
       </a>
-      {/* Background ahora manejado en el main container */}
+      {/* Mobile GIF Background - Full Screen */}
+      <div className="md:hidden absolute inset-0 z-0">
+        <Image 
+          src="/16.gif"
+          alt="Alexis background"
+          fill
+          className="object-contain bg-transparent"
+          unoptimized
+          priority
+        />
+      </div>
 
       {/* Main Content */}
-      <div className="relative z-10 mx-auto grid max-w-6xl items-center gap-8 md:gap-12 px-6 sm:px-8 py-20 md:py-28 min-h-screen md:grid-cols-2 mb-0 pb-0">
+      <div className="relative z-20 mx-auto grid max-w-6xl items-end md:items-center gap-8 md:gap-12 px-6 sm:px-8 py-20 md:py-28 min-h-screen md:grid-cols-2 mb-0 pb-8 md:pb-0">
         
         {/* Mobile Background Character removed */}
 
         {/* Left Side - Text Content */}
-        <div className="space-y-6 relative z-20 md:-mt-6 lg:-mt-10">
+        <div className="space-y-6 relative z-20 mt-auto md:-mt-6 lg:-mt-10 sm:z-30">
           
-          {/* Content Wrapper */}
-          <div className="relative z-30">
+          {/* Content Wrapper with Glassmorphism for Mobile */}
+          <div className="relative z-40 sm:z-50 md:bg-transparent md:backdrop-filter-none md:border-none md:p-0 bg-black/20 backdrop-blur-sm border border-white/10 rounded-2xl p-6 sm:p-8 shadow-2xl">
 
           {/* Main Title */}
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight text-center md:text-left hero-title font-mono tracking-tight" aria-label={`Hey, I'm ${title}`}>
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight text-center md:text-left hero-title font-mono tracking-tight drop-shadow-2xl" aria-label={`Hey, I'm ${title}`} style={{ textShadow: '2px 2px 10px rgba(0, 0, 0, 0.9)' }}>
             <span className="relative block">
               {/* Placeholder to reserve final height */}
               <span className="opacity-0 select-none">{finalTitle}</span>
@@ -149,9 +159,10 @@ export default function Hero({
                 <span
                   className={
                     typedIndex >= fullLength
-                      ? "bg-gradient-to-r from-sky-400 via-blue-500 to-indigo-500 bg-clip-text text-transparent"
+                      ? "bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-500 bg-clip-text text-transparent font-extrabold"
                       : "text-white"
                   }
+                  style={{ textShadow: typedIndex >= fullLength ? '0 0 20px rgba(100, 255, 218, 0.5)' : 'inherit' }}
                 >
                   {typedIndex > prefixText.length
                     ? nameText.slice(0, Math.min(typedIndex - prefixText.length, nameText.length))
@@ -166,27 +177,15 @@ export default function Hero({
             </span>
           </h1>
 
-          {/* Mobile circular avatar */}
-          <div className="md:hidden flex justify-center mb-8">
-            <div className="relative w-32 h-32">
-              <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full blur animate-pulse"></div>
-              <Image 
-                src="/avatar.jpg"
-                alt="Alexis"
-                width={128}
-                height={128}
-                className="relative rounded-full border-4 border-black/50"
-              />
-            </div>
-          </div>
+          {/* Mobile GIF background - moved outside and made full screen */}
 
           {/* Description */}
-          <div className="text-lg lg:text-xl text-gray-300 mb-8 font-extralight font-mono relative text-center md:text-left max-w-xl md:max-w-none mx-auto md:mx-0 hero-subtitle">
+          <div className="text-base sm:text-lg lg:text-xl text-gray-100 md:text-gray-300 mb-8 font-light md:font-extralight font-mono relative text-center md:text-left max-w-xl md:max-w-none mx-auto md:mx-0 hero-subtitle" style={{ textShadow: '1px 1px 6px rgba(0, 0, 0, 0.9)' }}>
             {/* Placeholder to reserve final height */}
             <p className="opacity-0 select-none text-gray-400">{subtitleText}</p>
             {/* Overlay typed content */}
             <div className="absolute inset-0">
-              <span className="text-sky-200">
+              <span className="text-gray-100 md:text-sky-200">
                 {subtitleText.slice(0, subtitleTypedIndex)}
               </span>
               {typedIndex >= fullLength && subtitleTypedIndex < subtitleText.length && (
@@ -361,14 +360,14 @@ export default function Hero({
         /* ===== BOTONES MODERNOS CON GRADIENTES ===== */
         .cyberpunk-btn {
           position: relative;
-          padding: 1rem 2rem;
+          padding: 0.875rem 1.75rem;
           border: 2px solid transparent;
           border-radius: 12px;
           font-family: 'Inter', system-ui, -apple-system, sans-serif;
           text-transform: uppercase;
-          letter-spacing: 0.5px;
-          font-size: 1rem;
-          font-weight: 600;
+          letter-spacing: 0.8px;
+          font-size: 0.9rem;
+          font-weight: 700;
           text-decoration: none;
           display: inline-flex;
           align-items: center;
@@ -378,13 +377,15 @@ export default function Hero({
           overflow: hidden;
           text-align: center;
           backdrop-filter: blur(10px);
+          box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
         }
         
         /* Botón principal con gradiente azul-púrpura */
         .cyberpunk-btn-primary {
           background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
           color: #ffffff;
-          box-shadow: 0 8px 32px rgba(102, 126, 234, 0.3);
+          box-shadow: 0 10px 40px rgba(102, 126, 234, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+          border: 1px solid rgba(255, 255, 255, 0.2);
         }
         
         .cyberpunk-btn-primary::before {
@@ -414,7 +415,7 @@ export default function Hero({
         
         .cyberpunk-btn-primary:hover {
           transform: translateY(-3px) scale(1.02);
-          box-shadow: 0 15px 40px rgba(102, 126, 234, 0.4), 0 0 0 2px rgba(118, 75, 162, 0.3);
+          box-shadow: 0 20px 50px rgba(102, 126, 234, 0.5), 0 0 0 2px rgba(118, 75, 162, 0.3), 0 0 30px rgba(102, 126, 234, 0.3) inset;
         }
         
         .cyberpunk-btn-primary:hover::before {
@@ -425,7 +426,8 @@ export default function Hero({
         .cyberpunk-btn-secondary {
           background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
           color: #ffffff;
-          box-shadow: 0 8px 32px rgba(240, 147, 251, 0.3);
+          box-shadow: 0 10px 40px rgba(240, 147, 251, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+          border: 1px solid rgba(255, 255, 255, 0.2);
         }
         
         .cyberpunk-btn-secondary::before {
@@ -455,7 +457,7 @@ export default function Hero({
         
         .cyberpunk-btn-secondary:hover {
           transform: translateY(-3px) scale(1.02);
-          box-shadow: 0 15px 40px rgba(245, 87, 108, 0.4), 0 0 0 2px rgba(240, 147, 251, 0.3);
+          box-shadow: 0 20px 50px rgba(245, 87, 108, 0.5), 0 0 0 2px rgba(240, 147, 251, 0.3), 0 0 30px rgba(240, 147, 251, 0.3) inset;
         }
         
         .cyberpunk-btn-secondary:hover::before {
@@ -495,12 +497,32 @@ export default function Hero({
           box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.3);
         }
         
-        /* Responsive para móvil */
-        @media (max-width: 768px) {
+        /* Responsive para pantallas medianas y grandes */
+        @media (min-width: 768px) {
           .cyberpunk-btn {
-            padding: 0.9rem 1.8rem;
+            padding: 0.875rem 1.75rem;
             font-size: 0.9rem;
-            border-radius: 10px;
+            border-radius: 11px;
+          }
+        }
+        
+        @media (min-width: 1024px) {
+          .cyberpunk-btn {
+            padding: 1rem 2rem;
+            font-size: 1rem;
+            border-radius: 12px;
+          }
+        }
+        
+        /* Responsive para móvil */
+        @media (max-width: 767px) {
+          .cyberpunk-btn {
+            padding: 1rem 2rem;
+            font-size: 0.95rem;
+            border-radius: 14px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            box-shadow: 0 12px 45px rgba(0, 0, 0, 0.4);
           }
           
           .cyberpunk-btn:hover {
@@ -508,12 +530,14 @@ export default function Hero({
           }
         }
         
-        /* Mejoras para pantallas pequeñas */
+        /* Mejoras para pantallas muy pequeñas */
         @media (max-width: 640px) {
           .cyberpunk-btn {
-            padding: 0.8rem 1.5rem;
-            font-size: 0.85rem;
-            letter-spacing: 0.3px;
+            padding: 0.95rem 1.8rem;
+            font-size: 0.9rem;
+            letter-spacing: 0.8px;
+            border-radius: 13px;
+            min-height: 48px;
           }
         }
       `}</style>
