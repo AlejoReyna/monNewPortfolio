@@ -5,7 +5,7 @@ import { useLanguage } from "@/components/lang-context";
 import Link from "next/link";
 
 export default function Navbar() {
-  const { language } = useLanguage();
+  const { language, toggleLanguage } = useLanguage();
   const isEs = language === 'es';
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
@@ -88,8 +88,32 @@ export default function Navbar() {
             ))}
           </nav>
 
-          {/* Right: CTA + Mobile toggle */}
+          {/* Right: Language Selector + CTA + Mobile toggle */}
           <div className="relative z-10 flex items-center gap-2">
+            {/* Language Selector */}
+            <div className="hidden sm:flex items-center rounded-full border border-white/10 bg-black/20 px-1 py-0.5">
+              <button
+                onClick={toggleLanguage}
+                className={`px-2 py-0.5 text-xs font-medium rounded-full transition-all duration-200 ${
+                  language === 'en'
+                    ? 'bg-gradient-to-r from-cyan-500/20 to-blue-500/20 text-cyan-300 shadow-inner shadow-cyan-400/10'
+                    : 'text-gray-400 hover:text-gray-300'
+                }`}
+              >
+                EN
+              </button>
+              <div className="w-px h-3 bg-white/20 mx-0.5" />
+              <button
+                onClick={toggleLanguage}
+                className={`px-2 py-0.5 text-xs font-medium rounded-full transition-all duration-200 ${
+                  language === 'es'
+                    ? 'bg-gradient-to-r from-cyan-500/20 to-blue-500/20 text-cyan-300 shadow-inner shadow-cyan-400/10'
+                    : 'text-gray-400 hover:text-gray-300'
+                }`}
+              >
+                ES
+              </button>
+            </div>
             <a
               href="#contact"
               className="relative hidden sm:inline-flex items-center gap-2 rounded-full gradient-border bg-gradient-to-r from-slate-800/80 via-blue-900/60 to-violet-900/70 px-4 py-1.5 text-sm font-mono font-bold tracking-tight text-white shadow-inner shadow-cyan-400/10 transition-all hover:from-slate-700/90 hover:via-blue-800/70 hover:to-violet-800/80 hover:shadow-cyan-400/20 hover:scale-[1.02]"
@@ -130,6 +154,31 @@ export default function Navbar() {
           }
         >
           <div className="mx-2 mt-2 rounded-2xl border border-white/10 bg-black/40 backdrop-blur-md p-2">
+            {/* Language Selector for Mobile */}
+            <div className="flex items-center justify-center rounded-full border border-white/10 bg-black/20 px-1 py-0.5 mb-2">
+              <button
+                onClick={toggleLanguage}
+                className={`px-3 py-1 text-xs font-medium rounded-full transition-all duration-200 ${
+                  language === 'en'
+                    ? 'bg-gradient-to-r from-cyan-500/20 to-blue-500/20 text-cyan-300'
+                    : 'text-gray-400'
+                }`}
+              >
+                EN
+              </button>
+              <div className="w-px h-3 bg-white/20 mx-1" />
+              <button
+                onClick={toggleLanguage}
+                className={`px-3 py-1 text-xs font-medium rounded-full transition-all duration-200 ${
+                  language === 'es'
+                    ? 'bg-gradient-to-r from-cyan-500/20 to-blue-500/20 text-cyan-300'
+                    : 'text-gray-400'
+                }`}
+              >
+                ES
+              </button>
+            </div>
+            <div className="h-px bg-white/10 mb-2" />
             {[
               { href: "/", label: isEs ? "Inicio" : "Home" },
               { href: "#services", label: isEs ? "Servicios" : "Services" },
