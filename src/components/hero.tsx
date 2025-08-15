@@ -333,18 +333,7 @@ export default function Hero({
         </div>
       </div>
 
-      {/* Scroll Indicator */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 text-gray-400/80">
-        <div className="flex flex-col items-center gap-2">
-          <div className="w-5 h-8 rounded-full border border-gray-500/50 flex items-start justify-center p-1">
-            <div className="w-1 h-2 bg-gray-400/80 rounded-full animate-bounce"></div>
-          </div>
-          <svg className="w-4 h-4 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ animationDelay: '0.15s' }}>
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-          </svg>
-        </div>
-      </div>
-
+      
       {/* ===== ESTILOS CSS PERSONALIZADOS ===== */}
       <style jsx>{`
         /* Animación de entrada desde abajo hacia arriba */
