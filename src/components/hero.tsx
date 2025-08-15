@@ -33,6 +33,7 @@ export default function Hero({
   const spotlightRef = useRef<HTMLDivElement | null>(null);
   const [typedIndex, setTypedIndex] = useState(0);
   const [subtitleTypedIndex, setSubtitleTypedIndex] = useState(0);
+  const [showMobileContainer, setShowMobileContainer] = useState(false);
 
   // Typewriter setup
   const prefixText = isEs ? "Hola, soy " : "Hey, I'm ";
@@ -49,6 +50,14 @@ export default function Hero({
     setTypedIndex(0);
     setSubtitleTypedIndex(0);
   }, [language]);
+
+  // Show mobile container after 0.8 seconds
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowMobileContainer(true);
+    }, 800);
+    return () => clearTimeout(timer);
+  }, []);
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -143,8 +152,10 @@ export default function Hero({
         {/* Left Side - Text Content */}
         <div className="space-y-6 relative z-20 mt-auto md:-mt-6 lg:-mt-10 sm:z-30">
           
-          {/* Content Wrapper with Glassmorphism for Mobile */}
-          <div className="relative z-40 sm:z-50 md:bg-transparent md:backdrop-filter-none md:border-none md:p-0 bg-black/20 backdrop-blur-sm border border-white/10 rounded-2xl p-6 sm:p-8 shadow-2xl">
+          {/* Content Wrapper with Dark Overlay for Mobile */}
+          <div className={`relative z-40 sm:z-50 md:bg-transparent md:border-none md:p-0 bg-black/30 border border-white/10 rounded-2xl p-6 sm:p-8 shadow-2xl transition-all duration-800 ease-out md:opacity-100 md:translate-y-0 ${
+            showMobileContainer ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+          }`}>
 
           {/* Main Title */}
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight text-center md:text-left hero-title font-mono tracking-tight drop-shadow-2xl" aria-label={`Hey, I'm ${title}`} style={{ textShadow: '2px 2px 10px rgba(0, 0, 0, 0.9)' }}>
@@ -196,17 +207,17 @@ export default function Hero({
 
           {/* CTA Buttons - Cyberpunk Style */}
           <div className={`mb-8 transition-all duration-700 ${isSubtitleDone ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2 pointer-events-none'}`}>
-            <div className="flex flex-col sm:flex-row justify-center md:justify-start items-center gap-4 w-full">
+            <div className="flex flex-row justify-center md:justify-start items-center gap-3 w-full">
               <a 
                 href="#projects"
-                className="cyberpunk-btn cyberpunk-btn-primary w-full sm:w-auto"
+                className="cyberpunk-btn cyberpunk-btn-primary flex-1"
               >
                 <span>{isEs ? 'VER MI TRABAJO' : 'VIEW MY WORK'}</span>
               </a>
               
               <a 
                 href="#contact"
-                className="cyberpunk-btn cyberpunk-btn-secondary w-full sm:w-auto"
+                className="cyberpunk-btn cyberpunk-btn-secondary flex-1"
               >
                 <span>{isEs ? 'CONTÁCTAME' : 'CONTACT ME'}</span>
               </a>
@@ -378,6 +389,11 @@ export default function Hero({
           text-align: center;
           backdrop-filter: blur(10px);
           box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+          min-height: 52px;
+          max-height: 52px;
+          height: 52px;
+          white-space: nowrap;
+          box-sizing: border-box;
         }
         
         /* Botón principal con gradiente azul-púrpura */
@@ -503,6 +519,9 @@ export default function Hero({
             padding: 0.875rem 1.75rem;
             font-size: 0.9rem;
             border-radius: 11px;
+            min-height: 50px;
+            max-height: 50px;
+            height: 50px;
           }
         }
         
@@ -511,6 +530,9 @@ export default function Hero({
             padding: 1rem 2rem;
             font-size: 1rem;
             border-radius: 12px;
+            min-height: 54px;
+            max-height: 54px;
+            height: 54px;
           }
         }
         
@@ -538,6 +560,8 @@ export default function Hero({
             letter-spacing: 0.8px;
             border-radius: 13px;
             min-height: 48px;
+            max-height: 48px;
+            height: 48px;
           }
         }
       `}</style>
