@@ -113,7 +113,7 @@ export default function Hero({
   ];
 
   return (
-    <section className={`relative min-h-screen overflow-hidden ${className}`}>
+    <section className={`relative min-h-screen overflow-hidden mb-0 ${className}`}>
       {/* Side language tab */}
       <a
         href="#toggle-lang"
@@ -126,7 +126,7 @@ export default function Hero({
       {/* Background ahora manejado en el main container */}
 
       {/* Main Content */}
-      <div className="relative z-10 mx-auto grid max-w-6xl items-center gap-8 md:gap-12 px-6 sm:px-8 py-20 md:py-28 min-h-screen md:grid-cols-2">
+      <div className="relative z-10 mx-auto grid max-w-6xl items-center gap-8 md:gap-12 px-6 sm:px-8 py-20 md:py-28 min-h-screen md:grid-cols-2 mb-0 pb-0">
         
         {/* Mobile Background Character removed */}
 

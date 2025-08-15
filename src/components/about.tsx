@@ -105,7 +105,7 @@ export default function About({ className }: AboutProps) {
   return (
     <section 
       id="about-section"
-      className={`relative min-h-screen overflow-hidden bg-transparent ${className}`}
+      className={`relative min-h-screen overflow-hidden bg-transparent mt-20 ${className}`}
     >
       {/* Sin background separado - continúa el fondo del Hero */}
 
@@ -118,17 +118,17 @@ export default function About({ className }: AboutProps) {
       </div>
 
       {/* Contenido principal */}
-      <div className="relative z-10 mx-auto max-w-6xl px-6 sm:px-8 py-20 md:py-28">
+      <div className="relative z-10 mx-auto max-w-6xl px-6 sm:px-8 py-0 md:py-0">
         
         {/* Header Section */}
-        <div className="text-center mb-16">
+        <div className="text-left mb-16 pt-20">
           <h2 className={`text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight font-mono tracking-tight transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
             <span className="bg-gradient-to-r from-sky-400 via-blue-500 to-indigo-500 bg-clip-text text-transparent">
               {isEs ? 'Sobre Mí' : 'About Me'}
             </span>
           </h2>
           
-          <div className={`w-24 h-1 bg-gradient-to-r from-blue-400 to-purple-500 mx-auto rounded-full transition-all duration-1000 delay-300 ${isVisible ? 'opacity-100 scale-x-100' : 'opacity-0 scale-x-0'}`}></div>
+          <div className={`w-24 h-1 bg-gradient-to-r from-blue-400 to-purple-500 rounded-full transition-all duration-1000 delay-300 ${isVisible ? 'opacity-100 scale-x-100' : 'opacity-0 scale-x-0'}`}></div>
         </div>
 
         {/* Main Content Grid */}
