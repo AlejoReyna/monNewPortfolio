@@ -153,7 +153,7 @@ export default function Hero({
         <div className="space-y-6 relative z-20 mt-auto md:-mt-6 lg:-mt-10 sm:z-30">
           
           {/* Content Wrapper with Dark Overlay for Mobile */}
-          <div className={`relative z-40 sm:z-50 md:bg-transparent md:border-none md:p-0 bg-black/30 border border-white/10 rounded-2xl p-6 sm:p-8 shadow-2xl transition-all duration-800 ease-out md:opacity-100 md:translate-y-0 ${
+          <div className={`relative z-40 sm:z-50 md:bg-transparent md:border-none md:p-0 bg-black/70 backdrop-blur-md border border-white/20 rounded-2xl p-6 sm:p-8 shadow-2xl transition-all duration-800 ease-out md:opacity-100 md:translate-y-0 ${
             showMobileContainer ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
           }`}>
 
