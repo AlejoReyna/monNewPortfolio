@@ -139,7 +139,7 @@ export default function Hero({
           <div className="relative z-30">
 
           {/* Main Title */}
-          <h1 className="text-4xl lg:text-6xl font-bold text-white mb-6 leading-tight text-center md:text-left hero-title font-mono tracking-tight" aria-label={`Hey, I'm ${title}`}>
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight text-center md:text-left hero-title font-mono tracking-tight" aria-label={`Hey, I'm ${title}`}>
             <span className="relative block">
               {/* Placeholder to reserve final height */}
               <span className="opacity-0 select-none">{finalTitle}</span>
@@ -197,21 +197,21 @@ export default function Hero({
             </div>
           </div>
 
-          {/* CTA Buttons (replacing metrics), centered */}
+          {/* CTA Buttons - Cyberpunk Style */}
           <div className={`mb-8 transition-all duration-700 ${isSubtitleDone ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2 pointer-events-none'}`}>
             <div className="flex flex-col sm:flex-row justify-center md:justify-start items-center gap-4 w-full">
               <a 
                 href="#projects"
-                className="w-full sm:w-auto px-8 py-4 text-base sm:text-lg bg-gradient-to-r from-purple-600 to-blue-600 text-white font-bold rounded-2xl shadow-2xl hover:shadow-purple-500/30 transform hover:scale-105 transition-all duration-300 text-center"
+                className="cyberpunk-btn cyberpunk-btn-primary w-full sm:w-auto"
               >
-                {isEs ? 'Ver mi trabajo' : 'View my work'}
+                <span>{isEs ? 'VER MI TRABAJO' : 'VIEW MY WORK'}</span>
               </a>
               
               <a 
                 href="#contact"
-                className="w-full sm:w-auto px-8 py-4 text-base sm:text-lg bg-white/10 backdrop-blur-xl border border-white/20 text-white font-bold rounded-2xl hover:bg-white/20 transform hover:scale-105 transition-all duration-300 text-center"
+                className="cyberpunk-btn cyberpunk-btn-secondary w-full sm:w-auto"
               >
-                {isEs ? 'Contáctame' : 'Contact me'}
+                <span>{isEs ? 'CONTÁCTAME' : 'CONTACT ME'}</span>
               </a>
             </div>
           </div>
@@ -366,17 +366,168 @@ export default function Hero({
         }
         
         /* ===== ANIMACIÓN DEL CAROUSEL INFINITO ===== */
-        /* 
-          Esta animación mueve el contenedor del carousel hacia la izquierda.
-          Al mover exactamente -50%, se crea el efecto infinito porque:
-          1. Los elementos originales se mueven fuera de la vista
-          2. Los elementos duplicados (que están después) toman su lugar
-          3. Cuando la animación termina, se reinicia sin saltos visibles
-          4. La duración de 30s hace que el movimiento sea suave y no distraiga
-        */
         @keyframes marquee {
           0% { transform: translateX(0); }
           100% { transform: translateX(-50%); }
+        }
+        
+        /* ===== BOTONES MODERNOS CON GRADIENTES ===== */
+        .cyberpunk-btn {
+          position: relative;
+          padding: 1rem 2rem;
+          border: 2px solid transparent;
+          border-radius: 12px;
+          font-family: 'Inter', system-ui, -apple-system, sans-serif;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+          font-size: 1rem;
+          font-weight: 600;
+          text-decoration: none;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+          overflow: hidden;
+          text-align: center;
+          backdrop-filter: blur(10px);
+        }
+        
+        /* Botón principal con gradiente azul-púrpura */
+        .cyberpunk-btn-primary {
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          color: #ffffff;
+          box-shadow: 0 8px 32px rgba(102, 126, 234, 0.3);
+        }
+        
+        .cyberpunk-btn-primary::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+          opacity: 0;
+          transition: opacity 0.4s ease;
+          z-index: -1;
+        }
+        
+        .cyberpunk-btn-primary::after {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          opacity: 1;
+          z-index: -2;
+        }
+        
+        .cyberpunk-btn-primary:hover {
+          transform: translateY(-3px) scale(1.02);
+          box-shadow: 0 15px 40px rgba(102, 126, 234, 0.4), 0 0 0 2px rgba(118, 75, 162, 0.3);
+        }
+        
+        .cyberpunk-btn-primary:hover::before {
+          opacity: 1;
+        }
+        
+        /* Botón secundario con gradiente coral-naranja */
+        .cyberpunk-btn-secondary {
+          background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+          color: #ffffff;
+          box-shadow: 0 8px 32px rgba(240, 147, 251, 0.3);
+        }
+        
+        .cyberpunk-btn-secondary::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: linear-gradient(135deg, #f5576c 0%, #f093fb 100%);
+          opacity: 0;
+          transition: opacity 0.4s ease;
+          z-index: -1;
+        }
+        
+        .cyberpunk-btn-secondary::after {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+          opacity: 1;
+          z-index: -2;
+        }
+        
+        .cyberpunk-btn-secondary:hover {
+          transform: translateY(-3px) scale(1.02);
+          box-shadow: 0 15px 40px rgba(245, 87, 108, 0.4), 0 0 0 2px rgba(240, 147, 251, 0.3);
+        }
+        
+        .cyberpunk-btn-secondary:hover::before {
+          opacity: 1;
+        }
+        
+        /* Animación suave de pulso para botones */
+        @keyframes pulse-glow {
+          0%, 100% { 
+            opacity: 0.8; 
+          }
+          50% { 
+            opacity: 1; 
+          }
+        }
+        
+        /* Efecto de brillo al hacer hover */
+        .cyberpunk-btn:hover {
+          animation: pulse-glow 2s ease-in-out infinite;
+        }
+        
+        /* Asegurar que el span interno esté visible */
+        .cyberpunk-btn span {
+          position: relative;
+          z-index: 10;
+          text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Estados adicionales para mejor UX */
+        .cyberpunk-btn:active {
+          transform: translateY(-1px) scale(0.98);
+          transition: all 0.1s ease;
+        }
+        
+        .cyberpunk-btn:focus {
+          outline: none;
+          box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.3);
+        }
+        
+        /* Responsive para móvil */
+        @media (max-width: 768px) {
+          .cyberpunk-btn {
+            padding: 0.9rem 1.8rem;
+            font-size: 0.9rem;
+            border-radius: 10px;
+          }
+          
+          .cyberpunk-btn:hover {
+            transform: translateY(-2px) scale(1.01);
+          }
+        }
+        
+        /* Mejoras para pantallas pequeñas */
+        @media (max-width: 640px) {
+          .cyberpunk-btn {
+            padding: 0.8rem 1.5rem;
+            font-size: 0.85rem;
+            letter-spacing: 0.3px;
+          }
         }
       `}</style>
     </section>

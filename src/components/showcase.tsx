@@ -243,13 +243,13 @@ function TimelineItem({ project, index, quarter, year, isFirstJob }: TimelineIte
                         </p>
 
                         {/* Action Buttons */}
-                        <div className="flex flex-col sm:flex-row gap-3">
+                        <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
                             {project.url && (
                                 <a
                                     href={project.url}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="flex-1 px-6 py-3 bg-gradient-to-r from-cyan-500 to-violet-500 text-white font-semibold rounded-full text-center hover:from-cyan-400 hover:to-violet-400 transition-all duration-300 hover:shadow-lg hover:shadow-cyan-500/25 hover:scale-[1.02]"
+                                    className="flex-1 px-6 py-3 bg-gradient-to-r from-cyan-500 to-violet-500 text-white font-mono font-bold rounded-full text-center hover:from-cyan-400 hover:to-violet-400 transition-all duration-300 hover:shadow-lg hover:shadow-cyan-500/25 hover:scale-[1.02]"
                                 >
                                     <span className="flex items-center justify-center gap-2">
                                         View Live Demo
@@ -265,7 +265,7 @@ function TimelineItem({ project, index, quarter, year, isFirstJob }: TimelineIte
                                     href={project.repo}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="flex-1 px-6 py-3 border border-white/20 text-gray-300 font-semibold rounded-full text-center hover:bg-white/10 hover:text-white hover:border-white/30 transition-all duration-300"
+                                    className="flex-1 px-6 py-3 border border-white/20 text-gray-300 font-mono font-bold rounded-full text-center hover:bg-white/10 hover:text-white hover:border-white/30 transition-all duration-300"
                                 >
                                     <span className="flex items-center justify-center gap-2">
                                         GitHub Repository
@@ -278,7 +278,7 @@ function TimelineItem({ project, index, quarter, year, isFirstJob }: TimelineIte
                             
                             {/* Special message for current job if no links */}
                             {isFirstJob && !project.url && !project.repo && (
-                                <div className="flex-1 px-6 py-3 border border-blue-500/30 text-blue-300 font-semibold rounded-full text-center bg-gradient-to-r from-blue-500/10 to-indigo-500/10">
+                                <div className="flex-1 px-6 py-3 border border-blue-500/30 text-blue-300 font-mono font-bold rounded-full text-center bg-gradient-to-r from-blue-500/10 to-indigo-500/10">
                                     <span className="flex items-center justify-center gap-2">
                                         🏢 Private Company Project
                                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
