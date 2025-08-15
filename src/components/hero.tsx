@@ -123,9 +123,7 @@ export default function Hero({
       >
         {isEs ? 'Click for English' : 'Click aquí para ver en español'}
       </a>
-      {/* Black background with subtle gradient */}
-      <div className="absolute inset-0 bg-gradient-to-br from-black via-gray-900 to-black">
-      </div>
+      {/* Background ahora manejado en el main container */}
 
       {/* Main Content */}
       <div className="relative z-10 mx-auto grid max-w-6xl items-center gap-8 md:gap-12 px-6 sm:px-8 py-20 md:py-28 min-h-screen md:grid-cols-2">
