@@ -59,7 +59,7 @@ export default function Navbar() {
           {/* Left: Brand */}
           <div className="relative z-10 flex min-w-0 items-center gap-2">
             <Link href="#top" className="group inline-flex items-center gap-2">
-              <div className="flex items-center font-mono text-base font-extralight tracking-tight">
+              <div className="flex items-center font-mono text-base font-bold tracking-tight">
                 <span className="text-cyan-400 group-hover:text-cyan-300 transition-colors duration-200">&lt;</span>
                 <span className="mx-1 bg-gradient-to-r from-white via-gray-100 to-gray-200 bg-clip-text text-transparent group-hover:from-white group-hover:via-white group-hover:to-gray-100 transition-all duration-200">
                   Alexis Reyna

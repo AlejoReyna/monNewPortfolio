@@ -118,12 +118,8 @@ export default function Hero({
       >
         {isEs ? 'Click for English' : 'Click aquí para ver en español'}
       </a>
-      {/* Playful midnight background with drifting pastel blobs */}
-      <div className="absolute inset-0 bg-gradient-to-br from-slate-950 via-sky-950 to-slate-950">
-        <div className="absolute top-8 -left-16 w-72 h-72 bg-cyan-400/30 rounded-full blur-3xl animate-[drift_22s_ease-in-out_infinite_alternate]"></div>
-        <div className="absolute bottom-10 -right-16 w-80 h-80 bg-pink-400/25 rounded-full blur-3xl animate-[drift_26s_ease-in-out_infinite_alternate]" style={{ animationDelay: '2s' }}></div>
-        <div className="absolute top-[40%] left-[60%] w-64 h-64 bg-amber-300/20 rounded-full blur-3xl animate-[drift_28s_ease-in-out_infinite_alternate]" style={{ animationDelay: '4s' }}></div>
-        <div className="absolute top-[65%] left-[22%] w-56 h-56 bg-lime-300/20 rounded-full blur-3xl animate-[drift_24s_ease-in-out_infinite_alternate]" style={{ animationDelay: '1s' }}></div>
+      {/* Black background with subtle gradient */}
+      <div className="absolute inset-0 bg-gradient-to-br from-black via-gray-900 to-black">
       </div>
 
       {/* Main Content */}
@@ -331,11 +327,7 @@ export default function Hero({
             0% { transform: translateX(0); }
             100% { transform: translateX(-50%); }
           }
-        @keyframes drift {
-          0% { transform: translate3d(0, 0, 0) scale(1); }
-          50% { transform: translate3d(10px, -16px, 0) scale(1.05); }
-          100% { transform: translate3d(-12px, 12px, 0) scale(1); }
-        }
+
       `}</style>
     </section>
   );
