@@ -205,19 +205,19 @@ export default function Hero({
             </div>
           </div>
 
-          {/* CTA Buttons - Cyberpunk Style */}
+          {/* CTA Buttons - Matching Let's Talk Style */}
           <div className={`mb-8 transition-all duration-700 ${isSubtitleDone ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2 pointer-events-none'}`}>
             <div className="flex flex-row justify-center md:justify-start items-center gap-3 w-full">
               <a 
                 href="#projects"
-                className="cyberpunk-btn cyberpunk-btn-primary flex-1"
+                className="lets-talk-btn lets-talk-btn-primary flex-1"
               >
                 <span>{isEs ? 'VER MI TRABAJO' : 'VIEW MY WORK'}</span>
               </a>
               
               <a 
                 href="#contact"
-                className="cyberpunk-btn cyberpunk-btn-secondary flex-1"
+                className="lets-talk-btn lets-talk-btn-glass flex-1"
               >
                 <span>{isEs ? 'CONTÁCTAME' : 'CONTACT ME'}</span>
               </a>
@@ -368,157 +368,117 @@ export default function Hero({
           100% { transform: translateX(-50%); }
         }
         
-        /* ===== BOTONES MODERNOS CON GRADIENTES ===== */
-        .cyberpunk-btn {
+        /* ===== BOTONES CON ESTILO LET'S TALK ===== */
+        .lets-talk-btn {
           position: relative;
-          padding: 0.875rem 1.75rem;
-          border: 2px solid transparent;
-          border-radius: 12px;
-          font-family: 'Inter', system-ui, -apple-system, sans-serif;
-          text-transform: uppercase;
-          letter-spacing: 0.8px;
-          font-size: 0.9rem;
-          font-weight: 700;
-          text-decoration: none;
           display: inline-flex;
           align-items: center;
           justify-content: center;
+          gap: 0.5rem;
+          border-radius: 9999px;
+          padding: 0.875rem 1.75rem;
+          text-sm: 0.875rem;
+          font-family: 'Geist Mono', monospace;
+          font-weight: 700;
+          letter-spacing: 0.025em;
+          color: white;
+          text-decoration: none;
+          transition: all 0.3s ease;
           cursor: pointer;
-          transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-          overflow: hidden;
-          text-align: center;
-          backdrop-filter: blur(10px);
-          box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+          white-space: nowrap;
+          box-sizing: border-box;
           min-height: 52px;
           max-height: 52px;
           height: 52px;
-          white-space: nowrap;
-          box-sizing: border-box;
         }
         
-        /* Botón principal con gradiente azul-púrpura */
-        .cyberpunk-btn-primary {
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-          color: #ffffff;
-          box-shadow: 0 10px 40px rgba(102, 126, 234, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.1) inset;
-          border: 1px solid rgba(255, 255, 255, 0.2);
+        /* Botón primario - idéntico al Let's talk */
+        .lets-talk-btn-primary {
+          background: linear-gradient(to right, rgb(30 41 59 / 0.8), rgb(30 58 138 / 0.6), rgb(91 33 182 / 0.7));
+          box-shadow: inset 0 1px 0 rgb(34 211 238 / 0.1);
+          border: 1px solid transparent;
         }
         
-        .cyberpunk-btn-primary::before {
+        .lets-talk-btn-primary::before {
           content: '';
           position: absolute;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
-          opacity: 0;
-          transition: opacity 0.4s ease;
-          z-index: -1;
+          inset: 0;
+          border-radius: inherit;
+          padding: 1px;
+          background: conic-gradient(from 0deg, #60a5fa, #22d3ee, #a78bfa, #60a5fa);
+          -webkit-mask: 
+            linear-gradient(#000 0 0) content-box,
+            linear-gradient(#000 0 0);
+          -webkit-mask-composite: xor;
+          mask-composite: exclude;
+          pointer-events: none;
         }
         
-        .cyberpunk-btn-primary::after {
+        .lets-talk-btn-primary:hover {
+          background: linear-gradient(to right, rgb(15 23 42 / 0.9), rgb(30 64 175 / 0.7), rgb(109 40 217 / 0.8));
+          box-shadow: inset 0 1px 0 rgb(34 211 238 / 0.2);
+          transform: scale(1.02);
+        }
+        
+        /* Botón con glassmorphism */
+        .lets-talk-btn-glass {
+          background: linear-gradient(to right, rgba(30, 41, 59, 0.3), rgba(30, 58, 138, 0.2), rgba(91, 33, 182, 0.3));
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          backdrop-filter: blur(12px);
+          box-shadow: 
+            inset 0 1px 0 rgba(34, 211, 238, 0.1),
+            0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .lets-talk-btn-glass::before {
           content: '';
           position: absolute;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-          opacity: 1;
-          z-index: -2;
+          inset: 0;
+          border-radius: inherit;
+          padding: 1px;
+          background: conic-gradient(from 0deg, rgba(96, 165, 250, 0.6), rgba(34, 211, 238, 0.6), rgba(167, 139, 250, 0.6), rgba(96, 165, 250, 0.6));
+          -webkit-mask: 
+            linear-gradient(#000 0 0) content-box,
+            linear-gradient(#000 0 0);
+          -webkit-mask-composite: xor;
+          mask-composite: exclude;
+          pointer-events: none;
         }
         
-        .cyberpunk-btn-primary:hover {
-          transform: translateY(-3px) scale(1.02);
-          box-shadow: 0 20px 50px rgba(102, 126, 234, 0.5), 0 0 0 2px rgba(118, 75, 162, 0.3), 0 0 30px rgba(102, 126, 234, 0.3) inset;
-        }
-        
-        .cyberpunk-btn-primary:hover::before {
-          opacity: 1;
-        }
-        
-        /* Botón secundario con gradiente coral-naranja */
-        .cyberpunk-btn-secondary {
-          background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-          color: #ffffff;
-          box-shadow: 0 10px 40px rgba(240, 147, 251, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.1) inset;
-          border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        
-        .cyberpunk-btn-secondary::before {
-          content: '';
-          position: absolute;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          background: linear-gradient(135deg, #f5576c 0%, #f093fb 100%);
-          opacity: 0;
-          transition: opacity 0.4s ease;
-          z-index: -1;
-        }
-        
-        .cyberpunk-btn-secondary::after {
-          content: '';
-          position: absolute;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-          opacity: 1;
-          z-index: -2;
-        }
-        
-        .cyberpunk-btn-secondary:hover {
-          transform: translateY(-3px) scale(1.02);
-          box-shadow: 0 20px 50px rgba(245, 87, 108, 0.5), 0 0 0 2px rgba(240, 147, 251, 0.3), 0 0 30px rgba(240, 147, 251, 0.3) inset;
-        }
-        
-        .cyberpunk-btn-secondary:hover::before {
-          opacity: 1;
-        }
-        
-        /* Animación suave de pulso para botones */
-        @keyframes pulse-glow {
-          0%, 100% { 
-            opacity: 0.8; 
-          }
-          50% { 
-            opacity: 1; 
-          }
-        }
-        
-        /* Efecto de brillo al hacer hover */
-        .cyberpunk-btn:hover {
-          animation: pulse-glow 2s ease-in-out infinite;
+        .lets-talk-btn-glass:hover {
+          background: linear-gradient(to right, rgba(15, 23, 42, 0.4), rgba(30, 64, 175, 0.3), rgba(109, 40, 217, 0.4));
+          box-shadow: 
+            inset 0 1px 0 rgba(34, 211, 238, 0.2),
+            0 8px 30px rgba(0, 0, 0, 0.4);
+          transform: scale(1.02);
+          border-color: rgba(255, 255, 255, 0.2);
         }
         
         /* Asegurar que el span interno esté visible */
-        .cyberpunk-btn span {
+        .lets-talk-btn span {
           position: relative;
           z-index: 10;
-          text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+          font-weight: 700;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
         }
         
         /* Estados adicionales para mejor UX */
-        .cyberpunk-btn:active {
-          transform: translateY(-1px) scale(0.98);
+        .lets-talk-btn:active {
+          transform: scale(0.98);
           transition: all 0.1s ease;
         }
         
-        .cyberpunk-btn:focus {
+        .lets-talk-btn:focus {
           outline: none;
-          box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.3);
+          box-shadow: 0 0 0 3px rgba(34, 211, 238, 0.3);
         }
         
         /* Responsive para pantallas medianas y grandes */
         @media (min-width: 768px) {
-          .cyberpunk-btn {
+          .lets-talk-btn {
             padding: 0.875rem 1.75rem;
-            font-size: 0.9rem;
-            border-radius: 11px;
+            font-size: 0.875rem;
             min-height: 50px;
             max-height: 50px;
             height: 50px;
@@ -526,10 +486,9 @@ export default function Hero({
         }
         
         @media (min-width: 1024px) {
-          .cyberpunk-btn {
+          .lets-talk-btn {
             padding: 1rem 2rem;
             font-size: 1rem;
-            border-radius: 12px;
             min-height: 54px;
             max-height: 54px;
             height: 54px;
@@ -538,27 +497,23 @@ export default function Hero({
         
         /* Responsive para móvil */
         @media (max-width: 767px) {
-          .cyberpunk-btn {
+          .lets-talk-btn {
             padding: 1rem 2rem;
             font-size: 0.95rem;
-            border-radius: 14px;
             font-weight: 800;
-            letter-spacing: 1px;
-            box-shadow: 0 12px 45px rgba(0, 0, 0, 0.4);
+            letter-spacing: 0.05em;
           }
           
-          .cyberpunk-btn:hover {
-            transform: translateY(-2px) scale(1.01);
+          .lets-talk-btn:hover {
+            transform: scale(1.01);
           }
         }
         
         /* Mejoras para pantallas muy pequeñas */
         @media (max-width: 640px) {
-          .cyberpunk-btn {
+          .lets-talk-btn {
             padding: 0.95rem 1.8rem;
             font-size: 0.9rem;
-            letter-spacing: 0.8px;
-            border-radius: 13px;
             min-height: 48px;
             max-height: 48px;
             height: 48px;

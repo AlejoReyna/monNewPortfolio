@@ -5,6 +5,21 @@ import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import { LanguageProvider, LanguageFade } from "@/components/lang-context";
 
+// Function to generate iOS meta tags for status bar styling
+function generateiOSMetaTags() {
+  return {
+    // iOS status bar appearance
+    'apple-mobile-web-app-capable': 'yes',
+    'apple-mobile-web-app-status-bar-style': 'black-translucent',
+    'apple-mobile-web-app-title': 'Alexis Reyna',
+    // Theme color for mobile browsers (matches navbar dark theme)
+    'theme-color': '#0f0f0f',
+    // Additional iOS meta tags
+    'format-detection': 'telephone=no',
+    'viewport': 'width=device-width, initial-scale=1, viewport-fit=cover',
+  };
+}
+
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -18,6 +33,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Alexis Reyna | Software Engineer",
   description: "Fullstack Developer | Building modern, fast, and accessible web experiences.",
+  other: generateiOSMetaTags(),
 };
 
 export default function RootLayout({
@@ -27,8 +43,21 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        {/* Additional iOS specific meta tags */}
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta name="apple-mobile-web-app-title" content="Alexis Reyna" />
+        <meta name="theme-color" content="#0f0f0f" />
+        <meta name="format-detection" content="telephone=no" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+        {/* iOS splash screen color */}
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        style={{ backgroundColor: '#0f0f0f' }}
       >
         <LanguageProvider>
           <LanguageFade>
