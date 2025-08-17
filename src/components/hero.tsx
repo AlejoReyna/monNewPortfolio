@@ -23,6 +23,43 @@ const getGradientColors = (gradient: string): string => {
   return gradientMap[gradient] || '#6b7280, #9ca3af';
 };
 
+// Arrays de saludos para primera visita y visitas recurrentes
+const firstTimeGreetings = [
+  { en: "Howdy visitor", es: "Hola visitante" },
+  { en: "Well hello there", es: "Vaya, hola" },
+  { en: "Welcome, stranger", es: "Bienvenido, forastero" },
+  { en: "Greetings, traveler", es: "Saludos, viajero" },
+  { en: "Hey there, friend", es: "Ey amigo" },
+  { en: "Good to see you", es: "Qué bueno verte" },
+  { en: "Look who's here", es: "Mira quién llegó" },
+  { en: "Welcome aboard", es: "Bienvenido a bordo" },
+  { en: "Hello, wanderer", es: "Hola, caminante" },
+  { en: "Nice to meet you", es: "Un gusto conocerte" }
+];
+
+const returningGreetings = [
+  { en: "Back again, huh?", es: "¿De vuelta otra vez?" },
+  { en: "Missed me already?", es: "¿Ya me extrañabas?" },
+  { en: "Welcome back, friend", es: "Bienvenido de vuelta" },
+  { en: "Déjà vu, isn't it?", es: "Déjà vu, ¿no?" },
+  { en: "We meet again", es: "Nos volvemos a ver" },
+  { en: "Couldn't stay away?", es: "¿No pudiste alejarte?" },
+  { en: "Back for more?", es: "¿Vienes por más?" },
+  { en: "Oh, you again!", es: "¡Oh, tú otra vez!" },
+  { en: "Long time no see", es: "Cuánto tiempo sin verte" },
+  { en: "The legend returns", es: "La leyenda regresa" },
+  { en: "Twice in one day?", es: "¿Dos veces en un día?" },
+  { en: "Reload addiction?", es: "¿Adicción al F5?" },
+  { en: "Testing my patience?", es: "¿Probando mi paciencia?" },
+  { en: "Still here? Nice!", es: "¿Sigues aquí? ¡Genial!" },
+  { en: "My favorite visitor", es: "Mi visitante favorito" },
+  { en: "You're persistent", es: "Eres persistente" },
+  { en: "Round two, fight!", es: "¡Round dos, pelea!" },
+  { en: "Ah, a familiar face", es: "Ah, una cara conocida" },
+  { en: "The prodigal returns", es: "El pródigo regresa" },
+  { en: "Fancy seeing you here", es: "Qué casualidad verte aquí" }
+];
+
 export default function Hero({
   title = "Alexis",
   subtitle = "Full-stack developer creating intuitive user experiences and powerful backend architectures for modern businesses.",
@@ -34,22 +71,85 @@ export default function Hero({
   const [typedIndex, setTypedIndex] = useState(0);
   const [subtitleTypedIndex, setSubtitleTypedIndex] = useState(0);
   const [showMobileContainer, setShowMobileContainer] = useState(false);
+  const [greeting, setGreeting] = useState("");
+  const [userName, setUserName] = useState("");
+  const [inputValue, setInputValue] = useState("");
+  const [showNameInput, setShowNameInput] = useState(false);
+
+  // Función para obtener un saludo aleatorio
+  const getRandomGreeting = () => {
+    const hasVisitedBefore = typeof window !== 'undefined' && localStorage.getItem('hasVisitedBefore');
+    const useReturning = hasVisitedBefore && Math.random() < 0.7;
+    const greetingsArray = useReturning ? returningGreetings : firstTimeGreetings;
+    const randomIndex = Math.floor(Math.random() * greetingsArray.length);
+    const selectedGreeting = greetingsArray[randomIndex];
+    
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('hasVisitedBefore', 'true');
+    }
+    
+    return isEs ? selectedGreeting.es : selectedGreeting.en;
+  };
+
+  // Cargar el nombre del usuario y establecer el saludo cuando el componente se monta
+  useEffect(() => {
+    const savedName = localStorage.getItem('userName');
+    if (savedName) {
+      setUserName(savedName);
+    }
+    setGreeting(getRandomGreeting());
+  }, []);
+
+  // Mostrar el input después de que termine de escribir el saludo
+  useEffect(() => {
+    if (!userName && typedIndex >= greeting.length && !showNameInput) {
+      setTimeout(() => setShowNameInput(true), 300);
+    }
+  }, [typedIndex, greeting.length, userName, showNameInput]);
+
+  // Manejar el guardado del nombre
+  const handleSaveName = () => {
+    if (inputValue.trim()) {
+      const name = inputValue.trim();
+      setUserName(name);
+      localStorage.setItem('userName', name);
+      setShowNameInput(false);
+      // Continuar el typewriter para el nombre
+      setTypedIndex(greeting.length);
+    }
+  };
+
+  // Manejar el enter y escape en el input
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleSaveName();
+    } else if (e.key === 'Escape') {
+      setShowNameInput(false);
+      setInputValue('');
+    }
+  };
 
   // Typewriter setup
-  const prefixText = isEs ? "Hola, soy " : "Hey, I'm ";
-  const nameText = title;
+  const prefixText = greeting || "Howdy visitor";
+  const nameText = userName ? `, ${userName}` : "";
   const fullLength = prefixText.length + nameText.length;
   const finalTitle = `${prefixText}${nameText}`;
   const subtitleText = isEs
     ? "Desarrollador full‑stack creando experiencias intuitivas y arquitecturas backend potentes para negocios modernos."
     : subtitle;
-  const isSubtitleDone = typedIndex >= fullLength && subtitleTypedIndex >= subtitleText.length;
+  const isSubtitleDone = (userName || showNameInput) && typedIndex >= fullLength && subtitleTypedIndex >= subtitleText.length;
 
-  // Reset typewriter when language changes
+  // Reset typewriter and update greeting when language changes
   useEffect(() => {
     setTypedIndex(0);
     setSubtitleTypedIndex(0);
-  }, [language]);
+    const hasVisitedBefore = typeof window !== 'undefined' && localStorage.getItem('hasVisitedBefore');
+    const useReturning = hasVisitedBefore && Math.random() < 0.7;
+    const greetingsArray = useReturning ? returningGreetings : firstTimeGreetings;
+    const randomIndex = Math.floor(Math.random() * greetingsArray.length);
+    const selectedGreeting = greetingsArray[randomIndex];
+    setGreeting(isEs ? selectedGreeting.es : selectedGreeting.en);
+  }, [language, isEs]);
 
   // Show mobile container after 0.8 seconds
   useEffect(() => {
@@ -70,68 +170,62 @@ export default function Hero({
     return () => window.removeEventListener('mousemove', handleMouseMove);
   }, []);
 
-  // Increment typewriter index until full text is rendered
+  // Increment typewriter index
   useEffect(() => {
+    // Si estamos mostrando el input, detener el typewriter en el saludo
+    if (showNameInput && typedIndex >= prefixText.length) return;
+    // Si ya escribimos todo, detener
     if (typedIndex >= fullLength) return;
+    
     const timeout = setTimeout(() => setTypedIndex((v) => v + 1), 70);
     return () => clearTimeout(timeout);
-  }, [typedIndex, fullLength]);
+  }, [typedIndex, fullLength, showNameInput, prefixText.length]);
 
-  // Start subtitle typewriter after title completes
+  // Start subtitle typewriter after title completes or input is shown
   useEffect(() => {
-    if (typedIndex < fullLength) return;
+    // No empezar si estamos esperando input
+    if (!userName && showNameInput) return;
+    // No empezar si no hemos terminado el título
+    if (userName && typedIndex < fullLength) return;
+    if (!userName && typedIndex < prefixText.length) return;
+    // No continuar si ya terminamos
     if (subtitleTypedIndex >= subtitleText.length) return;
+    
     const timeout = setTimeout(() => setSubtitleTypedIndex((v) => v + 1), 30);
     return () => clearTimeout(timeout);
-  }, [typedIndex, fullLength, subtitleTypedIndex, subtitleText]);
+  }, [typedIndex, fullLength, subtitleTypedIndex, subtitleText, showNameInput, userName, prefixText.length]);
 
-  // ===== TIPO Y DATOS DEL CAROUSEL =====
-  // Tipo que define la estructura de cada tecnología en el carousel
-  // Puede tener iconUrl (imagen) O icon (emoji/símbolo)
+  // Technologies carousel data
   type Technology = {
     name: string;
     gradient: string;
   } & ({ iconUrl: string } | { icon: string });
 
-  // Array de tecnologías que se muestran en el carousel
-  // Cada tecnología tiene: nombre, gradiente de color, y icono (URL o emoji)
   const technologies: Technology[] = [
     {
       name: 'TypeScript',
-      gradient: 'from-blue-600 to-blue-400', // Gradiente azul para TypeScript
-      iconUrl:
-        'https://raw.githubusercontent.com/marwin1991/profile-technology-icons/refs/heads/main/icons/typescript.png',
+      gradient: 'from-blue-600 to-blue-400',
+      iconUrl: 'https://raw.githubusercontent.com/marwin1991/profile-technology-icons/refs/heads/main/icons/typescript.png',
     },
     {
       name: 'Ruby',
-      gradient: 'from-red-500 to-pink-400', // Gradiente rojo-rosa para Ruby
-      iconUrl:
-        'https://raw.githubusercontent.com/marwin1991/profile-technology-icons/refs/heads/main/icons/ruby.png',
+      gradient: 'from-red-500 to-pink-400',
+      iconUrl: 'https://raw.githubusercontent.com/marwin1991/profile-technology-icons/refs/heads/main/icons/ruby.png',
     },
     {
       name: 'AWS',
-      gradient: 'from-orange-500 to-red-400', // Gradiente naranja-rojo para AWS
-      iconUrl:
-        'https://raw.githubusercontent.com/marwin1991/profile-technology-icons/refs/heads/main/icons/aws.png',
+      gradient: 'from-orange-500 to-red-400',
+      iconUrl: 'https://raw.githubusercontent.com/marwin1991/profile-technology-icons/refs/heads/main/icons/aws.png',
     },
     {
       name: 'Crypto',
-      gradient: 'from-yellow-500 to-orange-400', // Gradiente amarillo-naranja para Crypto
-      icon: '₿', // Emoji de Bitcoin en lugar de imagen
+      gradient: 'from-yellow-500 to-orange-400',
+      icon: '₿',
     },
   ];
 
   return (
     <section className={`relative min-h-screen overflow-hidden mb-0 ${className}`}>
-      {/* Side language tab */}
-      <a
-        href="#toggle-lang"
-        onClick={(e) => { e.preventDefault(); toggleWithFade(); }}
-        aria-label={isEs ? "Click for English" : "Click aquí para ver en español"}
-        className="absolute left-0 top-24 z-50 translate-x-0 bg-gray-800/70 text-gray-200 text-[11px] sm:text-xs font-medium px-3 py-1.5 rounded-r-full border border-gray-700/60 backdrop-blur-sm shadow-md shadow-black/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/60"
-      >
-        {isEs ? 'Click for English' : 'Click aquí para ver en español'}
-      </a>
       {/* Mobile GIF Background - Full Screen */}
       <div className="md:hidden absolute inset-0 z-0">
         <Image 
@@ -147,8 +241,6 @@ export default function Hero({
       {/* Main Content */}
       <div className="relative z-20 mx-auto grid max-w-6xl items-end md:items-center gap-8 md:gap-12 px-6 sm:px-8 py-20 md:py-28 min-h-screen md:grid-cols-2 mb-0 pb-8 md:pb-0">
         
-        {/* Mobile Background Character removed */}
-
         {/* Left Side - Text Content */}
         <div className="space-y-6 relative z-20 mt-auto md:-mt-6 lg:-mt-10 sm:z-30">
           
@@ -157,38 +249,60 @@ export default function Hero({
             showMobileContainer ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
           }`}>
 
-          {/* Main Title */}
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight text-center md:text-left hero-title font-mono tracking-tight drop-shadow-2xl" aria-label={`Hey, I'm ${title}`} style={{ textShadow: '2px 2px 10px rgba(0, 0, 0, 0.9)' }}>
-            <span className="relative block">
-              {/* Placeholder to reserve final height */}
-              <span className="opacity-0 select-none">{finalTitle}</span>
-              {/* Overlay typed content */}
-              <span className="absolute inset-0">
-                <span>
-                  {prefixText.slice(0, Math.min(typedIndex, prefixText.length))}
+          {/* Main Title with Inline Input */}
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-8 leading-tight text-center md:text-left hero-title font-mono tracking-tight drop-shadow-2xl relative" 
+              style={{ textShadow: '2px 2px 10px rgba(0, 0, 0, 0.9)' }}>
+            <span className="inline-block w-full">
+              {/* Typed greeting text */}
+              <span className="inline">
+                {prefixText.slice(0, Math.min(typedIndex, prefixText.length))}
+              </span>
+              
+              {/* Comma and space before name/input */}
+              {typedIndex >= prefixText.length && (
+                <span className="inline">, </span>
+              )}
+              
+              {/* Name input inline - appears after greeting is typed */}
+              {showNameInput && !userName && typedIndex >= prefixText.length && (
+                <span className="inline-block relative">
+                  <input
+                    type="text"
+                    value={inputValue}
+                    onChange={(e) => setInputValue(e.target.value)}
+                    onKeyPress={handleKeyPress}
+                    placeholder={isEs ? "tu nombre" : "your name"}
+                    className="bg-transparent border-b-4 border-cyan-400 text-cyan-400 placeholder-cyan-400/50 outline-none font-mono font-bold min-w-[200px] max-w-[400px] pb-1 animate-pulse-border text-4xl md:text-5xl lg:text-6xl"
+                    style={{ 
+                      width: inputValue ? `${Math.max(200, inputValue.length * 35)}px` : '250px',
+                      textShadow: '0 0 20px rgba(100, 255, 218, 0.5)'
+                    }}
+                    autoFocus
+                  />
+                  <span className="absolute -bottom-10 left-0 text-xs text-white/60 whitespace-nowrap">
+                    🔒 {isEs ? "Solo en tu navegador" : "Browser only"}
+                  </span>
                 </span>
+              )}
+              
+              {/* Typed name if already saved */}
+              {userName && (
                 <span
-                  className={
-                    typedIndex >= fullLength
-                      ? "bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-500 bg-clip-text text-transparent font-extrabold"
-                      : "text-white"
-                  }
-                  style={{ textShadow: typedIndex >= fullLength ? '0 0 20px rgba(100, 255, 218, 0.5)' : 'inherit' }}
+                  className="bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-500 bg-clip-text text-transparent font-extrabold inline"
+                  style={{ textShadow: '0 0 20px rgba(100, 255, 218, 0.5)' }}
                 >
                   {typedIndex > prefixText.length
                     ? nameText.slice(0, Math.min(typedIndex - prefixText.length, nameText.length))
                     : ''}
                 </span>
-                {/* Caret */}
-                {typedIndex < fullLength && (
-                  <span className="ml-[1px] inline-block w-[2px] h-[1em] align-[-0.1em] bg-white/80 animate-pulse" />
-                )}
-                <div className="absolute -bottom-2 left-0 w-full h-1 bg-gradient-to-r from-gray-400 to-gray-600 rounded-full transform scale-x-0 animate-[scaleX_1s_ease-out_1s_forwards]"></div>
-              </span>
+              )}
+              
+              {/* Caret */}
+              {!showNameInput && typedIndex < fullLength && (
+                <span className="ml-[1px] inline-block w-[2px] h-[1em] align-[-0.1em] bg-white/80 animate-pulse" />
+              )}
             </span>
           </h1>
-
-          {/* Mobile GIF background - moved outside and made full screen */}
 
           {/* Description */}
           <div className="text-base sm:text-lg lg:text-xl text-gray-100 md:text-gray-300 mb-8 font-light md:font-extralight font-mono relative text-center md:text-left max-w-xl md:max-w-none mx-auto md:mx-0 hero-subtitle" style={{ textShadow: '1px 1px 6px rgba(0, 0, 0, 0.9)' }}>
@@ -199,7 +313,7 @@ export default function Hero({
               <span className="text-gray-100 md:text-sky-200">
                 {subtitleText.slice(0, subtitleTypedIndex)}
               </span>
-              {typedIndex >= fullLength && subtitleTypedIndex < subtitleText.length && (
+              {((userName && typedIndex >= fullLength) || (showNameInput)) && subtitleTypedIndex < subtitleText.length && (
                 <span className="ml-[1px] inline-block w-[2px] h-[1em] align-[-0.1em] bg-sky-200/80 animate-pulse" />
               )}
             </div>
@@ -224,47 +338,26 @@ export default function Hero({
             </div>
           </div>
 
-          {/* ===== CAROUSEL DE TECNOLOGÍAS ===== */}
-          {/* 
-            Este carousel muestra las tecnologías que manejo de forma animada.
-            Funciona de manera diferente en móvil vs desktop:
-            - Móvil: Scroll horizontal manual
-            - Desktop: Animación automática infinita (marquee)
-            
-            NOTA: Actualmente oculto - cambiar 'hidden' por 'block' para mostrarlo
-          */}
+          {/* Technologies Carousel - Hidden by default */}
           <div className="hidden mt-2 block transition-all duration-700">
-            
-            {/* Contenedor principal del carousel */}
             <div
               className="relative overflow-x-auto md:overflow-hidden rounded-full border border-gray-700/40 bg-gray-800/20 -mx-6 px-6 md:mx-0 md:px-0"
               style={{ 
-                // Máscara de gradiente para crear efecto de desvanecimiento en los bordes
-                // En móvil: permite scroll horizontal con desvanecimiento suave
                 WebkitMaskImage: 'linear-gradient(to right, transparent, black 6%, black 94%, transparent)', 
                 maskImage: 'linear-gradient(to right, transparent, black 6%, black 94%, transparent)' 
               }}
             >
-              
-              {/* Contenedor interno con los elementos del carousel */}
               <div className={`flex items-center gap-3 whitespace-nowrap will-change-transform md:${isSubtitleDone ? 'animate-[marquee_30s_linear_infinite]' : ''}`}>
-                
-                {/* ===== PRIMERA ITERACIÓN - Elementos originales ===== */}
                 {technologies.map((tech) => (
                   <span
                     key={`${tech.name}-a`}
                     className="inline-flex items-center gap-1.5 px-4 py-1 text-xs font-medium text-gray-300 rounded-full mr-2 backdrop-blur-sm hover:scale-110 transition-transform duration-300 cursor-pointer"
                     style={{
-                      // Fondo con gradiente personalizado usando la función helper
-                      // padding-box: color de fondo interno
-                      // border-box: gradiente en el borde
                       background: `linear-gradient(rgb(31 41 55 / 0.5), rgb(31 41 55 / 0.5)) padding-box, linear-gradient(to right, ${getGradientColors(tech.gradient)}) border-box`,
                       border: '1px solid transparent',
                     }}
                   >
-                    {/* Renderizado condicional del icono */}
                     {'iconUrl' in tech ? (
-                      // Si tiene URL de icono, renderiza imagen
                       <Image
                         src={tech.iconUrl}
                         alt={`${tech.name} icon`}
@@ -273,20 +366,12 @@ export default function Hero({
                         className="h-4 w-4 object-contain"
                       />
                     ) : (
-                      // Si no tiene URL, renderiza emoji/símbolo
                       <span className="text-sm">{tech.icon}</span>
                     )}
                     {tech.name}
                   </span>
                 ))}
                 
-                {/* ===== SEGUNDA ITERACIÓN - Duplicados para efecto infinito ===== */}
-                {/* 
-                  En desktop, se duplican los elementos para crear el efecto de carousel infinito.
-                  Los elementos duplicados tienen aria-hidden="true" para accesibilidad.
-                  La animación marquee mueve todo el contenedor hacia la izquierda,
-                  y cuando termina, se reinicia sin saltos visibles.
-                */}
                 {technologies.map((tech) => (
                   <span
                     key={`${tech.name}-b`}
@@ -295,7 +380,7 @@ export default function Hero({
                       background: `linear-gradient(rgb(31 41 55 / 0.5), rgb(31 41 55 / 0.5)) padding-box, linear-gradient(to right, ${getGradientColors(tech.gradient)}) border-box`,
                       border: '1px solid transparent',
                     }}
-                    aria-hidden="true" // Oculto para lectores de pantalla
+                    aria-hidden="true"
                   >
                     {'iconUrl' in tech ? (
                       <Image
@@ -315,15 +400,12 @@ export default function Hero({
             </div>
           </div>
 
-          {/* CTA Buttons moved above; removed duplicate here */}
           </div> {/* End Content Wrapper */}
         </div>
 
         {/* Right Side - Character (Desktop Only) */}
         <div className="hidden md:block relative w-full max-w-[811px] sm:max-w-[905px] md:max-w-[998px] lg:max-w-[1123px] aspect-[768/1211] mt-32">
-          <div 
-            className="relative transform h-full w-full"
-          >
+          <div className="relative transform h-full w-full">
             {/* Glow Effect */}
             <div className="absolute inset-0 bg-gradient-to-r from-gray-600 to-gray-700 rounded-xl blur-3xl opacity-20 scale-110"></div>
             
@@ -341,10 +423,23 @@ export default function Hero({
         </div>
       </div>
 
-      
-      {/* ===== ESTILOS CSS PERSONALIZADOS ===== */}
+      {/* CSS Styles */}
       <style jsx>{`
-        /* Animación de entrada desde abajo hacia arriba */
+        @keyframes pulse-border {
+          0%, 100% { 
+            border-color: rgb(34 211 238);
+            box-shadow: 0 4px 20px rgba(34, 211, 238, 0.4);
+          }
+          50% { 
+            border-color: rgb(167 139 250);
+            box-shadow: 0 4px 20px rgba(167, 139, 250, 0.4);
+          }
+        }
+        
+        .animate-pulse-border {
+          animation: pulse-border 2s ease-in-out infinite;
+        }
+        
         @keyframes fadeInUp {
           from {
             opacity: 0;
@@ -356,19 +451,16 @@ export default function Hero({
           }
         }
         
-        /* Animación de la línea debajo del título */
         @keyframes scaleX {
           from { transform: scaleX(0); }
           to { transform: scaleX(1); }
         }
         
-        /* ===== ANIMACIÓN DEL CAROUSEL INFINITO ===== */
         @keyframes marquee {
           0% { transform: translateX(0); }
           100% { transform: translateX(-50%); }
         }
         
-        /* ===== BOTONES CON ESTILO LET'S TALK ===== */
         .lets-talk-btn {
           position: relative;
           display: inline-flex;
@@ -392,7 +484,6 @@ export default function Hero({
           height: 52px;
         }
         
-        /* Botón primario - idéntico al Let's talk */
         .lets-talk-btn-primary {
           background: linear-gradient(to right, rgb(30 41 59 / 0.8), rgb(30 58 138 / 0.6), rgb(91 33 182 / 0.7));
           box-shadow: inset 0 1px 0 rgb(34 211 238 / 0.1);
@@ -420,7 +511,6 @@ export default function Hero({
           transform: scale(1.02);
         }
         
-        /* Botón con glassmorphism */
         .lets-talk-btn-glass {
           background: linear-gradient(to right, rgba(30, 41, 59, 0.3), rgba(30, 58, 138, 0.2), rgba(91, 33, 182, 0.3));
           border: 1px solid rgba(255, 255, 255, 0.1);
@@ -454,7 +544,6 @@ export default function Hero({
           border-color: rgba(255, 255, 255, 0.2);
         }
         
-        /* Asegurar que el span interno esté visible */
         .lets-talk-btn span {
           position: relative;
           z-index: 10;
@@ -463,7 +552,6 @@ export default function Hero({
           letter-spacing: 0.05em;
         }
         
-        /* Estados adicionales para mejor UX */
         .lets-talk-btn:active {
           transform: scale(0.98);
           transition: all 0.1s ease;
@@ -474,7 +562,6 @@ export default function Hero({
           box-shadow: 0 0 0 3px rgba(34, 211, 238, 0.3);
         }
         
-        /* Responsive para pantallas medianas y grandes */
         @media (min-width: 768px) {
           .lets-talk-btn {
             padding: 0.875rem 1.75rem;
@@ -495,7 +582,6 @@ export default function Hero({
           }
         }
         
-        /* Responsive para móvil */
         @media (max-width: 767px) {
           .lets-talk-btn {
             padding: 1rem 2rem;
@@ -509,7 +595,6 @@ export default function Hero({
           }
         }
         
-        /* Mejoras para pantallas muy pequeñas */
         @media (max-width: 640px) {
           .lets-talk-btn {
             padding: 0.95rem 1.8rem;
