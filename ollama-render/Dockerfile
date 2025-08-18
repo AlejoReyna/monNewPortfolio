@@ -12,4 +12,4 @@ ENV OLLAMA_HOST=0.0.0.0:10000
 ENV OLLAMA_KEEP_ALIVE=24h
 
 # Comando optimizado - usar llama3.2:1b (más rápido y eficiente)
-CMD ["sh", "-c", "ollama serve & sleep 15 && ollama pull llama3.2:1b && echo '🚀 Modelo Llama 3.2 1B listo!' && wait"]
+CMD sh -c "ollama serve & sleep 15 && ollama pull llama3.2:1b && echo '🚀 Modelo Llama 3.2 1B listo!' && wait"
