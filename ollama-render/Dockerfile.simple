@@ -1,12 +1,15 @@
 FROM ollama/ollama:latest
 
-# Instalar curl
+# Instalar curl como root
 USER root
 RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
 
-# Exponer puerto
-EXPOSE 11434
+# Exponer puerto 10000 para Render
+EXPOSE 10000
 
-# Script simple inline
-USER ollama
-CMD ["sh", "-c", "ollama serve & sleep 10 && ollama pull llama3.1:8b && wait"]
+# Configuración para Render
+ENV OLLAMA_HOST=0.0.0.0:10000
+ENV OLLAMA_KEEP_ALIVE=24h
+
+# Usar llama3.2:1b (más rápido y eficiente)
+CMD ["sh", "-c", "ollama serve & sleep 15 && ollama pull llama3.2:1b && echo '🚀 Modelo Llama 3.2 1B listo!' && wait"]

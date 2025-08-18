@@ -118,7 +118,7 @@ export async function POST(req: NextRequest) {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          model: 'llama3.1:8b',
+          model: 'llama3.2:1b',
           messages: ollamaMessages,
           stream: false,
           options: {
