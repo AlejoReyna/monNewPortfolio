@@ -52,7 +52,7 @@ async function fetchWithRetry(url: string, options: RequestInit, maxRetries = 3)
     try {
       const response = await fetch(url, {
         ...options,
-        signal: AbortSignal.timeout(30000), // 30 segundos timeout
+        signal: AbortSignal.timeout(60000), // 60 segundos para cold starts
       });
       
       if (response.ok) {
@@ -118,13 +118,14 @@ export async function POST(req: NextRequest) {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          model: 'llama3.2:1b',
+          model: 'llama3.2:1b', // Modelo confirmado disponible
           messages: ollamaMessages,
           stream: false,
           options: {
-            temperature: 0.7,
-            top_p: 0.9,
-            max_tokens: 150, // Limitar respuestas cortas
+            temperature: 0.3, // Menos aleatorio = más rápido
+            top_p: 0.8,
+            max_tokens: 100, // Respuestas más cortas = más rápido
+            num_predict: 100, // Límite de tokens
           }
         }),
       }
@@ -133,6 +134,17 @@ export async function POST(req: NextRequest) {
     if (!response.ok) {
       const errorText = await response.text();
       console.error('❌ Error de Ollama:', response.status, errorText);
+      
+      if (response.status === 404) {
+        return NextResponse.json(
+          { 
+            error: 'Modelo no encontrado. El chatbot se está inicializando, intenta en unos segundos.',
+            isWakingUp: true,
+            details: 'Error 404: Verifica que el modelo llama3.2:1b esté disponible'
+          },
+          { status: 404 }
+        );
+      }
       
       if (response.status === 503 || response.status === 502) {
         return NextResponse.json(
