@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 
 const OLLAMA_URL = process.env.OLLAMA_URL || 'http://localhost:11434';
 
+// Para debugging
+console.log('🔗 OLLAMA_URL configurada:', OLLAMA_URL);
+
 interface ChatMessage {
   role: 'user' | 'assistant' | 'system';
   content: string;
