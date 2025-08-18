@@ -1,4 +1,4 @@
-import Hero from "@/components/hero";
+import HeroChat from "@/components/hero-chat";
 import About from "@/components/about";
 import Showcase from "@/components/showcase";
 import Services from "@/components/services";
@@ -11,7 +11,7 @@ export default function Home() {
       {/* Background continuo para toda la página */}
       <div className="fixed inset-0 bg-gradient-to-br from-black via-gray-900 to-black -z-10"></div>
       
-      <Hero />
+      <HeroChat />
       <About />
       <Services />
       <Showcase />

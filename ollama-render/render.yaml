@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: ollama-chatbot
+    env: docker
+    dockerfilePath: ./ollama-render/Dockerfile
+    plan: free
+    port: 11434
+    envVars:
+      - key: OLLAMA_HOST
+        value: "0.0.0.0:11434"
+      - key: OLLAMA_KEEP_ALIVE
+        value: "24h"
+    healthCheckPath: /api/version
+    buildCommand: echo "Building Ollama service..."
+    startCommand: "/start.sh"
