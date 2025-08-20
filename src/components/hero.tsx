@@ -2,6 +2,7 @@
 import Image from "next/image";
 import { useState, useEffect, useRef } from 'react';
 import { useLanguage } from "@/components/lang-context";
+import { useChat, ChatMessage } from "@/hooks/useChat";
 
 type HeroProps = {
   title?: string;
@@ -60,6 +61,13 @@ const returningGreetings = [
   { en: "Fancy seeing you here", es: "Qué casualidad verte aquí" }
 ];
 
+const quickSuggestions = [
+  { en: "About me", es: "Sobre mí" },
+  { en: "Projects", es: "Proyectos" },
+  { en: "Technologies", es: "Tecnologías" },
+  { en: "Contact", es: "Contacto" },
+];
+
 export default function Hero({
   title = "Alexis",
   subtitle = "Full-stack developer creating intuitive user experiences and powerful backend architectures for modern businesses.",
@@ -75,6 +83,13 @@ export default function Hero({
   const [userName, setUserName] = useState("");
   const [inputValue, setInputValue] = useState("");
   const [showNameInput, setShowNameInput] = useState(false);
+  const [isChatMode, setIsChatMode] = useState(false);
+  const [showIntroChat, setShowIntroChat] = useState(false);
+
+  // Chat functionality with GPT-5 nano
+  const { messages, isLoading, error, sendMessage, isRateLimit, usage } = useChat(userName);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const chatInputRef = useRef<HTMLInputElement>(null);
 
   // Función para obtener un saludo aleatorio
   const getRandomGreeting = () => {
@@ -116,18 +131,58 @@ export default function Hero({
       setShowNameInput(false);
       // Continuar el typewriter para el nombre
       setTypedIndex(greeting.length);
+      // Mostrar chat intro después de guardar nombre
+      setTimeout(() => setShowIntroChat(true), 1000);
     }
   };
 
   // Manejar el enter y escape en el input
-  const handleKeyPress = (e: React.KeyboardEvent) => {
+  const handleKeyPress = (e: React.KeyboardEvent, isChat = false) => {
     if (e.key === 'Enter') {
-      handleSaveName();
+      e.preventDefault();
+      if (isChat) {
+        handleSendMessage();
+      } else {
+        handleSaveName();
+      }
     } else if (e.key === 'Escape') {
       setShowNameInput(false);
       setInputValue('');
     }
   };
+
+  // Chat functions
+  const handleSendMessage = () => {
+    if (inputValue.trim() && !isLoading) {
+      sendMessage(inputValue.trim());
+      setInputValue('');
+    }
+  };
+
+  const handleSuggestionClick = (suggestion: string) => {
+    sendMessage(suggestion);
+  };
+
+  const toggleChatMode = () => {
+    setIsChatMode(!isChatMode);
+    if (!isChatMode) {
+      setTimeout(() => chatInputRef.current?.focus(), 100);
+    }
+  };
+
+  // Auto-scroll en chat
+  useEffect(() => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [messages]);
+
+  // Mostrar intro del chat automáticamente si el usuario ya tiene nombre
+  useEffect(() => {
+    if (userName && !showIntroChat) {
+      setTimeout(() => setShowIntroChat(true), 1500);
+    }
+  }, [userName, showIntroChat]);
 
   // Typewriter setup
   const prefixText = greeting || "Howdy visitor";
@@ -218,9 +273,9 @@ export default function Hero({
       iconUrl: 'https://raw.githubusercontent.com/marwin1991/profile-technology-icons/refs/heads/main/icons/aws.png',
     },
     {
-      name: 'Crypto',
+      name: 'AI/GPT',
       gradient: 'from-yellow-500 to-orange-400',
-      icon: '₿',
+      icon: '🤖',
     },
   ];
 
@@ -241,7 +296,7 @@ export default function Hero({
       {/* Main Content */}
       <div className="relative z-20 mx-auto grid max-w-6xl items-end md:items-center gap-8 md:gap-12 px-6 sm:px-8 py-20 md:py-28 min-h-screen md:grid-cols-2 mb-0 pb-8 md:pb-0">
         
-        {/* Left Side - Text Content */}
+        {/* Left Side - Content */}
         <div className="space-y-6 relative z-20 mt-auto md:-mt-6 lg:-mt-10 sm:z-30">
           
           {/* Content Wrapper with Dark Overlay for Mobile */}
@@ -249,156 +304,247 @@ export default function Hero({
             showMobileContainer ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
           }`}>
 
-          {/* Main Title with Inline Input */}
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-8 leading-tight text-center md:text-left hero-title font-mono tracking-tight drop-shadow-2xl relative" 
-              style={{ textShadow: '2px 2px 10px rgba(0, 0, 0, 0.9)' }}>
-            <span className="inline-block w-full">
-              {/* Typed greeting text */}
-              <span className="inline">
-                {prefixText.slice(0, Math.min(typedIndex, prefixText.length))}
-              </span>
-              
-              {/* Comma and space before name/input */}
-              {typedIndex >= prefixText.length && (
-                <span className="inline">, </span>
-              )}
-              
-              {/* Name input inline - appears after greeting is typed */}
-              {showNameInput && !userName && typedIndex >= prefixText.length && (
-                <span className="inline-block relative">
-                  <input
-                    type="text"
-                    value={inputValue}
-                    onChange={(e) => setInputValue(e.target.value)}
-                    onKeyPress={handleKeyPress}
-                    placeholder={isEs ? "tu nombre" : "your name"}
-                    className="bg-transparent border-b-4 border-cyan-400 text-cyan-400 placeholder-cyan-400/50 outline-none font-mono font-bold min-w-[200px] max-w-[400px] pb-1 animate-pulse-border text-4xl md:text-5xl lg:text-6xl"
-                    style={{ 
-                      width: inputValue ? `${Math.max(200, inputValue.length * 35)}px` : '250px',
-                      textShadow: '0 0 20px rgba(100, 255, 218, 0.5)'
-                    }}
-                    autoFocus
-                  />
-                  <span className="absolute -bottom-10 left-0 text-xs text-white/60 whitespace-nowrap">
-                    🔒 {isEs ? "Solo en tu navegador" : "Browser only"}
+          {!isChatMode ? (
+            // Modo tradicional con greeting y intro al chat
+            <div className="space-y-6">
+              {/* Main Title with Inline Input */}
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-8 leading-tight text-center md:text-left hero-title font-mono tracking-tight drop-shadow-2xl relative" 
+                  style={{ textShadow: '2px 2px 10px rgba(0, 0, 0, 0.9)' }}>
+                <span className="inline-block w-full">
+                  {/* Typed greeting text */}
+                  <span className="inline">
+                    {prefixText.slice(0, Math.min(typedIndex, prefixText.length))}
                   </span>
-                </span>
-              )}
-              
-              {/* Typed name if already saved */}
-              {userName && (
-                <span
-                  className="bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-500 bg-clip-text text-transparent font-extrabold inline"
-                  style={{ textShadow: '0 0 20px rgba(100, 255, 218, 0.5)' }}
-                >
-                  {typedIndex > prefixText.length
-                    ? nameText.slice(0, Math.min(typedIndex - prefixText.length, nameText.length))
-                    : ''}
-                </span>
-              )}
-              
-              {/* Caret */}
-              {!showNameInput && typedIndex < fullLength && (
-                <span className="ml-[1px] inline-block w-[2px] h-[1em] align-[-0.1em] bg-white/80 animate-pulse" />
-              )}
-            </span>
-          </h1>
-
-          {/* Description */}
-          <div className="text-base sm:text-lg lg:text-xl text-gray-100 md:text-gray-300 mb-8 font-light md:font-extralight font-mono relative text-center md:text-left max-w-xl md:max-w-none mx-auto md:mx-0 hero-subtitle" style={{ textShadow: '1px 1px 6px rgba(0, 0, 0, 0.9)' }}>
-            {/* Placeholder to reserve final height */}
-            <p className="opacity-0 select-none text-gray-400">{subtitleText}</p>
-            {/* Overlay typed content */}
-            <div className="absolute inset-0">
-              <span className="text-gray-100 md:text-sky-200">
-                {subtitleText.slice(0, subtitleTypedIndex)}
-              </span>
-              {((userName && typedIndex >= fullLength) || (showNameInput)) && subtitleTypedIndex < subtitleText.length && (
-                <span className="ml-[1px] inline-block w-[2px] h-[1em] align-[-0.1em] bg-sky-200/80 animate-pulse" />
-              )}
-            </div>
-          </div>
-
-          {/* CTA Buttons - Matching Let's Talk Style */}
-          <div className={`mb-8 transition-all duration-700 ${isSubtitleDone ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2 pointer-events-none'}`}>
-            <div className="flex flex-row justify-center md:justify-start items-center gap-3 w-full">
-              <a 
-                href="#projects"
-                className="lets-talk-btn lets-talk-btn-primary flex-1"
-              >
-                <span>{isEs ? 'VER MI TRABAJO' : 'VIEW MY WORK'}</span>
-              </a>
-              
-              <a 
-                href="#contact"
-                className="lets-talk-btn lets-talk-btn-glass flex-1"
-              >
-                <span>{isEs ? 'CONTÁCTAME' : 'CONTACT ME'}</span>
-              </a>
-            </div>
-          </div>
-
-          {/* Technologies Carousel - Hidden by default */}
-          <div className="hidden mt-2 block transition-all duration-700">
-            <div
-              className="relative overflow-x-auto md:overflow-hidden rounded-full border border-gray-700/40 bg-gray-800/20 -mx-6 px-6 md:mx-0 md:px-0"
-              style={{ 
-                WebkitMaskImage: 'linear-gradient(to right, transparent, black 6%, black 94%, transparent)', 
-                maskImage: 'linear-gradient(to right, transparent, black 6%, black 94%, transparent)' 
-              }}
-            >
-              <div className={`flex items-center gap-3 whitespace-nowrap will-change-transform md:${isSubtitleDone ? 'animate-[marquee_30s_linear_infinite]' : ''}`}>
-                {technologies.map((tech) => (
-                  <span
-                    key={`${tech.name}-a`}
-                    className="inline-flex items-center gap-1.5 px-4 py-1 text-xs font-medium text-gray-300 rounded-full mr-2 backdrop-blur-sm hover:scale-110 transition-transform duration-300 cursor-pointer"
-                    style={{
-                      background: `linear-gradient(rgb(31 41 55 / 0.5), rgb(31 41 55 / 0.5)) padding-box, linear-gradient(to right, ${getGradientColors(tech.gradient)}) border-box`,
-                      border: '1px solid transparent',
-                    }}
-                  >
-                    {'iconUrl' in tech ? (
-                      <Image
-                        src={tech.iconUrl}
-                        alt={`${tech.name} icon`}
-                        width={16}
-                        height={16}
-                        className="h-4 w-4 object-contain"
+                  
+                  {/* Comma and space before name/input */}
+                  {typedIndex >= prefixText.length && (
+                    <span className="inline">, </span>
+                  )}
+                  
+                  {/* Name input inline - appears after greeting is typed */}
+                  {showNameInput && !userName && typedIndex >= prefixText.length && (
+                    <span className="inline-block relative">
+                      <input
+                        type="text"
+                        value={inputValue}
+                        onChange={(e) => setInputValue(e.target.value)}
+                        onKeyPress={handleKeyPress}
+                        placeholder={isEs ? "tu nombre" : "your name"}
+                        className="bg-transparent border-b-4 border-cyan-400 text-cyan-400 placeholder-cyan-400/50 outline-none font-mono font-bold min-w-[200px] max-w-[400px] pb-1 animate-pulse-border text-4xl md:text-5xl lg:text-6xl"
+                        style={{ 
+                          width: inputValue ? `${Math.max(200, inputValue.length * 35)}px` : '250px',
+                          textShadow: '0 0 20px rgba(100, 255, 218, 0.5)'
+                        }}
+                        autoFocus
                       />
-                    ) : (
-                      <span className="text-sm">{tech.icon}</span>
-                    )}
-                    {tech.name}
+                      <span className="absolute -bottom-10 left-0 text-xs text-white/60 whitespace-nowrap">
+                        🔒 {isEs ? "Solo en tu navegador" : "Browser only"}
+                      </span>
+                    </span>
+                  )}
+                  
+                  {/* Typed name if already saved */}
+                  {userName && (
+                    <span
+                      className="bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-500 bg-clip-text text-transparent font-extrabold inline"
+                      style={{ textShadow: '0 0 20px rgba(100, 255, 218, 0.5)' }}
+                    >
+                      {typedIndex > prefixText.length
+                        ? nameText.slice(0, Math.min(typedIndex - prefixText.length, nameText.length))
+                        : ''}
+                    </span>
+                  )}
+                  
+                  {/* Caret */}
+                  {!showNameInput && typedIndex < fullLength && (
+                    <span className="ml-[1px] inline-block w-[2px] h-[1em] align-[-0.1em] bg-white/80 animate-pulse" />
+                  )}
+                </span>
+              </h1>
+
+              {/* Description */}
+              <div className="text-base sm:text-lg lg:text-xl text-gray-100 md:text-gray-300 mb-8 font-light md:font-extralight font-mono relative text-center md:text-left max-w-xl md:max-w-none mx-auto md:mx-0 hero-subtitle" style={{ textShadow: '1px 1px 6px rgba(0, 0, 0, 0.9)' }}>
+                {/* Placeholder to reserve final height */}
+                <p className="opacity-0 select-none text-gray-400">{subtitleText}</p>
+                {/* Overlay typed content */}
+                <div className="absolute inset-0">
+                  <span className="text-gray-100 md:text-sky-200">
+                    {subtitleText.slice(0, subtitleTypedIndex)}
                   </span>
-                ))}
-                
-                {technologies.map((tech) => (
-                  <span
-                    key={`${tech.name}-b`}
-                    className="inline-flex items-center gap-1.5 px-4 py-1 text-xs font-medium text-gray-300 rounded-full mr-2 backdrop-blur-sm hover:scale-110 transition-transform duration-300 cursor-pointer"
-                    style={{
-                      background: `linear-gradient(rgb(31 41 55 / 0.5), rgb(31 41 55 / 0.5)) padding-box, linear-gradient(to right, ${getGradientColors(tech.gradient)}) border-box`,
-                      border: '1px solid transparent',
-                    }}
-                    aria-hidden="true"
+                  {((userName && typedIndex >= fullLength) || (showNameInput)) && subtitleTypedIndex < subtitleText.length && (
+                    <span className="ml-[1px] inline-block w-[2px] h-[1em] align-[-0.1em] bg-sky-200/80 animate-pulse" />
+                  )}
+                </div>
+              </div>
+
+              {/* AI Chat Introduction */}
+              {showIntroChat && (
+                <div className="bg-gradient-to-r from-blue-500/10 to-purple-500/10 border border-blue-400/30 rounded-xl p-4 backdrop-blur-sm animate-fadeInUp">
+                  <div className="flex items-center gap-2 mb-3">
+                    <span className="text-2xl">🤖</span>
+                    <p className="text-cyan-200 text-sm font-mono">
+                      {isEs ? "¡Hola! Soy Alexis. Pregúntame lo que quieras sobre mi trabajo." : "Hi! I'm Alexis. Ask me anything about my work."}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2 text-xs text-cyan-300/60 mt-1">
+                    <span>⚡ GPT-5 nano</span>
+                    {usage && (
+                      <span className="text-green-400">
+                        • ${(usage.total_tokens * 0.00005).toFixed(4)} {isEs ? "por conversación" : "per conversation"}
+                      </span>
+                    )}
+                  </div>
+                  <button
+                    onClick={toggleChatMode}
+                    className="text-xs bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 text-white px-4 py-2 rounded-lg font-bold transition-all duration-300 transform hover:scale-105"
                   >
-                    {'iconUrl' in tech ? (
-                      <Image
-                        src={tech.iconUrl}
-                        alt={`${tech.name} icon`}
-                        width={16}
-                        height={16}
-                        className="h-4 w-4 object-contain"
-                      />
-                    ) : (
-                      <span className="text-sm">{tech.icon}</span>
-                    )}
-                    {tech.name}
-                  </span>
-                ))}
+                    💬 {isEs ? "Iniciar Chat" : "Start Chat"}
+                  </button>
+                </div>
+              )}
+
+              {/* CTA Buttons */}
+              <div className={`mb-8 transition-all duration-700 ${isSubtitleDone ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2 pointer-events-none'}`}>
+                <div className="flex flex-row justify-center md:justify-start items-center gap-3 w-full">
+                  <a 
+                    href="#projects"
+                    className="lets-talk-btn lets-talk-btn-primary flex-1"
+                  >
+                    <span>{isEs ? 'VER MI TRABAJO' : 'VIEW MY WORK'}</span>
+                  </a>
+                  
+                  <a 
+                    href="#contact"
+                    className="lets-talk-btn lets-talk-btn-glass flex-1"
+                  >
+                    <span>{isEs ? 'CONTÁCTAME' : 'CONTACT ME'}</span>
+                  </a>
+                </div>
               </div>
             </div>
-          </div>
+          ) : (
+            // Modo Chat con GPT-5 nano
+            <div className="space-y-4">
+              {/* Chat Header */}
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <h2 className="text-2xl font-bold text-white font-mono">
+                    💬 Chat with Alexis
+                  </h2>
+                  <div className="flex items-center gap-2 text-xs text-cyan-300/60 mt-1">
+                    <span>⚡ GPT-5 nano</span>
+                    {usage && (
+                      <span className="text-green-400">
+                        • ${(usage.total_tokens * 0.00005).toFixed(4)} {isEs ? "gastado" : "spent"}
+                      </span>
+                    )}
+                  </div>
+                </div>
+                <button
+                  onClick={toggleChatMode}
+                  className="text-gray-400 hover:text-white transition-colors"
+                >
+                  ✕
+                </button>
+              </div>
+
+              {/* Chat Messages */}
+              <div className="h-80 overflow-y-auto space-y-3 bg-black/20 rounded-xl p-4 border border-white/10">
+                {messages.length === 0 && (
+                  <div className="text-center text-gray-400 py-8">
+                    <p className="font-mono">
+                      {isEs ? "¡Hola! Pregúntame sobre mis proyectos, tecnologías o experiencia." : "Hi! Ask me about my projects, technologies, or experience."}
+                    </p>
+                  </div>
+                )}
+
+                {messages.map((message) => (
+                  <div
+                    key={message.id}
+                    className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                  >
+                    <div
+                      className={`max-w-[80%] p-3 rounded-xl font-mono text-sm ${
+                        message.role === 'user'
+                          ? 'bg-gradient-to-r from-cyan-500 to-blue-500 text-white'
+                          : 'bg-gray-700/50 text-gray-100 border border-gray-600/30'
+                      }`}
+                    >
+                      <p>{message.content}</p>
+                      <span className="text-xs opacity-60 mt-1 block">
+                        {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+
+                {isLoading && (
+                  <div className="flex justify-start">
+                    <div className="bg-gray-700/50 text-gray-100 border border-gray-600/30 p-3 rounded-xl font-mono text-sm">
+                      <div className="flex items-center space-x-2">
+                        <div className="flex space-x-1">
+                          <div className="w-2 h-2 bg-cyan-400 rounded-full animate-bounce"></div>
+                          <div className="w-2 h-2 bg-cyan-400 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
+                          <div className="w-2 h-2 bg-cyan-400 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+                        </div>
+                        <span>Alexis está escribiendo...</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {error && (
+                  <div className="bg-red-500/20 border border-red-400/30 text-red-200 p-3 rounded-xl font-mono text-sm">
+                    <p>{error}</p>
+                    {isRateLimit && (
+                      <p className="text-xs mt-2 opacity-80">
+                        ⏳ {isEs ? "Rate limit alcanzado. Intenta en unos segundos." : "Rate limit reached. Try in a few seconds."}
+                      </p>
+                    )}
+                  </div>
+                )}
+
+                <div ref={messagesEndRef} />
+              </div>
+
+              {/* Quick Suggestions */}
+              {messages.length === 0 && !isLoading && (
+                <div className="flex flex-wrap gap-2 mb-3">
+                  {quickSuggestions.map((suggestion) => (
+                    <button
+                      key={suggestion.en}
+                      onClick={() => handleSuggestionClick(isEs ? suggestion.es : suggestion.en)}
+                      className="text-xs bg-gray-700/30 hover:bg-gray-600/40 text-gray-300 hover:text-white px-3 py-2 rounded-lg border border-gray-600/30 transition-all duration-300 font-mono"
+                    >
+                      {isEs ? suggestion.es : suggestion.en}
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              {/* Chat Input */}
+              <div className="flex gap-2">
+                <input
+                  ref={chatInputRef}
+                  type="text"
+                  value={inputValue}
+                  onChange={(e) => setInputValue(e.target.value)}
+                  onKeyPress={(e) => handleKeyPress(e, true)}
+                  placeholder={isEs ? "Pregúntame algo..." : "Ask me something..."}
+                  className="flex-1 bg-gray-800/50 border border-gray-600/50 text-white placeholder-gray-400 px-4 py-3 rounded-xl outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/30 font-mono text-sm"
+                  disabled={isLoading}
+                  maxLength={500} // Límite para controlar costos
+                />
+                <button
+                  onClick={handleSendMessage}
+                  disabled={!inputValue.trim() || isLoading}
+                  className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 disabled:from-gray-600 disabled:to-gray-700 disabled:cursor-not-allowed text-white px-6 py-3 rounded-xl font-bold transition-all duration-300 transform hover:scale-105 disabled:scale-100"
+                >
+                  {isLoading ? '⏳' : '🚀'}
+                </button>
+              </div>
+            </div>
+          )}
 
           </div> {/* End Content Wrapper */}
         </div>
@@ -449,6 +595,10 @@ export default function Hero({
             opacity: 1;
             transform: translateY(0);
           }
+        }
+        
+        .animate-fadeInUp {
+          animation: fadeInUp 0.6s ease-out;
         }
         
         @keyframes scaleX {

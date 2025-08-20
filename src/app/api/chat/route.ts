@@ -1,23 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
+import OpenAI from 'openai';
 
-const OLLAMA_URL = process.env.OLLAMA_URL || 'https://monnewportfolio.onrender.com';
+// Inicializar OpenAI client
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
 
 // Para debugging
-console.log('🔗 OLLAMA_URL configurada:', OLLAMA_URL);
+console.log('🔗 OpenAI configurado para GPT-5 nano');
 
 interface ChatMessage {
   role: 'user' | 'assistant' | 'system';
   content: string;
-}
-
-interface OllamaResponse {
-  model: string;
-  created_at: string;
-  message: {
-    role: string;
-    content: string;
-  };
-  done: boolean;
 }
 
 const SYSTEM_PROMPT = `Eres Alexis, un desarrollador full-stack mexicano amigable y profesional. 
@@ -46,39 +40,6 @@ EJEMPLOS DE RESPUESTAS:
 - "Trabajo principalmente con React y Ruby. ¿Te interesa alguna tecnología en particular?"
 - "Puedes ver mis proyectos en la sección de portfolio. ¿Hay algo específico que te gustaría saber?"`;
 
-// Función de retry con backoff exponencial
-async function fetchWithRetry(url: string, options: RequestInit, maxRetries = 3): Promise<Response> {
-  for (let i = 0; i < maxRetries; i++) {
-    try {
-      const response = await fetch(url, {
-        ...options,
-        signal: AbortSignal.timeout(60000), // 60 segundos para cold starts
-      });
-      
-      if (response.ok) {
-        return response;
-      }
-      
-      if (response.status >= 500 && i < maxRetries - 1) {
-        const delay = Math.pow(2, i) * 1000; // Backoff exponencial
-        await new Promise(resolve => setTimeout(resolve, delay));
-        continue;
-      }
-      
-      return response;
-    } catch (error) {
-      if (i === maxRetries - 1) {
-        throw error;
-      }
-      
-      const delay = Math.pow(2, i) * 1000;
-      await new Promise(resolve => setTimeout(resolve, delay));
-    }
-  }
-  
-  throw new Error('Max retries exceeded');
-}
-
 export async function POST(req: NextRequest) {
   try {
     const { messages, userName } = await req.json() as {
@@ -93,6 +54,15 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Verificar API key
+    if (!process.env.OPENAI_API_KEY) {
+      console.error('❌ OPENAI_API_KEY no configurada');
+      return NextResponse.json(
+        { error: 'Configuración de API faltante' },
+        { status: 500 }
+      );
+    }
+
     // Personalizar el prompt del sistema con el nombre del usuario
     const systemMessage: ChatMessage = {
       role: 'system',
@@ -101,81 +71,83 @@ export async function POST(req: NextRequest) {
         : SYSTEM_PROMPT
     };
 
-    // Construir mensajes para Ollama
-    const ollamaMessages = [systemMessage, ...messages];
+    // Construir mensajes para OpenAI
+    const openaiMessages = [systemMessage, ...messages];
 
-    console.log('🤖 Enviando request a Ollama:', {
-      url: `${OLLAMA_URL}/api/chat`,
-      messageCount: ollamaMessages.length,
+    console.log('🤖 Enviando request a GPT-5 nano:', {
+      model: 'gpt-5-nano',
+      messageCount: openaiMessages.length,
       lastMessage: messages[messages.length - 1]?.content?.substring(0, 100)
     });
 
-    const response = await fetchWithRetry(
-      `${OLLAMA_URL}/api/chat`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          model: 'llama3.2:1b', // Modelo confirmado disponible
-          messages: ollamaMessages,
-          stream: false,
-          options: {
-            temperature: 0.3, // Menos aleatorio = más rápido
-            top_p: 0.8,
-            max_tokens: 100, // Respuestas más cortas = más rápido
-            num_predict: 100, // Límite de tokens
-          }
-        }),
-      }
-    );
+    const completion = await openai.chat.completions.create({
+      model: 'gpt-5-nano',
+      messages: openaiMessages,
+      max_tokens: 500, // Límite para controlar costos y respuestas concisas
+      temperature: 0.3, // Menos aleatorio = más consistente
+      top_p: 0.8,
+      frequency_penalty: 0.1,
+      presence_penalty: 0.1,
+    });
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('❌ Error de Ollama:', response.status, errorText);
-      
-      if (response.status === 404) {
-        return NextResponse.json(
-          { 
-            error: 'Modelo no encontrado. El chatbot se está inicializando, intenta en unos segundos.',
-            isWakingUp: true,
-            details: 'Error 404: Verifica que el modelo llama3.2:1b esté disponible'
-          },
-          { status: 404 }
-        );
-      }
-      
-      if (response.status === 503 || response.status === 502) {
-        return NextResponse.json(
-          { 
-            error: 'El servicio está iniciando. Intenta de nuevo en unos segundos.',
-            isWakingUp: true 
-          },
-          { status: 503 }
-        );
-      }
-      
+    const responseMessage = completion.choices[0]?.message?.content;
+
+    if (!responseMessage) {
+      console.error('❌ No se recibió respuesta de OpenAI');
       return NextResponse.json(
-        { error: 'Error del servidor de IA' },
+        { error: 'No se pudo generar respuesta' },
         { status: 500 }
       );
     }
 
-    const data: OllamaResponse = await response.json();
-    
-    console.log('✅ Respuesta de Ollama recibida:', {
-      content: data.message?.content?.substring(0, 100),
-      done: data.done
+    console.log('✅ Respuesta de GPT-5 nano recibida:', {
+      content: responseMessage.substring(0, 100),
+      usage: completion.usage
     });
 
     return NextResponse.json({
-      message: data.message.content,
-      success: true
+      message: responseMessage,
+      success: true,
+      usage: completion.usage,
+      model: 'gpt-5-nano'
     });
 
   } catch (error) {
     console.error('❌ Error en API de chat:', error);
+    
+    // Manejar errores específicos de OpenAI
+    if (error instanceof OpenAI.APIError) {
+      if (error.status === 401) {
+        return NextResponse.json(
+          { error: 'API key inválida. Verifica tu OPENAI_API_KEY en .env.local' },
+          { status: 401 }
+        );
+      }
+      
+      if (error.status === 429) {
+        return NextResponse.json(
+          { 
+            error: 'Límite de velocidad alcanzado. Intenta en unos segundos.',
+            isRateLimit: true 
+          },
+          { status: 429 }
+        );
+      }
+
+      if (error.status === 404) {
+        return NextResponse.json(
+          { error: 'Modelo gpt-5-nano no disponible para tu cuenta' },
+          { status: 404 }
+        );
+      }
+
+      if (error.status === 400) {
+        return NextResponse.json(
+          { error: 'Request inválido a la API' },
+          { status: 400 }
+        );
+      }
+    }
     
     return NextResponse.json(
       { 
@@ -190,24 +162,28 @@ export async function POST(req: NextRequest) {
 // Health check endpoint
 export async function GET() {
   try {
-    const response = await fetch(`${OLLAMA_URL}/api/version`, {
-      signal: AbortSignal.timeout(5000),
-    });
-    
-    if (response.ok) {
-      const data = await response.json();
-      return NextResponse.json({
-        status: 'healthy',
-        ollama: data,
-        timestamp: new Date().toISOString()
-      });
+    if (!process.env.OPENAI_API_KEY) {
+      return NextResponse.json(
+        { status: 'unhealthy', error: 'OPENAI_API_KEY no configurada' },
+        { status: 503 }
+      );
     }
-    
-    return NextResponse.json(
-      { status: 'unhealthy', error: 'Ollama no disponible' },
-      { status: 503 }
-    );
+
+    // Test simple call to GPT-5 nano
+    const completion = await openai.chat.completions.create({
+      model: 'gpt-5-nano',
+      messages: [{ role: 'user', content: 'test' }],
+      max_tokens: 1,
+    });
+
+    return NextResponse.json({
+      status: 'healthy',
+      model: 'gpt-5-nano',
+      timestamp: new Date().toISOString(),
+      usage: completion.usage
+    });
   } catch (error) {
+    console.error('❌ Health check failed:', error);
     return NextResponse.json(
       { status: 'unhealthy', error: String(error) },
       { status: 503 }

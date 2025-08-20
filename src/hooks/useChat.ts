@@ -14,14 +14,26 @@ interface UseChatReturn {
   error: string | null;
   sendMessage: (content: string) => Promise<void>;
   clearMessages: () => void;
-  isWakingUp: boolean;
+  isRateLimit: boolean;
+  usage?: {
+    prompt_tokens: number;
+    completion_tokens: number;
+    total_tokens: number;
+  };
+  modelUsed?: string;
 }
 
 export function useChat(userName?: string): UseChatReturn {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [isWakingUp, setIsWakingUp] = useState(false);
+  const [isRateLimit, setIsRateLimit] = useState(false);
+  const [modelUsed, setModelUsed] = useState<string>();
+  const [usage, setUsage] = useState<{
+    prompt_tokens: number;
+    completion_tokens: number;
+    total_tokens: number;
+  }>();
   const abortControllerRef = useRef<AbortController | null>(null);
 
   const sendMessage = useCallback(async (content: string) => {
@@ -42,7 +54,8 @@ export function useChat(userName?: string): UseChatReturn {
     setMessages(prev => [...prev, userMessage]);
     setIsLoading(true);
     setError(null);
-    setIsWakingUp(false);
+    setIsRateLimit(false);
+    setDebugInfo(null);
 
     try {
       abortControllerRef.current = new AbortController();
@@ -61,14 +74,34 @@ export function useChat(userName?: string): UseChatReturn {
 
       const data = await response.json();
 
+      // Log de debugging para el desarrollador
+      console.log('🔍 Chat API Response:', {
+        status: response.status,
+        data: data,
+        usage: data.usage
+      });
+
       if (!response.ok) {
-        if (data.isWakingUp) {
-          setIsWakingUp(true);
-          setError('El bot está despertando... Intenta de nuevo en unos segundos.');
+        if (response.status === 429 || data.isRateLimit) {
+          setIsRateLimit(true);
+          setError(data.error || 'Rate limit alcanzado');
+        } else if (response.status === 401) {
+          setError('❌ API key inválida. Verifica tu configuración.');
+        } else if (response.status === 404) {
+          setError('❌ Modelo no disponible.');
         } else {
-          setError(data.error || 'Error de conexión');
+          setError(data.error || `Error ${response.status}`);
         }
         return;
+      }
+
+      // Actualizar stats si están disponibles
+      if (data.usage) {
+        setUsage(data.usage);
+      }
+      
+      if (data.model) {
+        setModelUsed(data.model);
       }
 
       const assistantMessage: ChatMessage = {
@@ -85,7 +118,7 @@ export function useChat(userName?: string): UseChatReturn {
       }
       
       console.error('Error sending message:', error);
-      setError('Error de conexión. Intenta de nuevo.');
+      setError('❌ Error de conexión. Verifica tu internet e intenta de nuevo.');
     } finally {
       setIsLoading(false);
     }
@@ -94,7 +127,9 @@ export function useChat(userName?: string): UseChatReturn {
   const clearMessages = useCallback(() => {
     setMessages([]);
     setError(null);
-    setIsWakingUp(false);
+    setIsRateLimit(false);
+    setUsage(undefined);
+    setModelUsed(undefined);
   }, []);
 
   return {
@@ -103,6 +138,8 @@ export function useChat(userName?: string): UseChatReturn {
     error,
     sendMessage,
     clearMessages,
-    isWakingUp,
+    isRateLimit,
+    usage,
+    modelUsed,
   };
 }
