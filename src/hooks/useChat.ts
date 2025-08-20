@@ -55,7 +55,6 @@ export function useChat(userName?: string): UseChatReturn {
     setIsLoading(true);
     setError(null);
     setIsRateLimit(false);
-    setDebugInfo(null);
 
     try {
       abortControllerRef.current = new AbortController();
@@ -66,7 +65,7 @@ export function useChat(userName?: string): UseChatReturn {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          messages: [...messages, userMessage].map(({ id, timestamp, ...rest }) => rest),
+          messages: [...messages, userMessage].map(({ role, content }) => ({ role, content })),
           userName,
         }),
         signal: abortControllerRef.current.signal,
