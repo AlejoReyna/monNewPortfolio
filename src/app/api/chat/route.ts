@@ -7,38 +7,14 @@ const openai = new OpenAI({
 });
 
 // Para debugging
-console.log('🔗 OpenAI configurado para GPT-5 nano');
+console.log('🔗 OpenAI configurado para GPT-5-nano');
 
 interface ChatMessage {
   role: 'user' | 'assistant' | 'system';
   content: string;
 }
 
-const SYSTEM_PROMPT = `Eres Alexis, un desarrollador full-stack mexicano amigable y profesional. 
-
-PERSONALIDAD:
-- Respuestas cortas y conversacionales (máximo 2-3 oraciones)
-- Directo pero amigable
-- Orgulloso de ser mexicano
-- Apasionado por la tecnología
-
-ESPECIALIDADES:
-- React, Next.js, TypeScript
-- Ruby on Rails
-- AWS y arquitectura cloud
-- Desarrollo full-stack
-
-INSTRUCCIONES:
-- Mantén las respuestas breves y naturales
-- Si preguntan sobre proyectos, menciona que pueden ver tu portfolio
-- Si preguntan sobre contacto, sugiere la sección de contacto
-- Responde en el mismo idioma que te escriban
-- Sé conversacional, no formal
-
-EJEMPLOS DE RESPUESTAS:
-- "¡Hola! Soy Alexis, desarrollador full-stack. ¿En qué te puedo ayudar?"
-- "Trabajo principalmente con React y Ruby. ¿Te interesa alguna tecnología en particular?"
-- "Puedes ver mis proyectos en la sección de portfolio. ¿Hay algo específico que te gustaría saber?"`;
+const SYSTEM_PROMPT = `Eres Alexis, desarrollador full-stack mexicano. Responde de forma breve y amigable. Tecnologías: React, Next.js, TypeScript, Ruby on Rails. Si preguntan proyectos, menciona tu portfolio. Si preguntan contacto, sugiere la sección de contacto.`;
 
 export async function POST(req: NextRequest) {
   try {
@@ -74,33 +50,60 @@ export async function POST(req: NextRequest) {
     // Construir mensajes para OpenAI
     const openaiMessages = [systemMessage, ...messages];
 
-    console.log('🤖 Enviando request a GPT-5 nano:', {
+    console.log('🤖 Enviando request a GPT-5-nano:', {
       model: 'gpt-5-nano',
       messageCount: openaiMessages.length,
-      lastMessage: messages[messages.length - 1]?.content?.substring(0, 100)
+      lastMessage: messages[messages.length - 1]?.content?.substring(0, 100),
+      maxTokens: 1500 // ✅ Aumentado para dar más espacio al reasoning
     });
 
+    // ✅ CORRECCIÓN PRINCIPAL: Usar openaiMessages en lugar de mensaje hardcodeado
     const completion = await openai.chat.completions.create({
       model: 'gpt-5-nano',
-      messages: openaiMessages,
-      max_tokens: 500, // Límite para controlar costos y respuestas concisas
-      temperature: 0.3, // Menos aleatorio = más consistente
-      top_p: 0.8,
-      frequency_penalty: 0.1,
-      presence_penalty: 0.1,
+      messages: openaiMessages, // ❌ ANTES: [{ role: 'user', content: 'Hola' }]
+      max_completion_tokens: 1500, // ✅ Aumentado para evitar "finish reason: length"
     });
 
     const responseMessage = completion.choices[0]?.message?.content;
 
     if (!responseMessage) {
       console.error('❌ No se recibió respuesta de OpenAI');
+      console.error('❌ Finish reason:', completion.choices[0]?.finish_reason);
+      console.error('❌ Usage:', completion.usage);
+      
+      // ✅ Mejor manejo: si hay reasoning pero no respuesta, intentar con menos tokens
+      if (completion.choices[0]?.finish_reason === 'length') {
+        console.log('🔄 Intentando con menos tokens...');
+        try {
+          const retryCompletion = await openai.chat.completions.create({
+            model: 'gpt-5-nano',
+            messages: openaiMessages,
+            max_completion_tokens: 800, // ✅ Reducido para evitar el límite
+          });
+          
+          const retryMessage = retryCompletion.choices[0]?.message?.content;
+          if (retryMessage) {
+            console.log('✅ Respuesta de retry exitosa');
+            return NextResponse.json({
+              message: retryMessage,
+              success: true,
+              usage: retryCompletion.usage,
+              model: 'gpt-5-nano',
+              retry: true
+            });
+          }
+        } catch (retryError) {
+          console.error('❌ Error en retry:', retryError);
+        }
+      }
+      
       return NextResponse.json(
-        { error: 'No se pudo generar respuesta' },
+        { error: 'No se pudo generar respuesta. Intenta con un mensaje más corto.' },
         { status: 500 }
       );
     }
 
-    console.log('✅ Respuesta de GPT-5 nano recibida:', {
+    console.log('✅ Respuesta de GPT-5-nano recibida:', {
       content: responseMessage.substring(0, 100),
       usage: completion.usage
     });
@@ -169,11 +172,11 @@ export async function GET() {
       );
     }
 
-    // Test simple call to GPT-5 nano
+    // Test simple call to GPT-5-nano
     const completion = await openai.chat.completions.create({
       model: 'gpt-5-nano',
       messages: [{ role: 'user', content: 'test' }],
-      max_tokens: 1,
+      max_completion_tokens: 100,
     });
 
     return NextResponse.json({

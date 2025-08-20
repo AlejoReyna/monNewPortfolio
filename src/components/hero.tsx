@@ -170,12 +170,15 @@ export default function Hero({
     }
   };
 
-  // Auto-scroll en chat
+  // Auto-scroll en chat - solo dentro del contenedor del chat
   useEffect(() => {
-    if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    if (messagesEndRef.current && isChatMode) {
+      const chatContainer = messagesEndRef.current.closest('.overflow-y-auto');
+      if (chatContainer) {
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+      }
     }
-  }, [messages]);
+  }, [messages, isChatMode]);
 
   // Mostrar intro del chat automáticamente si el usuario ya tiene nombre
   useEffect(() => {

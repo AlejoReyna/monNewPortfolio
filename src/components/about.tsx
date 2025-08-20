@@ -206,7 +206,7 @@ export default function About({ className }: AboutProps) {
               <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full blur-xl opacity-30 animate-pulse"></div>
               <div className="relative w-full h-full">
                 <Image 
-                  src="/avatar.jpg"
+                  src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face"
                   alt="Profile"
                   fill
                   className="rounded-full border-4 border-gray-700/50 object-cover"
