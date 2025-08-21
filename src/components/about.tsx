@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/image";
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useLanguage } from "@/components/lang-context";
 
 type AboutProps = {
@@ -20,11 +20,11 @@ export default function About({ className }: AboutProps) {
   });
 
   // Datos para las estadísticas
-  const finalStats = {
+  const finalStats = useMemo(() => ({
     experience: 5,
     projects: 50,
     technologies: 15
-  };
+  }), []);
 
   // Intersection Observer para activar animaciones cuando sea visible
   useEffect(() => {
@@ -76,7 +76,7 @@ export default function About({ className }: AboutProps) {
     setTimeout(() => animateCounter('experience', 2000), 500);
     setTimeout(() => animateCounter('projects', 2500), 800);
     setTimeout(() => animateCounter('technologies', 2000), 1100);
-  }, [isVisible]);
+  }, [isVisible, finalStats]);
 
   // Datos de habilidades técnicas
   const skills = [

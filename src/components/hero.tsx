@@ -1,6 +1,5 @@
 "use client";
 import Image from "next/image";
-import { useLanguage } from "@/components/lang-context";
 import ChatInterface from "./chat-interface";
 
 type HeroProps = {
@@ -8,8 +7,6 @@ type HeroProps = {
 };
 
 export default function Hero({ className }: HeroProps) {
-  const { language } = useLanguage();
-  const isEs = language === 'es';
 
   return (
     <section

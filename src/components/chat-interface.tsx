@@ -1,7 +1,7 @@
 "use client";
 import { useState, useRef, useEffect } from 'react';
 import { useLanguage } from "@/components/lang-context";
-import { useChat, ChatMessage } from "@/hooks/useChat";
+import { useChat } from "@/hooks/useChat";
 
 const quickSuggestions = [
   { en: "About me", es: "Sobre mí" },
@@ -28,7 +28,7 @@ export default function ChatInterface() {
   const [userName, setUserName] = useState("");
   const [inputValue, setInputValue] = useState("");
   const [showChat, setShowChat] = useState(false);
-  const { messages, isLoading, error, sendMessage, isRateLimit, usage } = useChat(userName);
+  const { messages, isLoading, error, sendMessage, isRateLimit } = useChat(userName);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatInputRef = useRef<HTMLInputElement>(null);
 

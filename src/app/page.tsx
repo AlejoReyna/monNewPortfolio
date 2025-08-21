@@ -1,9 +1,4 @@
 import Hero from "@/components/hero";
-import About from "@/components/about";
-import Showcase from "@/components/showcase";
-import Services from "@/components/services";
-import MiniGame from "@/components/mini-game";
-import LetsTalk from "@/components/lets-talk";
 
 export default function Home() {
   return (
