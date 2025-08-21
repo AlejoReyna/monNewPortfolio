@@ -124,7 +124,7 @@ export default function Navbar() {
               </svg>
             </a>
 
-            <button
+            {/* <button
               aria-label="Toggle menu"
               onClick={() => setIsOpen((v) => !v)}
               className="inline-flex items-center justify-center rounded-full border border-white/10 bg-black/30 p-2 text-gray-200 shadow-sm transition hover:bg-black/40 sm:hidden"
@@ -142,7 +142,7 @@ export default function Navbar() {
                   <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
                 )}
               </svg>
-            </button>
+            </button> */}
           </div>
         </div>
 

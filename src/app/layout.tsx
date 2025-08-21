@@ -13,7 +13,7 @@ function generateiOSMetaTags() {
     'apple-mobile-web-app-status-bar-style': 'black-translucent',
     'apple-mobile-web-app-title': 'Alexis Reyna',
     // Theme color for mobile browsers (matches navbar dark theme)
-    'theme-color': '#0f0f0f',
+    'theme-color': '#080404',
     // Additional iOS meta tags
     'format-detection': 'telephone=no',
     'viewport': 'width=device-width, initial-scale=1, viewport-fit=cover',
@@ -48,16 +48,18 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <meta name="apple-mobile-web-app-title" content="Alexis Reyna" />
-        <meta name="theme-color" content="#0f0f0f" />
+        <meta name="theme-color" content="#080404" />
         <meta name="format-detection" content="telephone=no" />
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
         {/* iOS splash screen color */}
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+        {/* PWA Manifest */}
+        <link rel="manifest" href="/manifest.json" />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-        style={{ backgroundColor: '#0f0f0f' }}
+        style={{ backgroundColor: '#080404' }}
       >
         <LanguageProvider>
           <LanguageFade>
