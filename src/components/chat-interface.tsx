@@ -451,7 +451,6 @@ export default function ChatInterface() {
             className="flex-1 rounded-xl border border-white/10 bg-black/30 backdrop-blur-md px-4 py-3 text-gray-200 placeholder-gray-400 font-mono focus:outline-none focus:ring-2 focus:ring-cyan-400 shadow-xl transition-all duration-300"
             disabled={isLoading || showNamePrompt}
             maxLength={500}
-            onFocus={() => setShowChat(true)}
           />
           <button
             onClick={handleSendMessage}
