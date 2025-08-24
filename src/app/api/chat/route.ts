@@ -52,7 +52,7 @@ interface ChatMessage {
 /**
  * Helper function to get output_text from Responses API
  */
-function getOutputText(response: any): string {
+function getOutputText(response: { output_text?: string }): string {
   return response.output_text || 'No obtuve contenido.';
 }
 
@@ -156,9 +156,10 @@ export async function POST(req: NextRequest) {
     });
 
     return res;
-  } catch (error: any) {
+  } catch (error: unknown) {
     // Manejo estandarizado de errores
-    if (error?.status === 429) {
+    const err = error as { status?: number };
+    if (err?.status === 429) {
       return NextResponse.json(
         {
           error: 'Rate limit alcanzado. Intenta más tarde.',
@@ -167,13 +168,13 @@ export async function POST(req: NextRequest) {
         { status: 429 }
       );
     }
-    if (error?.status === 401) {
+    if (err?.status === 401) {
       return NextResponse.json(
         { error: 'API key inválida' },
         { status: 401 }
       );
     }
-    if (error?.status === 404) {
+    if (err?.status === 404) {
       return NextResponse.json(
         { error: 'Modelo no disponible para tu cuenta' },
         { status: 404 }

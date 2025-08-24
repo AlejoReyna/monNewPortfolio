@@ -3,22 +3,19 @@
 import { useEffect, useState } from "react";
 import { useLanguage } from "@/components/lang-context";
 import { useNavigation } from "@/contexts/navigation-context";
-import Link from "next/link";
+
 
 export default function Navbar() {
-  const { language, toggleLanguage } = useLanguage();
+  const { language } = useLanguage();
   const { navigateToSection, currentSection } = useNavigation();
   const isEs = language === 'es';
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
-  const [progress, setProgress] = useState(0);
+
 
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 8);
-      const total = document.documentElement.scrollHeight - window.innerHeight;
-      const p = total > 0 ? window.scrollY / total : 0;
-      setProgress(Math.min(Math.max(p, 0), 1));
     };
     handleScroll();
     window.addEventListener("scroll", handleScroll, { passive: true });

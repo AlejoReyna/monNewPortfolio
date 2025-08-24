@@ -1,5 +1,5 @@
 "use client";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import type React from "react";
 import { useLanguage } from "@/components/lang-context";
 import { useChat } from "@/hooks/useChat";
@@ -104,10 +104,13 @@ const stripHintFromUserMessage = (raw: unknown) => {
 };
 
 export default function ChatInterface() {
-  const langCtx = useLanguage() as any;
+  const langCtx = useLanguage();
   const initialCtxLang: Lang = langCtx?.language === "es" ? "es" : "en";
-  const setCtxLanguage: ((l: Lang) => void) | undefined =
-    typeof langCtx?.setLanguage === "function" ? langCtx.setLanguage : undefined;
+  const setCtxLanguage = useCallback((l: Lang) => {
+    if (l !== langCtx.language) {
+      langCtx.toggleLanguage();
+    }
+  }, [langCtx]);
 
   const [preferredLang, setPreferredLang] = useState<Lang | null>(null);
   const currentLang: Lang = preferredLang ?? initialCtxLang;
@@ -159,7 +162,7 @@ export default function ChatInterface() {
         setLanguageSelected(true);
       }
     } catch { setShowNamePrompt(true); }
-  }, []);
+  }, [setCtxLanguage]);
 
   // Animación del Welcome! (fade-in y fade-out)
   useEffect(() => {
@@ -349,7 +352,7 @@ export default function ChatInterface() {
     sendMessage(payload);
     if (!showChat) setShowChat(true);
   };
-  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => { if (e.key === "Enter") { e.preventDefault(); handleSendMessage(); } };
+
 
   const sorted = [...messages].sort((a, b) => +a.timestamp - +b.timestamp);
 
