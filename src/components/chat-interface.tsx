@@ -1,16 +1,24 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
+import type React from "react";
 import { useLanguage } from "@/components/lang-context";
 import { useChat } from "@/hooks/useChat";
 
-const quickSuggestions = [
-  { en: "About me", es: "Sobre mí" },
-  { en: "Projects", es: "Proyectos" },
-  { en: "Technologies", es: "Tecnologías" },
-  { en: "Contact", es: "Contacto" },
+type Lang = "en" | "es";
+type Intent = "casual" | "work";
+type Suggestion = { en: string; es: string; intent: Intent };
+
+const suggestions: Suggestion[] = [
+  { en: "Music you're into lately", es: "Música que escuchas últimamente", intent: "casual" },
+  { en: "Movies or series you loved", es: "Películas o series que te gustaron", intent: "casual" },
+  { en: "A trip you'd like to take", es: "Un viaje que te gustaría hacer", intent: "casual" },
+  { en: "Hobbies or free-time stuff", es: "Hobbies o cosas de tu tiempo libre", intent: "casual" },
+  { en: "Projects", es: "Proyectos", intent: "work" },
+  { en: "Technologies", es: "Tecnologías", intent: "work" },
+  { en: "About me", es: "Sobre mí", intent: "work" },
+  { en: "Contact", es: "Contacto", intent: "work" },
 ];
 
-// Frases tipo "Ask me something…", en ambos idiomas
 const inputPlaceholders = [
   { en: "What's on your mind?", es: "¿Qué tienes en mente?" },
   { en: "Hit me with your best question...", es: "Dale con tu mejor pregunta..." },
@@ -32,37 +40,122 @@ const inputPlaceholders = [
   { en: "Penny for your thoughts?", es: "¿Un centavo por tus pensamientos?" },
 ];
 
+/** ---------------- Intent detection ---------------- */
+const WORK_EN = [
+  "project","portfolio","resume","cv","hire","job","work","code","coding","programming","developer",
+  "stack","react","next","typescript","node","api","deploy","github","experience","tech","technology"
+];
+const WORK_ES = [
+  "proyecto","portafolio","currículum","curriculum","cv","contratar","empleo","trabajo","código","codigo","programación",
+  "desarrollador","stack","react","next","typescript","node","api","deploy","github","experiencia","tecnología","tecnologias"
+];
+const GREET_EN = ["hi","hello","hey","how are you","i'm fine","and you","good morning","good evening","what's up"];
+const GREET_ES = ["hola","buenas","¿cómo estás","como estas","estoy bien","¿y tú","y tu","qué tal","que tal"];
+
+const isWorky = (t: string, lang: Lang) =>
+  (lang === "es" ? WORK_ES : WORK_EN).some(k => t.includes(k));
+const isGreetingish = (t: string, lang: Lang) =>
+  (lang === "es" ? GREET_ES : GREET_EN).some(g => t.includes(g)) && t.length <= 120;
+
+const deriveIntent = (text: string, lang: Lang): Intent => {
+  const t = text.toLowerCase();
+  if (isWorky(t, lang)) return "work";
+  if (isGreetingish(t, lang)) return "casual";
+  return "casual";
+};
+
+/** ---------------- Hidden hint block ----------------
+ * We wrap the hint between [[SYS]] ... [[/SYS]].
+ * Before rendering user messages, we strip this block.
+ */
+const HINT_START = "[[SYS]]";
+const HINT_END = "[[/SYS]]";
+
+const buildHint = (intent: Intent, lang: Lang) => {
+  if (intent === "casual") {
+    return lang === "es"
+      ? `${HINT_START}
+Modo: CASUAL (ES)
+- Responde ESTRICTAMENTE en español.
+- Tono cálido y ligero, sin mencionar trabajo ni proyectos salvo que el usuario lo pida.
+- 1–2 oraciones, 25–40 palabras máximo.
+- Incluye UNA pregunta abierta o UNA sugerencia breve, no más.
+${HINT_END}`
+      : `${HINT_START}
+Mode: CASUAL (EN)
+- Respond STRICTLY in English.
+- Warm, light tone; do not mention work or projects unless the user asks.
+- 1–2 sentences, 25–40 words max.
+- Include ONE open-ended question OR ONE brief suggestion, not both.
+${HINT_END}`;
+  }
+  // work
+  return lang === "es"
+    ? `${HINT_START}
+Modo: WORK (ES)
+- Responde ESTRICTAMENTE en español.
+- Enfócate en temas profesionales que el usuario mencione.
+- Sé claro y conciso.
+${HINT_END}`
+    : `${HINT_START}
+Mode: WORK (EN)
+- Respond STRICTLY in English.
+- Focus on professional topics the user mentions.
+- Be clear and concise.
+${HINT_END}`;
+};
+
+const withHint = (userText: string, intent: Intent, lang: Lang) =>
+  `${buildHint(intent, lang)}\n${userText.trim()}`;
+
+// Quita el bloque [[SYS]]...[[/SYS]] sin usar RegExp dinámico
+const stripHintFromUserMessage = (raw: unknown) => {
+  const text = (raw ?? "").toString();
+
+  // 1) Si empieza con [[SYS]], corta hasta [[/SYS]]
+  if (text.startsWith("[[SYS]]")) {
+    const endMarker = "[[/SYS]]";
+    const end = text.indexOf(endMarker);
+    if (end !== -1) {
+      let out = text.slice(end + endMarker.length);
+      // Limpia salto inicial si quedó
+      if (out.startsWith("\r\n")) out = out.slice(2);
+      else if (out.startsWith("\n")) out = out.slice(1);
+      return out;
+    }
+  }
+
+  // 2) Fallback: si alguien pegó bullets al inicio, quítalos línea por línea
+  const lines = text.split("\n");
+  while (lines.length && (/^\s*[-•]/.test(lines[0]))) lines.shift();
+  return lines.join("\n").replace(/^\s+/, "");
+};
+
 export default function ChatInterface() {
-  // Tomamos el contexto pero sin asumir que expone setLanguage (lo usamos opcionalmente)
   const langCtx = useLanguage() as any;
-  const initialCtxLang: "en" | "es" = langCtx?.language === "es" ? "es" : "en";
-  const setCtxLanguage: ((l: "en" | "es") => void) | undefined =
+  const initialCtxLang: Lang = langCtx?.language === "es" ? "es" : "en";
+  const setCtxLanguage: ((l: Lang) => void) | undefined =
     typeof langCtx?.setLanguage === "function" ? langCtx.setLanguage : undefined;
 
-  // Preferencias del usuario almacenadas localmente
-  const [preferredLang, setPreferredLang] = useState<"en" | "es" | null>(null);
-  const currentLang: "en" | "es" = preferredLang ?? initialCtxLang;
+  const [preferredLang, setPreferredLang] = useState<Lang | null>(null);
+  const currentLang: Lang = preferredLang ?? initialCtxLang;
   const isEs = currentLang === "es";
 
-  // --- Nombre de usuario (no GPT) ---
+  // --- User name & onboarding ---
   const [userName, setUserName] = useState("");
   const [showNamePrompt, setShowNamePrompt] = useState(false);
   const [nameInput, setNameInput] = useState("");
 
-  // Cargar nombre e idioma al montar
   useEffect(() => {
     try {
       const savedName = typeof window !== "undefined" ? (localStorage.getItem("userName") || "").trim() : "";
-      const savedLang = typeof window !== "undefined" ? localStorage.getItem("preferredLanguage") : null;
+      const savedLang = typeof window !== "undefined" ? (localStorage.getItem("preferredLanguage") as Lang | null) : null;
 
       if (savedLang === "en" || savedLang === "es") {
         setPreferredLang(savedLang);
         setCtxLanguage?.(savedLang);
       }
-
       if (savedName) setUserName(savedName);
-
-      // Mostrar modal si falta nombre o idioma
       setShowNamePrompt(!(savedName && (savedLang === "en" || savedLang === "es")));
     } catch {
       setShowNamePrompt(true);
@@ -71,7 +164,7 @@ export default function ChatInterface() {
 
   const confirmNameAndLang = () => {
     const trimmed = nameInput.trim();
-    const langToSave: "en" | "es" = preferredLang ?? initialCtxLang;
+    const langToSave: Lang = preferredLang ?? initialCtxLang;
     if (!trimmed || !langToSave) return;
     try {
       localStorage.setItem("userName", trimmed);
@@ -96,72 +189,39 @@ export default function ChatInterface() {
   const [visibleButtons, setVisibleButtons] = useState(0);
   const [showInput, setShowInput] = useState(false);
 
-  // Array de saludos variables
   const greetings = [
     {
       en: "Hey there! I'm Alexis. I code things that live on the internet, and this GPT version of me is here to chat.",
-      es: "¡Hey! Soy Alexis. Programo cosas que viven en internet, y esta versión GPT de mí está aquí para charlar."
+      es: "¡Hey! Soy Alexis. Programo cosas que viven en internet, y esta versión GPT de mí está aquí para charlar.",
     },
-    {
-      en: "Hi, I'm Alexis. Web developer by day, debugging wizard by night. This is my AI twin.",
-      es: "Hola, soy Alexis. Desarrollador web de día, mago del debugging de noche. Este es mi gemelo AI."
-    },
-    {
-      en: "Hello! Alexis here. I turn coffee into code, and this GPT knows most of my tricks.",
-      es: "¡Hola! Alexis aquí. Convierto café en código, y este GPT conoce la mayoría de mis trucos."
-    },
-    {
-      en: "Hey, I'm Alexis. I make pixels dance on screens, powered by GPT magic.",
-      es: "Hey, soy Alexis. Hago que los píxeles bailen en pantallas, con magia GPT."
-    },
-    {
-      en: "Hi there! I'm Alexis, your friendly neighborhood web developer (now in AI flavor).",
-      es: "¡Hola! Soy Alexis, tu desarrollador web de confianza (ahora en versión AI)."
-    },
-    {
-      en: "Greetings! I'm Alexis. I craft digital experiences, and this is my GPT stunt double.",
-      es: "¡Saludos! Soy Alexis. Creo experiencias digitales, y este es mi doble de acción GPT."
-    },
-    {
-      en: "Hey! Alexis here. I speak fluent JavaScript and broken human. Let's chat!",
-      es: "¡Hey! Alexis aquí. Hablo JavaScript fluido y humano a medias. ¡Charlemos!"
-    },
-    {
-      en: "Hi, I'm Alexis. Building the web, one component at a time. This GPT knows my story.",
-      es: "Hola, soy Alexis. Construyendo la web, un componente a la vez. Este GPT conoce mi historia."
-    },
+    { en: "Hi, I'm Alexis. Web developer by day, debugging wizard by night. This is my AI twin.", es: "Hola, soy Alexis. Desarrollador web de día, mago del debugging de noche. Este es mi gemelo AI." },
+    { en: "Hello! Alexis here. I turn coffee into code, and this GPT knows most of my tricks.", es: "¡Hola! Alexis aquí. Convierto café en código, y este GPT conoce la mayoría de mis trucos." },
+    { en: "Hey, I'm Alexis. I make pixels dance on screens, powered by GPT magic.", es: "Hey, soy Alexis. Hago que los píxeles bailen en pantallas, con magia GPT." },
+    { en: "Hi there! I'm Alexis, your friendly neighborhood web developer (now in AI flavor).", es: "¡Hola! Soy Alexis, tu desarrollador web de confianza (ahora en versión AI)." },
+    { en: "Greetings! I'm Alexis. I craft digital experiences, and this is my GPT stunt double.", es: "¡Saludos! Soy Alexis. Creo experiencias digitales, y este es mi doble de acción GPT." },
+    { en: "Hey! Alexis here. I speak fluent JavaScript and broken human. Let's chat!", es: "¡Hey! Alexis aquí. Hablo JavaScript fluido y humano a medias. ¡Charlemos!" },
+    { en: "Hi, I'm Alexis. Building the web, one component at a time. This GPT knows my story.", es: "Hola, soy Alexis. Construyendo la web, un componente a la vez. Este GPT conoce mi historia." },
   ];
 
-  // Seleccionar un saludo aleatorio (memo para evitar cambios en re-renders)
   const [greetingIndex] = useState(() => Math.floor(Math.random() * greetings.length));
   const baseGreeting = isEs ? greetings[greetingIndex].es : greetings[greetingIndex].en;
 
   const text = userName
-    ? isEs
-      ? `${baseGreeting} ¿Cómo estás, ${userName}?`
-      : `${baseGreeting} How are you, ${userName}?`
-    : isEs
-      ? `${baseGreeting} ¿Cómo estás?`
-      : `${baseGreeting} How are you?`;
+    ? isEs ? `${baseGreeting} ¿Cómo estás, ${userName}?` : `${baseGreeting} How are you, ${userName}?`
+    : isEs ? `${baseGreeting} ¿Cómo estás?` : `${baseGreeting} How are you?`;
 
-  // Chat (usa GPT, pero NO para el nombre)
+  // --- Chat hook ---
   const [inputValue, setInputValue] = useState("");
   const [showChat, setShowChat] = useState(false);
-  const [currentPlaceholder, setCurrentPlaceholder] = useState(
-    isEs ? "Pregúntame algo..." : "Ask me something..."
-  );
+  const [currentPlaceholder, setCurrentPlaceholder] = useState(isEs ? "Pregúntame algo..." : "Ask me something...");
   const { messages, isLoading, error, sendMessage, isRateLimit } = useChat(userName);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const chatInputRef = useRef<HTMLInputElement>(null);
 
-  // Placeholder aleatorio según idioma
   useEffect(() => {
     const pool = inputPlaceholders.map((p) => (isEs ? p.es : p.en));
-    const random = pool[Math.floor(Math.random() * pool.length)];
-    setCurrentPlaceholder(random);
+    setCurrentPlaceholder(pool[Math.floor(Math.random() * pool.length)]);
   }, [isEs]);
 
-  // Typewriter solo mensaje inicial
   useEffect(() => {
     if (!showChat && !showNamePrompt) {
       let i = 0;
@@ -179,54 +239,47 @@ export default function ChatInterface() {
     }
   }, [text, showChat, showNamePrompt]);
 
-  // Mostrar botones uno por uno
   useEffect(() => {
-    if (!showNamePrompt && typewriterComplete && !showChat && visibleButtons < quickSuggestions.length) {
-      const timer = setTimeout(() => setVisibleButtons((prev) => prev + 1), 200);
+    if (!showNamePrompt && typewriterComplete && !showChat && visibleButtons < suggestions.length) {
+      const timer = setTimeout(() => setVisibleButtons((p) => p + 1), 200);
       return () => clearTimeout(timer);
     }
   }, [typewriterComplete, visibleButtons, showChat, showNamePrompt]);
 
-  // Mostrar input luego de los botones
   useEffect(() => {
-    if (!showNamePrompt && typewriterComplete && !showChat && visibleButtons === quickSuggestions.length && !showInput) {
+    if (!showNamePrompt && typewriterComplete && !showChat && visibleButtons === suggestions.length && !showInput) {
       const timer = setTimeout(() => setShowInput(true), 300);
       return () => clearTimeout(timer);
     }
   }, [typewriterComplete, visibleButtons, showChat, showNamePrompt, showInput]);
 
-  // Reset animaciones al abrir chat
   useEffect(() => {
     if (showChat) {
-      setVisibleButtons(quickSuggestions.length);
+      setVisibleButtons(suggestions.length);
       setShowInput(true);
       setTypewriterComplete(true);
     }
   }, [showChat]);
 
-  // Enviar mensaje
   const handleSendMessage = () => {
-    if (!userName) {
-      setShowNamePrompt(true);
-      return;
-    }
-    if (inputValue.trim() && !isLoading) {
-      sendMessage(inputValue.trim());
+    if (!userName) return setShowNamePrompt(true);
+    const raw = inputValue.trim();
+    if (raw && !isLoading) {
+      const intent = deriveIntent(raw, currentLang);
+      const payload = withHint(raw, intent, currentLang);
+      sendMessage(payload);
       setInputValue("");
       if (!showChat) setShowChat(true);
     }
   };
 
-  const handleSuggestionClick = (suggestion: string) => {
-    if (!userName) {
-      setShowNamePrompt(true);
-      return;
-    }
-    sendMessage(suggestion);
+  const handleSuggestionClick = (label: string, intent: Intent) => {
+    if (!userName) return setShowNamePrompt(true);
+    const payload = withHint(label.trim(), intent, currentLang);
+    sendMessage(payload);
     if (!showChat) setShowChat(true);
   };
 
-  // Auto-scroll en chat
   useEffect(() => {
     if (messagesEndRef.current && showChat) {
       const chatContainer = messagesEndRef.current.closest(".overflow-y-auto");
@@ -234,21 +287,19 @@ export default function ChatInterface() {
     }
   }, [messages, showChat]);
 
-  // Enter en input de chat
-  const handleKeyPress = (e: React.KeyboardEvent) => {
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
       e.preventDefault();
       handleSendMessage();
     }
   };
 
-  // Último mensaje del asistente y lista de mensajes de usuario
   const latestAssistantMessage = messages.filter((m) => m.role === "assistant").pop();
   const userMessages = messages.filter((m) => m.role === "user");
 
   return (
     <div className="relative z-30 flex flex-col gap-4 px-4 w-full max-w-3xl mx-auto mb-20">
-      {/* Modal para nombre e idioma (NO usa GPT) */}
+      {/* Modal nombre/idioma */}
       {showNamePrompt && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
           <div className="w-full max-w-md rounded-2xl border border-white/10 bg-zinc-900/90 p-6 shadow-2xl">
@@ -319,7 +370,7 @@ export default function ChatInterface() {
         </div>
       )}
 
-      {/* Cabecera / textbox principal */}
+      {/* Cabecera */}
       <div className="pointer-events-auto w-full rounded-2xl border border-white/10 bg-black/40 backdrop-blur-md px-5 py-6 shadow-2xl shadow-black/30">
         <p className="relative text-base sm:text-lg text-gray-200 font-mono font-light leading-relaxed">
           {showChat && latestAssistantMessage ? latestAssistantMessage.content : displayed}
@@ -339,7 +390,7 @@ export default function ChatInterface() {
             <div key={message.id} className="flex justify-end">
               <div className="pointer-events-auto w-full max-w-[80%] rounded-2xl border border-white/10 bg-black/40 backdrop-blur-md px-5 py-4 shadow-2xl shadow-black/30">
                 <p className="text-base sm:text-lg text-gray-200 font-mono font-light leading-relaxed">
-                  {message.content}
+                  {stripHintFromUserMessage(message.content)}
                 </p>
                 <span className="text-xs opacity-60 mt-2 block">
                   {message.timestamp.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
@@ -363,25 +414,26 @@ export default function ChatInterface() {
         </div>
       )}
 
-      {/* Sugerencias rápidas */}
+      {/* Sugerencias */}
       {!showNamePrompt && !showChat && messages.length === 0 && (
         <div className="flex flex-wrap gap-2 mb-3">
-          {quickSuggestions.map((suggestion, index) => (
+          {suggestions.map((s, index) => (
             <button
-              key={suggestion.en}
-              onClick={() => handleSuggestionClick(isEs ? suggestion.es : suggestion.en)}
+              key={s.en}
+              onClick={() => handleSuggestionClick(isEs ? s.es : s.en, s.intent)}
               className={`text-xs bg-gray-700/30 hover:bg-gray-600/40 text-gray-300 hover:text-white px-3 py-2 rounded-lg border border-gray-600/30 transition-all duration-500 font-mono transform ${
                 index < visibleButtons ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2"
               }`}
               style={{ transitionDelay: `${index * 100}ms` }}
+              title={s.intent === "casual" ? (isEs ? "Conversación casual" : "Casual chat") : (isEs ? "Tema de trabajo" : "Work topic")}
             >
-              {isEs ? suggestion.es : suggestion.en}
+              {isEs ? s.es : s.en}
             </button>
           ))}
         </div>
       )}
 
-      {/* Input del chat */}
+      {/* Input */}
       <div
         className={`w-full transition-all duration-500 transform ${
           (showInput || showChat) && !showNamePrompt ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
@@ -389,7 +441,6 @@ export default function ChatInterface() {
       >
         <div className="flex gap-2">
           <input
-            ref={chatInputRef}
             type="text"
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
@@ -406,20 +457,8 @@ export default function ChatInterface() {
             aria-disabled={!userName}
             title={!userName ? (isEs ? "Primero escribe tu nombre" : "Please enter your name first") : undefined}
           >
-            {isLoading ? (
-              "⏳"
-            ) : (
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
+            {isLoading ? "⏳" : (
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="m22 2-7 20-4-9-9-4 20-7z" />
                 <path d="M22 2 11 13" />
               </svg>

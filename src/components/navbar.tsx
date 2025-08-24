@@ -25,13 +25,13 @@ export default function Navbar() {
 
   return (
     <header className="fixed inset-x-0 top-0 z-[60]">
-      {/* Top scroll progress bar */}
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-0.5 bg-white/5">
+      {/* Top scroll progress bar - COMMENTED OUT */}
+      {/* <div className="pointer-events-none absolute inset-x-0 top-0 h-0.5 bg-white/5">
         <div
           className="h-full bg-gradient-to-r from-sky-400 via-cyan-300 to-violet-400"
           style={{ width: `${progress * 100}%`, transition: "width 120ms linear" }}
         />
-      </div>
+      </div> */}
       {/* Glass/gradient background matching hero */}
       <div
         className={`mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 transition-colors duration-300`}
