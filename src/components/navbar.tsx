@@ -2,10 +2,12 @@
 
 import { useEffect, useState } from "react";
 import { useLanguage } from "@/components/lang-context";
+import { useNavigation } from "@/contexts/navigation-context";
 import Link from "next/link";
 
 export default function Navbar() {
   const { language, toggleLanguage } = useLanguage();
+  const { navigateToSection, currentSection } = useNavigation();
   const isEs = language === 'es';
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
@@ -44,7 +46,10 @@ export default function Navbar() {
         >
           {/* Left: Brand */}
           <div className="relative z-10 flex min-w-0 items-center gap-2">
-            <Link href="#top" className="group inline-flex items-center gap-2">
+            <button 
+              onClick={() => navigateToSection("home")}
+              className="group inline-flex items-center gap-2"
+            >
               {/* Logo Text */}
               <div className="flex flex-col">
                 <div className="text-lg tracking-tight">
@@ -56,37 +61,41 @@ export default function Navbar() {
                   Full-Stack Developer
                 </div>
               </div>
-            </Link>
+            </button>
           </div>
 
           {/* Center: Nav links (desktop) */}
           <nav className="relative z-10 hidden items-center gap-1 sm:flex font-mono font-extralight">
             {[
-              { href: "/", label: isEs ? "Inicio" : "Home" },
-              { href: "#services", label: isEs ? "Servicios" : "Services" },
-              { href: "#projects", label: isEs ? "Proyectos" : "Projects" },
+              { section: "home", label: isEs ? "Inicio" : "Home" },
+              { section: "services", label: isEs ? "Servicios" : "Services" },
+              { section: "projects", label: isEs ? "Proyectos" : "Projects" },
             ].map((item) => (
-              <Link
+              <button
                 key={item.label}
-                href={item.href}
-                className="rounded-full px-3 py-1.5 text-sm text-gray-300 transition-colors hover:text-white hover:bg-white/5 border border-transparent hover:border-white/10 font-mono font-extralight"
+                onClick={() => navigateToSection(item.section as "home" | "services" | "projects" | "contact")}
+                className={`rounded-full px-3 py-1.5 text-sm transition-colors border font-mono font-extralight ${
+                  currentSection === item.section
+                    ? "text-white bg-white/10 border-white/20"
+                    : "text-gray-300 hover:text-white hover:bg-white/5 border-transparent hover:border-white/10"
+                }`}
               >
                 {item.label}
-              </Link>
+              </button>
             ))}
           </nav>
 
           {/* Right: CTA + Mobile toggle */}
           <div className="relative z-10 flex items-center gap-2">
-            <a
-              href="#contact"
+            <button
+              onClick={() => navigateToSection("contact")}
               className="relative hidden sm:inline-flex items-center gap-2 rounded-full gradient-border bg-gradient-to-r from-slate-800/80 via-blue-900/60 to-violet-900/70 px-4 py-1.5 text-sm font-mono font-bold tracking-tight text-white shadow-inner shadow-cyan-400/10 transition-all hover:from-slate-700/90 hover:via-blue-800/70 hover:to-violet-800/80 hover:shadow-cyan-400/20 hover:scale-[1.02]"
             >
               <span>{isEs ? 'Hablemos' : "Let's talk"}</span>
               <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
               </svg>
-            </a>
+            </button>
 
             <button
               aria-label="Toggle menu"
@@ -120,19 +129,25 @@ export default function Navbar() {
         >
           <div className="mx-2 mt-2 rounded-2xl border border-white/10 bg-black/40 backdrop-blur-md p-2">
             {[
-              { href: "/", label: isEs ? "Inicio" : "Home" },
-              { href: "#services", label: isEs ? "Servicios" : "Services" },
-              { href: "#projects", label: isEs ? "Proyectos" : "Projects" },
-              { href: "#contact", label: isEs ? "Contacto" : "Contact" },
+              { section: "home", label: isEs ? "Inicio" : "Home" },
+              { section: "services", label: isEs ? "Servicios" : "Services" },
+              { section: "projects", label: isEs ? "Proyectos" : "Projects" },
+              { section: "contact", label: isEs ? "Contacto" : "Contact" },
             ].map((item) => (
-              <Link
+              <button
                 key={item.label}
-                href={item.href}
-                onClick={() => setIsOpen(false)}
-                className="block rounded-xl px-3 py-2 text-sm text-gray-200 transition-colors hover:bg-white/5 font-mono font-extralight"
+                onClick={() => {
+                  navigateToSection(item.section as "home" | "services" | "projects" | "contact");
+                  setIsOpen(false);
+                }}
+                className={`block w-full text-left rounded-xl px-3 py-2 text-sm transition-colors font-mono font-extralight ${
+                  currentSection === item.section
+                    ? "text-white bg-white/10"
+                    : "text-gray-200 hover:bg-white/5"
+                }`}
               >
                 {item.label}
-              </Link>
+              </button>
             ))}
           </div>
         </div>

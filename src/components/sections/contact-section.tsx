@@ -72,10 +72,10 @@ export default function LetsTalk() {
         <div className="flex flex-col justify-center gap-6">
           <h2
             id="contact-title"
-            className="text-4xl sm:text-5xl font-bold tracking-tight"
+            className="text-4xl sm:text-5xl font-bold tracking-tight ml-8"
           >
             <span className="bg-gradient-to-r from-white via-gray-100 to-gray-300 bg-clip-text text-transparent">
-              {isEs ? "Hablemos" : "Let’s discuss"}
+              {isEs ? "Hablemos" : "Let's discuss"}
             </span>
             <br />
             <span className="font-mono font-light text-gray-300">
@@ -92,44 +92,12 @@ export default function LetsTalk() {
           <p className="text-gray-300/90 font-mono font-light leading-relaxed">
             {isEs
               ? "Cuéntame sobre tu idea, proyecto o lo que te gustaría construir. Respondo lo antes posible."
-              : "Tell me about your idea, project, or what you’d like to build. I’ll get back to you ASAP."}
+              : "Tell me about your idea, project, or what you'd like to build. I'll get back to you ASAP."}
           </p>
 
-          <ul className="mt-2 space-y-3">
-            <li className="flex items-center gap-3">
-              <span className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-black/40 text-gray-200 backdrop-blur-md">
-                {/* Mail */}
-                <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M4 6h16v12H4z" />
-                  <path d="M22 6l-10 7L2 6" />
-                </svg>
-              </span>
-              <a className="text-gray-300 hover:text-white transition-colors" href="mailto:hello@example.com">
-                hello@example.com
-              </a>
-            </li>
-            <li className="flex items-center gap-3">
-              <span className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-black/40 text-gray-200 backdrop-blur-md">
-                {/* Phone */}
-                <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M3 5l4-2 4 8-3 1c1 2 3 4 5 5l1-3 8 4-2 4c-6 1-13-6-17-13z" />
-                </svg>
-              </span>
-              <span className="text-gray-300">+1 234 567 890</span>
-            </li>
-            <li className="flex items-center gap-3">
-              <span className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-black/40 text-gray-200 backdrop-blur-md">
-                {/* Location */}
-                <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M12 21s-7-5.686-7-11a7 7 0 1114 0c0 5.314-7 11-7 11z" />
-                  <circle cx="12" cy="10" r="3" />
-                </svg>
-              </span>
-              <span className="text-gray-300">Remote • Worldwide</span>
-            </li>
-          </ul>
-
-          <div className="mt-2 flex items-center gap-2">
+          {/* All icons in a single horizontal row aligned to the right */}
+          <div className="flex items-center justify-end gap-3">
+            {/* Social media icons */}
             <a
               aria-label="GitHub"
               href="#"
@@ -144,8 +112,31 @@ export default function LetsTalk() {
               href="#"
               className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-black/40 text-gray-200 hover:text-white hover:bg-black/50 backdrop-blur-md transition-colors"
             >
+              {/* Real LinkedIn glyph from footer.tsx */}
+              <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor" role="img">
+                <path d="M22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.454C23.205 24 24 23.227 24 22.271V1.729C24 .774 23.205 0 22.225 0zM7.034 20.452H3.89V9h3.144v11.452zM5.462 7.433a2.062 2.062 0 110-4.124 2.062 2.062 0 010 4.124zM20.452 20.452h-3.142v-5.569c0-1.328-.027-3.037-1.854-3.037-1.855 0-2.139 1.445-2.139 2.939v5.667H10.18V9h3.017v1.561h.043c.421-.8 1.451-1.852 3.352-1.852 3.584 0 3.86 2.36 3.86 5.425v6.318z" />
+              </svg>
+            </a>
+
+            {/* WhatsApp icon */}
+            <a
+              aria-label="WhatsApp"
+              href="#"
+              className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-black/40 text-gray-200 hover:text-white hover:bg-black/50 backdrop-blur-md transition-colors"
+            >
               <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M4.98 3.5C4.98 4.88 3.86 6 2.5 6S0 4.88 0 3.5 1.12 1 2.5 1s2.48 1.12 2.48 2.5zM.5 8h4V24h-4zM8.5 8h3.8v2.2h.05c.53-1 1.82-2.2 3.75-2.2 4 0 4.75 2.63 4.75 6v7.99h-4V15.5c0-2 0-4.5-2.75-4.5s-3.17 2.15-3.17 4.36V24h-4z" />
+                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.488" />
+              </svg>
+            </a>
+
+            {/* Email icon */}
+            <a
+              aria-label="Email"
+              href="mailto:hello@example.com"
+              className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-black/40 text-gray-200 hover:text-white hover:bg-black/50 backdrop-blur-md transition-colors"
+            >
+              <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z" />
               </svg>
             </a>
           </div>

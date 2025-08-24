@@ -4,6 +4,7 @@ import "./globals.css";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import { LanguageProvider, LanguageFade } from "@/components/lang-context";
+import { NavigationProvider } from "@/contexts/navigation-context";
 
 // Function to generate iOS meta tags for status bar styling
 function generateiOSMetaTags() {
@@ -62,12 +63,14 @@ export default function RootLayout({
         style={{ backgroundColor: '#080404' }}
       >
         <LanguageProvider>
-          <LanguageFade>
-            <a id="top" />
-            <Navbar />
-            {children}
-            <Footer />
-          </LanguageFade>
+          <NavigationProvider>
+            <LanguageFade>
+              <a id="top" />
+              <Navbar />
+              {children}
+              <Footer />
+            </LanguageFade>
+          </NavigationProvider>
         </LanguageProvider>
       </body>
     </html>
