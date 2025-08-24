@@ -47,12 +47,12 @@ export default function Navbar() {
             <Link href="#top" className="group inline-flex items-center gap-2">
               {/* Logo Text */}
               <div className="flex flex-col">
-                <div className="text-lg font-bold tracking-tight">
-                  <span className="bg-gradient-to-r from-white via-gray-100 to-gray-200 bg-clip-text text-transparent group-hover:from-white group-hover:via-white group-hover:to-gray-100 transition-all duration-200">
+                <div className="text-lg tracking-tight">
+                  <span className="bg-gradient-to-r from-white via-gray-100 to-gray-200 bg-clip-text text-transparent group-hover:from-white group-hover:via-white group-hover:to-gray-100 transition-all duration-200 font-mono font-light">
                     Alexis Reyna
                   </span>
                 </div>
-                <div className="text-xs text-gray-400 uppercase tracking-wider font-medium">
+                <div className="text-xs text-gray-400 uppercase tracking-wider font-mono font-light">
                   Full-Stack Developer
                 </div>
               </div>
