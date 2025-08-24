@@ -118,6 +118,14 @@ export default function ChatInterface() {
   const [showNamePrompt, setShowNamePrompt] = useState(false);
   const [nameInput, setNameInput] = useState("");
 
+  // Estados para animaciones del modal
+  const [showWelcome, setShowWelcome] = useState(true);
+  const [welcomeText, setWelcomeText] = useState("");
+  const [showLanguageQuestion, setShowLanguageQuestion] = useState(false);
+  const [languageQuestionText, setLanguageQuestionText] = useState("");
+  const [showNameQuestion, setShowNameQuestion] = useState(false);
+  const [languageSelected, setLanguageSelected] = useState(false);
+
   // Medir 50% de la altura del padre en px (para ocultar burbujas previas de la vista)
   const rootRef = useRef<HTMLDivElement>(null);
   const [chatHeightPx, setChatHeightPx] = useState<number | undefined>();
@@ -140,9 +148,82 @@ export default function ChatInterface() {
       const savedLang = typeof window !== "undefined" ? (localStorage.getItem("preferredLanguage") as Lang | null) : null;
       if (savedLang === "en" || savedLang === "es") { setPreferredLang(savedLang); setCtxLanguage?.(savedLang); }
       if (savedName) setUserName(savedName);
-      setShowNamePrompt(!(savedName && (savedLang === "en" || savedLang === "es")));
+      const shouldShowPrompt = !(savedName && (savedLang === "en" || savedLang === "es"));
+      setShowNamePrompt(shouldShowPrompt);
+      
+      // Si no hay que mostrar el prompt, resetear estados de animación
+      if (!shouldShowPrompt) {
+        setShowWelcome(false);
+        setShowLanguageQuestion(false);
+        setShowNameQuestion(false);
+        setLanguageSelected(true);
+      }
     } catch { setShowNamePrompt(true); }
   }, []);
+
+  // Animación del Welcome! (fade-in y fade-out)
+  useEffect(() => {
+    if (!showNamePrompt || !showWelcome) return;
+    
+    const welcomeMsg = "Welcome!";
+    
+    // Fade-in del texto Welcome!
+    let i = 0;
+    const typeInterval = setInterval(() => {
+      setWelcomeText(welcomeMsg.slice(0, i + 1));
+      i++;
+      if (i >= welcomeMsg.length) {
+        clearInterval(typeInterval);
+        
+        // Esperar 1.5s y hacer fade-out
+        setTimeout(() => {
+          setShowWelcome(false);
+          // Iniciar pregunta de idioma después del fade-out
+          setTimeout(() => {
+            setShowLanguageQuestion(true);
+          }, 500);
+        }, 1500);
+      }
+    }, 80);
+
+    return () => clearInterval(typeInterval);
+  }, [showNamePrompt, showWelcome]);
+
+  // Typewriting para la pregunta de idioma
+  useEffect(() => {
+    if (!showLanguageQuestion) return;
+
+    const languageMsg = currentLang === "es" ? "¿Qué idioma prefieres?" : "Which language do you prefer?";
+    let i = 0;
+    setLanguageQuestionText("");
+    
+    const typeInterval = setInterval(() => {
+      setLanguageQuestionText(languageMsg.slice(0, i + 1));
+      i++;
+      if (i >= languageMsg.length) {
+        clearInterval(typeInterval);
+      }
+    }, 60);
+
+    return () => clearInterval(typeInterval);
+  }, [showLanguageQuestion, currentLang]);
+
+  // Mostrar pregunta del nombre después de seleccionar idioma
+  useEffect(() => {
+    if (languageSelected && !showNameQuestion && showNamePrompt) {
+      setTimeout(() => {
+        setShowNameQuestion(true);
+      }, 800);
+    }
+  }, [languageSelected, showNameQuestion, showNamePrompt]);
+
+  const handleLanguageSelection = (lang: Lang) => {
+    setPreferredLang(lang);
+    setCtxLanguage?.(lang);
+    setLanguageSelected(true);
+    // Ocultar la pregunta de idioma después de seleccionar
+    setShowLanguageQuestion(false);
+  };
 
   const confirmNameAndLang = () => {
     const trimmed = nameInput.trim();
@@ -386,50 +467,98 @@ export default function ChatInterface() {
         </div>
       </div>
 
-      {/* Modal nombre/idioma */}
+      {/* Modal nombre/idioma con animaciones */}
       {showNamePrompt && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
           <div className="w-full max-w-md rounded-2xl border border-white/10 bg-zinc-900/90 p-6 shadow-2xl">
-            <h2 className="text-lg font-semibold text-white mb-2">
-              {isEs ? "Personaliza tu experiencia" : "Personalize your experience"}
-            </h2>
-            <div className="mb-4">
-              <p className="text-sm text-gray-300 mb-2">
-                {isEs ? "¿Qué idioma prefieres?" : "Which language do you prefer?"}
-              </p>
-              <div className="flex gap-2">
-                <button type="button" onClick={() => setPreferredLang("es")}
-                  className={`text-xs px-4 py-2 rounded-lg border transition ${currentLang === "es" ? "border-cyan-500/30 bg-cyan-600/40 text-cyan-100" : "border-gray-600/30 bg-gray-700/30 text-gray-200 hover:bg-gray-600/40"}`}>
-                  Español
-                </button>
-                <button type="button" onClick={() => setPreferredLang("en")}
-                  className={`text-xs px-4 py-2 rounded-lg border transition ${currentLang === "en" ? "border-cyan-500/30 bg-cyan-600/40 text-cyan-100" : "border-gray-600/30 bg-gray-700/30 text-gray-200 hover:bg-gray-600/40"}`}>
-                  English
-                </button>
+            
+            {/* Welcome! fade-in/fade-out */}
+            {showWelcome && (
+              <div className={`transition-opacity duration-1000 ${showWelcome ? 'opacity-100' : 'opacity-0'}`}>
+                <h2 className="text-2xl font-mono font-light text-white mb-4 text-center">
+                  {welcomeText}
+                  {welcomeText.length < "Welcome!".length && (
+                    <span className="ml-1 inline-block h-6 w-0.5 bg-cyan-300 animate-pulse" />
+                  )}
+                </h2>
               </div>
-            </div>
-            <label className="text-sm text-gray-300 mb-2 block">
-              {isEs ? "¿Cómo te llamas?" : "What's your name?"}
-            </label>
-            <input
-              type="text"
-              className="w-full rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-gray-200 placeholder-gray-400 font-mono focus:outline-none focus:ring-2 focus:ring-cyan-400"
-              placeholder={isEs ? "Escribe tu nombre..." : "Type your name..."}
-              value={nameInput}
-              onChange={(e) => setNameInput(e.target.value)}
-              onKeyDown={handleNameKey}
-              autoFocus
-              maxLength={60}
-            />
-            <div className="mt-4 flex gap-2 justify-end">
-              <button onClick={() => setShowNamePrompt(false)} className="text-xs px-4 py-2 rounded-lg border border-gray-600/30 text-gray-300 hover:text-white hover:bg-gray-600/20 transition">
-                {isEs ? "Ahora no" : "Not now"}
-              </button>
-              <button onClick={confirmNameAndLang} disabled={!nameInput.trim() || !currentLang}
-                className="text-xs px-4 py-2 rounded-lg border border-cyan-500/30 bg-cyan-600/40 text-cyan-200 hover:bg-cyan-500/50 hover:text-white transition disabled:opacity-50 disabled:cursor-not-allowed">
-                {isEs ? "Guardar" : "Save"}
-              </button>
-            </div>
+            )}
+
+            {/* Pregunta de idioma con typewriting */}
+            {showLanguageQuestion && (
+              <div className={`transition-opacity duration-500 ${showLanguageQuestion ? 'opacity-100' : 'opacity-0'}`}>
+                <div className="mb-4">
+                  <p className="text-sm font-mono font-light text-gray-300 mb-3">
+                    {languageQuestionText}
+                    {languageQuestionText.length < (currentLang === "es" ? "¿Qué idioma prefieres?" : "Which language do you prefer?").length && (
+                      <span className="ml-1 inline-block h-4 w-0.5 bg-cyan-300 animate-pulse" />
+                    )}
+                  </p>
+                  <div className="flex gap-2 justify-center">
+                    <button 
+                      type="button" 
+                      onClick={() => handleLanguageSelection("es")}
+                      className={`text-xs font-mono font-light px-4 py-2 rounded-lg border transition-all duration-300 ${
+                        currentLang === "es" 
+                          ? "border-cyan-500/30 bg-cyan-600/40 text-cyan-100 scale-105" 
+                          : "border-gray-600/30 bg-gray-700/30 text-gray-200 hover:bg-gray-600/40 hover:scale-105"
+                      }`}
+                    >
+                      Español
+                    </button>
+                    <button 
+                      type="button" 
+                      onClick={() => handleLanguageSelection("en")}
+                      className={`text-xs font-mono font-light px-4 py-2 rounded-lg border transition-all duration-300 ${
+                        currentLang === "en" 
+                          ? "border-cyan-500/30 bg-cyan-600/40 text-cyan-100 scale-105" 
+                          : "border-gray-600/30 bg-gray-700/30 text-gray-200 hover:bg-gray-600/40 hover:scale-105"
+                      }`}
+                    >
+                      English
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Pregunta del nombre con fade-in */}
+            {showNameQuestion && (
+              <div className={`transition-all duration-800 transform ${
+                showNameQuestion 
+                  ? 'opacity-100 translate-y-0' 
+                  : 'opacity-0 translate-y-4'
+              }`}>
+                <label className="text-sm font-mono font-light text-gray-300 mb-2 block">
+                  {currentLang === "es" ? "¿Cómo te llamas?" : "What's your name?"}
+                </label>
+                <input
+                  type="text"
+                  className="w-full rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-gray-200 placeholder-gray-400 font-mono focus:outline-none focus:ring-2 focus:ring-cyan-400 transition-all duration-300"
+                  placeholder={currentLang === "es" ? "Escribe tu nombre..." : "Type your name..."}
+                  value={nameInput}
+                  onChange={(e) => setNameInput(e.target.value)}
+                  onKeyDown={handleNameKey}
+                  autoFocus={showNameQuestion}
+                  maxLength={60}
+                />
+                <div className="mt-4 flex gap-2 justify-end">
+                  <button 
+                    onClick={() => setShowNamePrompt(false)} 
+                    className="text-xs font-mono font-light px-4 py-2 rounded-lg border border-gray-600/30 text-gray-300 hover:text-white hover:bg-gray-600/20 transition-all duration-300 hover:scale-105"
+                  >
+                    {currentLang === "es" ? "Ahora no" : "Not now"}
+                  </button>
+                  <button 
+                    onClick={confirmNameAndLang} 
+                    disabled={!nameInput.trim() || !currentLang}
+                    className="text-xs font-mono font-light px-4 py-2 rounded-lg border border-cyan-500/30 bg-cyan-600/40 text-cyan-200 hover:bg-cyan-500/50 hover:text-white transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed hover:scale-105 disabled:hover:scale-100"
+                  >
+                    {currentLang === "es" ? "Guardar" : "Save"}
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}
