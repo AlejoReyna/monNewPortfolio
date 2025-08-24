@@ -68,7 +68,7 @@ export default function RootLayout({
               <a id="top" />
               <Navbar />
               {children}
-              <Footer />
+              {/* <Footer /> */}
             </LanguageFade>
           </NavigationProvider>
         </LanguageProvider>
