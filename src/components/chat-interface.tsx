@@ -10,20 +10,26 @@ const quickSuggestions = [
   { en: "Contact", es: "Contacto" },
 ];
 
-// Frases tipo “Ask me something…”, en ambos idiomas
+// Frases tipo "Ask me something…", en ambos idiomas
 const inputPlaceholders = [
-  { en: "Ask me something...", es: "Pregúntame algo..." },
-  { en: "Ask about my projects...", es: "Pregunta por mis proyectos..." },
-  { en: "Ask about my tech stack...", es: "Pregunta por mi stack..." },
-  { en: "Ask for a quick bio...", es: "Pide una bio rápida..." },
-  { en: "Ask what I'm working on...", es: "Pregunta en qué estoy trabajando..." },
-  { en: "Ask for a code sample...", es: "Pide un ejemplo de código..." },
-  { en: "Ask how I built this...", es: "Pregunta cómo hice esto..." },
-  { en: "Ask for performance tips...", es: "Pide tips de performance..." },
-  { en: "Ask for learning resources...", es: "Pide recursos para aprender..." },
-  { en: "Ask for a project idea...", es: "Pide una idea de proyecto..." },
-  { en: "Ask to review your code...", es: "Pide revisión de tu código..." },
-  { en: "Ask for career highlights...", es: "Pregunta por logros de carrera..." },
+  { en: "What's on your mind?", es: "¿Qué tienes en mente?" },
+  { en: "Hit me with your best question...", es: "Dale con tu mejor pregunta..." },
+  { en: "Let's talk code (or anything else)...", es: "Hablemos de código (o lo que sea)..." },
+  { en: "Curious about something?", es: "¿Curioso por algo?" },
+  { en: "Type away, I don't bite...", es: "Escribe tranquilo, no muerdo..." },
+  { en: "What would you like to know?", es: "¿Qué te gustaría saber?" },
+  { en: "Got a tech question? Or just wanna chat?", es: "¿Pregunta técnica? ¿O solo charlar?" },
+  { en: "Fire away with your questions...", es: "Dispara tus preguntas..." },
+  { en: "Let's geek out together...", es: "Hagamos nerdismo juntos..." },
+  { en: "Ask me anything (within reason)...", es: "Pregunta lo que sea (dentro de lo razonable)..." },
+  { en: "Your question, my attempt at wisdom...", es: "Tu pregunta, mi intento de sabiduría..." },
+  { en: "What can this digital me help with?", es: "¿En qué puede ayudar este yo digital?" },
+  { en: "Ready when you are...", es: "Listo cuando tú lo estés..." },
+  { en: "Drop your question here...", es: "Suelta tu pregunta aquí..." },
+  { en: "Let's build something cool together...", es: "Construyamos algo cool juntos..." },
+  { en: "Coffee break chat? I'm here...", es: "¿Chat de coffee break? Aquí estoy..." },
+  { en: "What brings you here today?", es: "¿Qué te trae por aquí hoy?" },
+  { en: "Penny for your thoughts?", es: "¿Un centavo por tus pensamientos?" },
 ];
 
 export default function ChatInterface() {
@@ -90,9 +96,45 @@ export default function ChatInterface() {
   const [visibleButtons, setVisibleButtons] = useState(0);
   const [showInput, setShowInput] = useState(false);
 
-  const baseGreeting = isEs
-    ? "Hola, soy Alexis. Construyo experiencias web rápidas y cuidadas, y esta es una instancia potenciada por GPT de mí."
-    : "Hi, I'm Alexis. I build fast, polished web experiences, and this is a GPT powered instance of me.";
+  // Array de saludos variables
+  const greetings = [
+    {
+      en: "Hey there! I'm Alexis. I code things that live on the internet, and this GPT version of me is here to chat.",
+      es: "¡Hey! Soy Alexis. Programo cosas que viven en internet, y esta versión GPT de mí está aquí para charlar."
+    },
+    {
+      en: "Hi, I'm Alexis. Web developer by day, debugging wizard by night. This is my AI twin.",
+      es: "Hola, soy Alexis. Desarrollador web de día, mago del debugging de noche. Este es mi gemelo AI."
+    },
+    {
+      en: "Hello! Alexis here. I turn coffee into code, and this GPT knows most of my tricks.",
+      es: "¡Hola! Alexis aquí. Convierto café en código, y este GPT conoce la mayoría de mis trucos."
+    },
+    {
+      en: "Hey, I'm Alexis. I make pixels dance on screens, powered by GPT magic.",
+      es: "Hey, soy Alexis. Hago que los píxeles bailen en pantallas, con magia GPT."
+    },
+    {
+      en: "Hi there! I'm Alexis, your friendly neighborhood web developer (now in AI flavor).",
+      es: "¡Hola! Soy Alexis, tu desarrollador web de confianza (ahora en versión AI)."
+    },
+    {
+      en: "Greetings! I'm Alexis. I craft digital experiences, and this is my GPT stunt double.",
+      es: "¡Saludos! Soy Alexis. Creo experiencias digitales, y este es mi doble de acción GPT."
+    },
+    {
+      en: "Hey! Alexis here. I speak fluent JavaScript and broken human. Let's chat!",
+      es: "¡Hey! Alexis aquí. Hablo JavaScript fluido y humano a medias. ¡Charlemos!"
+    },
+    {
+      en: "Hi, I'm Alexis. Building the web, one component at a time. This GPT knows my story.",
+      es: "Hola, soy Alexis. Construyendo la web, un componente a la vez. Este GPT conoce mi historia."
+    },
+  ];
+
+  // Seleccionar un saludo aleatorio (memo para evitar cambios en re-renders)
+  const [greetingIndex] = useState(() => Math.floor(Math.random() * greetings.length));
+  const baseGreeting = isEs ? greetings[greetingIndex].es : greetings[greetingIndex].en;
 
   const text = userName
     ? isEs
