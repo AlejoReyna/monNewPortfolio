@@ -91,7 +91,8 @@ export default function Navbar() {
             <button
               aria-label="Toggle menu"
               onClick={() => setIsOpen((v) => !v)}
-              className="inline-flex items-center justify-center rounded-full border border-white/10 bg-black/30 p-2 text-gray-200 shadow-sm transition hover:bg-black/40 sm:hidden"
+              className="inline-flex items-center justify-center rounded-full border border-white/10 bg-black/30 p-2 text-gray-200 shadow-sm hover:bg-black/40 sm:hidden"
+              style={{ backgroundColor: 'rgba(0, 0, 0, 0.3)', borderColor: 'rgba(255, 255, 255, 0.1)' }}
             >
               <svg
                 className={`h-5 w-5 transition-transform ${isOpen ? "rotate-90" : "rotate-0"}`}
