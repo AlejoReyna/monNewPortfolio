@@ -82,7 +82,7 @@ export default function Navbar() {
           <div className="relative z-10 flex items-center gap-2 h-full">
             <button
               onClick={() => navigateToSection("contact")}
-              className="relative hidden sm:inline-flex items-center gap-2 rounded-md border border-white/10 bg-black/50 px-4 py-2 text-sm font-mono font-semibold tracking-tight text-white shadow-lg shadow-black/20 transition-all hover:bg-black/60 hover:border-white/20"
+              className="relative hidden sm:inline-flex items-center gap-2 text-xs bg-gray-700/30 hover:bg-gray-600/40 text-gray-300 hover:text-white px-3 py-2 rounded-lg border border-gray-600/30 transition-all duration-500 font-mono"
             >
               <span>{isEs ? 'Hablemos' : "Let's talk"}</span>
               <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">

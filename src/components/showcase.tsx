@@ -43,7 +43,7 @@ export const projects: Project[] = [
     {
         title: "PokeFolio - My developer portfolio",
         info: "A Pokemon-themed developer portfolio featuring typing text animations, interactive dialog boxes, and music player functionality. Built with React and includes navigation between projects and sections with Pokemon-style UI elements.",
-        video: "/videos/preview-pokefolio.mp4",
+        video: "/preview_pokefolio.mp4",
         url: "https://pokefolio.vercel.app/",
         repo: "https://github.com/AlejoReyna/PokeFolio"
     },
