@@ -79,6 +79,99 @@ export default function ProjectsSection() {
               UANL Scholar services UI update
             </span>
           </h4>
+
+          {/* --- Open source project (60/40 grid) --- */}
+<section className="mt-6">
+  <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 lg:gap-8 items-stretch">
+    {/* 60% — Texto e instrucciones */}
+    <article className="relative lg:col-span-3 overflow-hidden rounded-2xl bg-black/40 p-6 md:p-8 text-white">
+      {/* Status badge */}
+      <span className="absolute top-4 right-4 z-20 inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/15 px-3 py-1 text-[10px] font-medium text-white backdrop-blur shadow-sm">
+        status: still working on it
+      </span>
+
+      <p className="text-white/70 text-sm mb-2">
+        {isEs ? "Extensión Chrome/Firefox (MV3) · Vite + TypeScript" : "Chrome/Firefox Extension (MV3) · Vite + TypeScript"}
+      </p>
+
+      <h5 className="text-2xl md:text-3xl font-mono font-light leading-tight">
+        UANL Interface+ — {isEs ? "Actualiza la UI de SIASE/Deimos" : "Modernizes SIASE/Deimos UI"}
+      </h5>
+
+      <p className="mt-3 text-white/85 text-sm max-w-2xl">
+        {isEs
+          ? "Extensión que inyecta una capa de UI propia, reorganiza menús y mejora la experiencia en páginas con frames. Usa content scripts, Shadow DOM y utilidades para extraer/mostrar datos."
+          : "Extension that injects a custom UI layer, reorganizes menus, and improves the UX on frame-based pages. Uses content scripts, Shadow DOM, and helpers to extract/render data."}
+      </p>
+
+      {/* Cómo ejecutar */}
+      <h6 className="mt-5 font-mono text-lg">{isEs ? "Cómo ejecutar" : "How to run"}</h6>
+      <pre className="mt-2 rounded-lg bg-black/60 p-4 text-[12px] leading-relaxed overflow-x-auto border border-white/10">
+        {`git clone https://github.com/AlejoReyna/UANLInterface.git
+cd UANLInterface
+npm install   # o: pnpm i / yarn
+npm run build # genera /dist con manifest.json`}
+      </pre>
+
+      <div className="mt-5 grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Chrome */}
+        <div className="rounded-xl border border-white/10 p-4 bg-white/5">
+          <h6 className="font-mono text-sm tracking-wide text-white/90 mb-2">Chrome</h6>
+          <ol className="list-decimal list-inside text-sm text-white/80 space-y-1">
+            <li>{isEs ? "Abre" : "Open"} <span className="font-mono">chrome://extensions</span></li>
+            <li>{isEs ? "Activa" : "Enable"} <b>Developer mode</b></li>
+            <li>
+              {isEs ? "Click en" : "Click"} <b>Load unpacked</b> {isEs ? "y selecciona" : "and select"} <span className="font-mono">/dist</span>
+            </li>
+            <li>{isEs ? "Usa 'Reload' para ver cambios tras volver a compilar." : "Use 'Reload' after rebuilding to see changes."}</li>
+          </ol>
+        </div>
+
+        {/* Firefox */}
+        <div className="rounded-xl border border-white/10 p-4 bg-white/5">
+          <h6 className="font-mono text-sm tracking-wide text-white/90 mb-2">Firefox</h6>
+          <ol className="list-decimal list-inside text-sm text-white/80 space-y-1">
+            <li>{isEs ? "Abre" : "Open"} <span className="font-mono">about:debugging#/runtime/this-firefox</span></li>
+            <li>
+              {isEs ? "Click en" : "Click"} <b>Load Temporary Add-on…</b> {isEs ? "y elige" : "and choose"} <span className="font-mono">/dist/manifest.json</span>
+            </li>
+            <li>{isEs ? "Para actualizar, elimina y vuelve a cargar la extensión." : "To update, remove and load the extension again."}</li>
+          </ol>
+        </div>
+      </div>
+
+      {/* Links */}
+      <div className="mt-5 flex flex-wrap items-center gap-4 text-[12px] text-white/80">
+        <a
+          href="https://github.com/AlejoReyna/UANLInterface"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="underline underline-offset-2 hover:text-white"
+        >
+          GitHub
+        </a>
+        <a
+          href="https://uanl-interface.vercel.app"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="underline underline-offset-2 hover:text-white"
+        >
+          {isEs ? "Sitio / Demo" : "Site / Demo"}
+        </a>
+      </div>
+    </article>
+
+    {/* 40% — Imagen */}
+    <aside className="relative lg:col-span-2 overflow-hidden rounded-2xl border border-white/10 min-h-[320px]">
+      <img
+        src="/uanl-interface.png" // Reemplaza con tu screenshot preferido
+        alt="UANL Interface+ preview"
+        className="absolute inset-0 w-full h-full object-cover"
+      />
+      <div className="absolute inset-0 bg-gradient-to-br from-black/20 to-black/40" />
+    </aside>
+  </div>
+</section>
         </div>
 
         {/* --- Hackathon projects --- */}
