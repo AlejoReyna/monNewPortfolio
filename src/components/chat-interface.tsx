@@ -20,6 +20,59 @@ const suggestions: Suggestion[] = [
   { en: "Contact", es: "Contacto", intent: "work" },
 ];
 
+/* ========= Easter Egg (Marthiel) ========= */
+const EASTER_GIBBERISH_ES = [
+  "weuhruqw wefhuqsbdchja scuwqe hfqusdncu",
+  "bzzt bzzt prrrt glitch glitch ajá ajá",
+  "pipipí popopó ñeee trrrrr zaaaa",
+  "error 404 del universo, jajaja no encontrado",
+  "bits bailando en espiral ñam ñam",
+  "texto corrupto: asdf ñññ !!!",
+  "ruido blanco entrando por los píxeles",
+  "la matrix tose: cof cof cof",
+  "símbolos sin sentido <> {} ???",
+  "estática cósmica ssshhh ssshhh"
+];
+const EASTER_GIBBERISH_EN = [
+  "weuhruqw wefhuqsbdchja scuwqe hfqusdncu",
+  "bzzt bzzt prrrt glitch glitch haha",
+  "beep boop brrrr zzzzt zaaap",
+  "universe 404, not found lol",
+  "bits dancing in a spiral nom nom",
+  "corrupted text: asdf ### !!!",
+  "white noise through the pixels",
+  "the matrix coughs: coff coff",
+  "nonsense symbols <> {} ???",
+  "cosmic static shhhhh shhhhh"
+];
+const EASTER_PLACEHOLDERS_ES = [
+  "¿De verdad vas a continuar escribiendo eso?",
+  "¿Seguro que quieres invocar eso?",
+  "Mmm… ¿seguimos por ahí?",
+  "¿Estás seguro de lo que haces?",
+  "Última oportunidad para arrepentirte…",
+  "Esto podría salir mal, ¿continuar?",
+  "¿No te da cosita escribir eso?",
+  "Ok… pero luego no digas que no avisé",
+  "¿De veritas vas a seguir?",
+  "Respira hondo… ¿listo?"
+];
+const EASTER_PLACEHOLDERS_EN = [
+  "Are you really going to keep typing that?",
+  "Sure you want to summon that?",
+  "Hmm… still going with that?",
+  "Are you certain about this?",
+  "Last chance to back out…",
+  "This could go sideways—continue?",
+  "Doesn’t this feel risky to type?",
+  "Okay… don’t say I didn’t warn you",
+  "For real—you’re proceeding?",
+  "Deep breath… ready?"
+];
+const buildEasterFull = (seed: string) => Array.from({ length: 80 })
+  .map((_, i) => (i % 5 === 4 ? `${seed}\n` : `${seed} `))
+  .join("");
+
 const inputPlaceholders = [
   { en: "What's on your mind?", es: "¿Qué tienes en mente?" },
   { en: "Hit me with your best question...", es: "Dale con tu mejor pregunta..." },
@@ -234,6 +287,10 @@ export default function ChatInterface() {
     if (!trimmed || !langToSave) return;
     try { localStorage.setItem("userName", trimmed); localStorage.setItem("preferredLanguage", langToSave); } catch {}
     setUserName(trimmed); setPreferredLang(langToSave); setCtxLanguage?.(langToSave); setShowNamePrompt(false);
+    // Trigger easter egg if name contains Marthiel/Marthi
+    if (/marthiel/i.test(trimmed) || /marthi/i.test(trimmed)) {
+      triggerEasterEgg();
+    }
   };
   const handleNameKey = (e: React.KeyboardEvent<HTMLInputElement>) => { if (e.key === "Enter") { e.preventDefault(); confirmNameAndLang(); } };
 
@@ -263,10 +320,21 @@ export default function ChatInterface() {
   const { messages, isLoading, error, sendMessage, isRateLimit } = useChat(userName);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    const pool = inputPlaceholders.map((p) => (isEs ? p.es : p.en));
+  // Easter egg state
+  const [easterActive, setEasterActive] = useState(false);
+  const [easterText, setEasterText] = useState("");
+  const easterRafRef = useRef<number | null>(null);
+  const [easterGifVisible, setEasterGifVisible] = useState(false);
+  const [easterGifScale, setEasterGifScale] = useState(0.001);
+
+  const pickPlaceholder = useCallback(() => {
+    const pool = isEs ? EASTER_PLACEHOLDERS_ES : EASTER_PLACEHOLDERS_EN;
     setCurrentPlaceholder(pool[Math.floor(Math.random() * pool.length)]);
   }, [isEs]);
+
+  useEffect(() => {
+    pickPlaceholder();
+  }, [pickPlaceholder]);
 
   useEffect(() => {
     if (!showChat && !showNamePrompt) {
@@ -295,6 +363,31 @@ export default function ChatInterface() {
   /* ========= Typewriter para respuestas del asistente ========= */
   const [typedById, setTypedById] = useState<Record<string, string>>({});
   const [doneById, setDoneById] = useState<Record<string, boolean>>({});
+
+  // Reusable easter egg trigger
+  const triggerEasterEgg = useCallback(() => {
+    if (!showChat) setShowChat(true);
+    setEasterActive(true);
+    setEasterGifVisible(true);
+    setEasterGifScale(0.15);
+    setTimeout(() => setEasterGifScale(6), 50);
+    setTimeout(() => setEasterGifScale(12), 350);
+    setTimeout(() => setEasterGifVisible(false), 1800);
+
+    setEasterText("");
+    let i = 0;
+    const pool = isEs ? EASTER_GIBBERISH_ES : EASTER_GIBBERISH_EN;
+    const seed = pool[Math.floor(Math.random() * pool.length)];
+    const full = buildEasterFull(seed);
+    const step = () => {
+      i = Math.min(i + (2 + Math.floor(Math.random() * 5)), full.length);
+      setEasterText(full.slice(0, i));
+      if (i < full.length && easterActive) {
+        easterRafRef.current = window.requestAnimationFrame(step);
+      }
+    };
+    easterRafRef.current = window.requestAnimationFrame(step);
+  }, [isEs, showChat, easterActive]);
 
   // animar última respuesta nueva; iniciar con 1 char para evitar burbuja vacía
   useEffect(() => {
@@ -335,22 +428,56 @@ export default function ChatInterface() {
     if (messagesEndRef.current) messagesEndRef.current.scrollIntoView({ behavior: "smooth", block: "end" });
   }, [messages, typedById]);
 
+  // Al cambiar el número de mensajes, refrescar placeholder
+  useEffect(() => {
+    pickPlaceholder();
+  }, [messages.length, pickPlaceholder]);
+
+  // Autoscroll for Easter egg typing
+  useEffect(() => {
+    if (!easterActive) return;
+    if (messagesEndRef.current) messagesEndRef.current.scrollIntoView({ behavior: "smooth", block: "end" });
+  }, [easterText, easterActive]);
+
+  // Cleanup RAF when Easter egg deactivates/unmounts
+  useEffect(() => {
+    return () => {
+      if (easterRafRef.current) {
+        window.cancelAnimationFrame(easterRafRef.current);
+        easterRafRef.current = null;
+      }
+    };
+  }, []);
+
   const handleSendMessage = () => {
-    if (!userName) return setShowNamePrompt(true);
     const raw = inputValue.trim();
-    if (raw && !isLoading) {
-      const intent = deriveIntent(raw, currentLang);
-      const payload = withHint(raw, intent, currentLang);
-      sendMessage(payload);
+    if (!raw || isLoading) return;
+
+    // Easter egg trigger: "Marthiel" (case-insensitive). Do NOT call API.
+    if (/marthiel/i.test(raw) || /marthi/i.test(raw)) {
       setInputValue("");
       if (!showChat) setShowChat(true);
+      pickPlaceholder();
+
+      // Activate gif burst
+      triggerEasterEgg();
+      return;
     }
+
+    if (!userName) return setShowNamePrompt(true);
+    const intent = deriveIntent(raw, currentLang);
+    const payload = withHint(raw, intent, currentLang);
+    sendMessage(payload);
+    setInputValue("");
+    if (!showChat) setShowChat(true);
+    pickPlaceholder();
   };
   const handleSuggestionClick = (label: string, intent: Intent) => {
     if (!userName) return setShowNamePrompt(true);
     const payload = withHint(label.trim(), intent, currentLang);
     sendMessage(payload);
     if (!showChat) setShowChat(true);
+    pickPlaceholder();
   };
 
 
@@ -372,7 +499,7 @@ export default function ChatInterface() {
       )}
 
       {/* Ventana de chat limitada al 50% del alto del padre */}
-      {sorted.length > 0 && (
+      {(sorted.length > 0 || easterActive) && (
         <div
           className="relative w-full rounded-2xl border border-white/10 bg-black/30 backdrop-blur-md shadow-2xl shadow-black/30 overflow-y-auto"
           style={{ height: chatHeightPx ? `${chatHeightPx}px` : undefined, maxHeight: chatHeightPx ? `${chatHeightPx}px` : undefined }}
@@ -396,6 +523,13 @@ export default function ChatInterface() {
                 </div>
               );
             })}
+            {easterActive && (
+              <div className="flex justify-start">
+                <div className="pointer-events-auto w-full max-w-[80%] rounded-2xl px-5 py-4 border bg-zinc-800/60 border-white/10">
+                  <p className="text-base sm:text-lg text-gray-200 font-mono font-light leading-relaxed whitespace-pre-wrap">{easterText || "▍"}</p>
+                </div>
+              </div>
+            )}
             {isLoading && (
               <div className="flex justify-start">
                 <div className="pointer-events-auto w-full max-w-[80%] rounded-2xl px-5 py-4 border bg-zinc-800/60 border-white/10">
@@ -563,6 +697,16 @@ export default function ChatInterface() {
             )}
           </div>
         </div>
+      )}
+
+      {/* Easter egg GIF overlay (expands dramatically) */}
+      {easterActive && easterGifVisible && (
+        <img
+          src="/16.gif"
+          alt="glitch"
+          className="fixed left-1/2 top-1/2 z-50 pointer-events-none select-none opacity-90"
+          style={{ transform: `translate(-50%, -50%) scale(${easterGifScale}) rotate(${(easterGifScale * 8).toFixed(2)}deg)` }}
+        />
       )}
     </div>
   );

@@ -12,8 +12,7 @@ export default function Hero({ className }: HeroProps) {
       {/* Grid: 1 col en mobile; 60/40 desde lg */}
       <div className="grid min-h-screen grid-cols-1 lg:grid-cols-[60%_40%] items-stretch pt-64 sm:pt-72 lg:pt-80">
         {/* Chat (izquierda) */}
-        <div className="relative flex flex-col justify-end pb-12 px-4 sm:px-6 lg:px-8">
-          <ChatInterface />
+        <div className="relative flex flex-col justify-center px-4 sm:px-6 lg:px-8">          <ChatInterface />
         </div>
 
         {/* GIF (derecha) */}

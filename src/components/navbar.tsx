@@ -25,36 +25,32 @@ export default function Navbar() {
   return (
     <header className="fixed inset-x-0 top-0 z-[60]">
       {/* Glass/gradient background matching hero */}
-      <div
-        className={`mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 transition-colors duration-300`}
-      >
+      {/* Gutter igual al chat; sin padding derecho */}
+      <div className="w-full site-gutter transition-colors duration-300">
         <div
           className={
-            `relative mt-5 sm:mt-6 lg:mt-8 flex items-center justify-between rounded-full border ` +
-            `backdrop-blur-md px-4 py-2 sm:px-5 sm:py-2.5 ` +
+            `relative w-full flex items-center justify-between border-b ` +
+            `px-4 sm:px-5 h-16 sm:h-20 ` +
             `transition-all duration-300 ` +
             (isScrolled
-              ? `bg-black/50 border-white/15 shadow-2xl shadow-black/20`
-              : `bg-black/30 border-white/10`)
+              ? `bg-black/70 border-white/15`
+              : `bg-black/50 border-white/10`)
           }
-          style={{
-            boxShadow: isScrolled ? "0 10px 40px rgba(0,0,0,0.35)" : undefined,
-          }}
         >
           {/* Left: Brand */}
-          <div className="relative z-10 flex min-w-0 items-center gap-2">
+          <div className="relative z-10 flex min-w-0 items-center gap-2 h-full">
             <button 
               onClick={() => navigateToSection("home")}
-              className="group inline-flex items-center gap-2"
+              className="group inline-flex items-center gap-2 h-full"
             >
               {/* Logo Text */}
-              <div className="flex flex-col items-center">
-                <div className="text-lg tracking-tight text-center">
+              <div className="flex flex-col items-start">
+                <div className="text-lg tracking-tight text-left">
                   <span className="bg-gradient-to-r from-white via-gray-100 to-gray-200 bg-clip-text text-transparent group-hover:from-white group-hover:via-white group-hover:to-gray-100 transition-all duration-200 font-mono font-light">
                     Alexis Reyna
                   </span>
                 </div>
-                <div className="text-xs text-gray-400 uppercase tracking-tight font-mono font-light text-center">
+                <div className="text-xs text-gray-400 uppercase tracking-tight font-mono font-light text-left">
                   Full-Stack Developer
                 </div>
               </div>
@@ -62,7 +58,7 @@ export default function Navbar() {
           </div>
 
           {/* Center: Nav links (desktop) */}
-          <nav className="relative z-10 hidden items-center gap-1 sm:flex font-mono font-extralight">
+          <nav className="relative z-10 hidden items-center gap-4 sm:flex font-mono font-light h-full">
             {[
               { section: "home", label: isEs ? "Inicio" : "Home" },
               { section: "services", label: isEs ? "Servicios" : "Services" },
@@ -71,10 +67,10 @@ export default function Navbar() {
               <button
                 key={item.label}
                 onClick={() => navigateToSection(item.section as "home" | "services" | "projects" | "contact")}
-                className={`rounded-full px-3 py-1.5 text-sm transition-colors border font-mono font-extralight ${
+                className={`px-3 py-2 text-sm transition-colors border-b-2 font-mono font-light ${
                   currentSection === item.section
-                    ? "text-white bg-white/10 border-white/20"
-                    : "text-gray-300 hover:text-white hover:bg-white/5 border-transparent hover:border-white/10"
+                    ? "text-white border-white/30"
+                    : "text-gray-300 hover:text-white border-transparent hover:border-white/20"
                 }`}
               >
                 {item.label}
@@ -83,10 +79,10 @@ export default function Navbar() {
           </nav>
 
           {/* Right: CTA + Mobile toggle */}
-          <div className="relative z-10 flex items-center gap-2">
+          <div className="relative z-10 flex items-center gap-2 h-full">
             <button
               onClick={() => navigateToSection("contact")}
-              className="relative hidden sm:inline-flex items-center gap-2 rounded-full gradient-border bg-gradient-to-r from-slate-800/80 via-blue-900/60 to-violet-900/70 px-4 py-1.5 text-sm font-mono font-bold tracking-tight text-white shadow-inner shadow-cyan-400/10 transition-all hover:from-slate-700/90 hover:via-blue-800/70 hover:to-violet-800/80 hover:shadow-cyan-400/20 hover:scale-[1.02]"
+              className="relative hidden sm:inline-flex items-center gap-2 rounded-md border border-white/10 bg-black/50 px-4 py-2 text-sm font-mono font-semibold tracking-tight text-white shadow-lg shadow-black/20 transition-all hover:bg-black/60 hover:border-white/20"
             >
               <span>{isEs ? 'Hablemos' : "Let's talk"}</span>
               <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">
