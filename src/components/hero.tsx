@@ -25,7 +25,7 @@ export default function Hero({ className }: HeroProps) {
             unoptimized
             // En mobile y tablet centrado; desde lg, más hacia la izquierda y con zoom
             className="object-contain sm:object-contain lg:object-left origin-left
-                       scale-[1.15] sm:scale-[1.25] md:scale-[1.125] lg:scale-[1.55] lg:translate-x-[-20px]"
+                       scale-[1.15] sm:scale-[1.25] md:scale-[1.125] lg:scale-[2.0] xl:scale-[1.7] 2xl:scale-[1.55] lg:translate-x-[-20px]"
           />
         </div>
       </div>
