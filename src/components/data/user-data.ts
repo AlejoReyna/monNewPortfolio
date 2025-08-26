@@ -132,10 +132,63 @@ export const alexisData: UserData = {
     },
     
     projects: [
-      // Placeholder - agregar proyectos reales del portfolio
+      // PROYECTOS DESTACADOS
+      {
+        name: "MK1 Presale Landing",
+        description: "Landing inmersiva fanmade de Mortal Kombat 1 con flujo completo de preventa. Frontend en Next.js, backend maneja emails y almacena pre-registros en PostgreSQL con confirmación vía Nodemailer",
+        technologies: ["Next.js", "PostgreSQL", "Nodemailer", "TypeScript"],
+        link: "https://next-mk.vercel.app",
+        highlight: true
+      },
+      {
+        name: "PokeFolio",
+        description: "Portfolio interactivo estilo Pokémon con intro typewriter, diálogos auténticos del juego, reproductor de música integrado y navegación inmersiva a proyectos",
+        technologies: ["Next.js", "Tailwind CSS", "TypeScript"],
+        link: "https://poke-folio.vercel.app",
+        highlight: true
+      },
+      {
+        name: "Plebes DAO",
+        description: "Diseño UX/UI completo para proyecto de moda blockchain, incluyendo sistema de diseño, experiencia de usuario y interfaz moderna",
+        technologies: ["UX/UI", "Figma", "Design System"],
+        highlight: true
+      },
+      
+      // OPEN SOURCE
+      {
+        name: "UANL Interface+",
+        description: "Extensión Chrome/Firefox que moderniza la interfaz de SIASE/Deimos con Shadow DOM, content scripts y mejoras UX para sistemas universitarios",
+        technologies: ["TypeScript", "Vite", "Chrome Extensions", "Shadow DOM"],
+        link: "https://uanl-interface.vercel.app",
+        highlight: true
+      },
+      
+      // HACKATHON WINNERS
+      {
+        name: "mpBot (3er lugar ETH Mérida)",
+        description: "Bot de Telegram para recomendaciones DeFi y staking con Meta Pool. Construido en 48h, integra OpenAI para Q&A sobre DeFi",
+        technologies: ["Next.js", "Telegraf", "OpenAI API", "DeFi"],
+        link: "https://t.me/PoolitoAssistantBot",
+        highlight: true
+      },
+      {
+        name: "Birdlypay",
+        description: "dApp para crear enlaces de pago on-chain compartibles globalmente. Contratos inteligentes en Solidity desplegados en Base blockchain",
+        technologies: ["Next.js", "Solidity", "Thirdweb", "Base"],
+        link: "https://birdlypay.vercel.app",
+        highlight: false
+      },
+      {
+        name: "NiftyRewards (3er lugar)",
+        description: "Sistema de recompensas de lealtad usando tokens fungibles y NFTs. Frontend en TypeScript con lógica y contratos en Rust",
+        technologies: ["TypeScript", "Rust", "NFTs", "Web3"],
+        highlight: false
+      },
+      
+      // TRABAJO ACTUAL
       {
         name: "Inverater Platform",
-        description: "Plataforma de startup de inversiones inmobiliarias - desarrollo full-stack con enfoque en UX/UI",
+        description: "Plataforma completa de startup de inversiones inmobiliarias - desarrollo full-stack con enfoque en UX/UI y experiencia de usuario",
         technologies: ["React", "Node.js", "AWS", "Figma"],
         link: "https://inverater.com",
         highlight: true

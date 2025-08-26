@@ -231,7 +231,7 @@ export const ENHANCED_PLACEHOLDERS = {
   es: [
     "¿Qué quieres saber sobre mí?",
     "Pregunta sobre música, tech, viajes...",
-    "¿Te cuento de Los Beatles? 🎸",
+    "¿Te cuento de The Beatles?",
     "¿Hablamos de código o de café?",
     "¿Algo sobre Monterrey o Inverater?",
     "¿React, Vue, o mejor freestyle de guitarra?",
@@ -242,7 +242,7 @@ export const ENHANCED_PLACEHOLDERS = {
   en: [
     "What would you like to know about me?",
     "Ask about music, tech, travels...",
-    "Should we talk about The Beatles? 🎸",
+    "Should we talk about The Beatles?",
     "Code or coffee talk?",
     "Something about Monterrey or Inverater?",
     "React, Vue, or guitar freestyle?",
@@ -274,7 +274,6 @@ export const ENHANCED_SUGGESTIONS = [
   { en: "Freelance availability", es: "Disponibilidad freelance", intent: "contact" as Intent },
   { en: "UX/UI + Backend combo", es: "Combo UX/UI + Backend", intent: "tech" as Intent },
   
-  // Travel dreams  
-  { en: "Peru travel dreams", es: "Sueños de viajar a Perú", intent: "travel" as Intent },
+  // Travel general (sin Perú específico)
   { en: "Backpacking adventures", es: "Aventuras de mochilero", intent: "travel" as Intent }
 ];
