@@ -14,6 +14,24 @@ const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
  * - ventana: 2 horas 30 minutos (2.5h = 9,000,000 ms)
  */
 const QUOTA_COOKIE = 'chat_quota_v1';
+const BYPASS_COOKIE = 'chat_bypass_v1';
+const BYPASS_PHRASE = 'im your god mfucker';
+const HINT_START = '[[SYS]]';
+const HINT_END = '[[/SYS]]';
+
+function stripHintBlock(raw: unknown): string {
+  const text = (raw ?? '').toString();
+  if (text.startsWith(HINT_START)) {
+    const end = text.indexOf(HINT_END);
+    if (end !== -1) {
+      let out = text.slice(end + HINT_END.length);
+      if (out.startsWith('\r\n')) out = out.slice(2);
+      else if (out.startsWith('\n')) out = out.slice(1);
+      return out;
+    }
+  }
+  return text;
+}
 const MAX_PROMPTS = 5;
 const WINDOW_MS = 2.5 * 60 * 60 * 1000; // 2.5h -> 9_000_000 ms
 
@@ -65,22 +83,7 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  // 1) Enforce cuota por sesión mediante cookie
-  let quota = (await readQuota()) ?? initQuota();
-  if (Date.now() > quota.resetAt) quota = initQuota();
-
-  if (quota.remaining <= 0) {
-    const retryAtISO = new Date(quota.resetAt).toISOString();
-    return NextResponse.json(
-      {
-        error: `Has alcanzado el límite de ${MAX_PROMPTS} prompts en 2h 30m.`,
-        retryAt: retryAtISO,
-      },
-      { status: 429 }
-    );
-  }
-
-  // 2) Parse body
+  // 1) Parse body primero (necesario para evaluar bypass incluso si ya no hay cuota)
   let body: { messages?: ChatMessage[]; userName?: string };
   try {
     body = await req.json();
@@ -96,6 +99,42 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(
       { error: 'Mensajes requeridos (array)' },
       { status: 400 }
+    );
+  }
+
+  // 2) Bypass secreto: si el último mensaje de usuario es la frase mágica, activa bypass y responde
+  const lastUser = [...messages].reverse().find(m => m.role === 'user');
+  const lastUserContent = stripHintBlock(lastUser?.content).trim().toLowerCase();
+  if (lastUserContent === BYPASS_PHRASE) {
+    const res = NextResponse.json({
+      success: true,
+      model: 'gpt-5-nano',
+      message: 'Bypass activado: sin límite de prompts en esta sesión.'
+    });
+    res.cookies.set(BYPASS_COOKIE, '1', {
+      httpOnly: true,
+      sameSite: 'lax',
+      secure: true,
+      path: '/',
+      maxAge: 60 * 60 * 24 * 30, // 30 días
+    });
+    return res;
+  }
+
+  // 3) Enforce cuota por sesión salvo que exista bypass activo
+  const cookieStore = await cookies();
+  const hasBypass = cookieStore.get(BYPASS_COOKIE)?.value === '1';
+  let quota = (await readQuota()) ?? initQuota();
+  if (Date.now() > quota.resetAt) quota = initQuota();
+
+  if (!hasBypass && quota.remaining <= 0) {
+    const retryAtISO = new Date(quota.resetAt).toISOString();
+    return NextResponse.json(
+      {
+        error: `Has alcanzado el límite de ${MAX_PROMPTS} prompts en 2h 30m.`,
+        retryAt: retryAtISO,
+      },
+      { status: 429 }
     );
   }
 
@@ -135,8 +174,7 @@ export async function POST(req: NextRequest) {
 
     const text = getOutputText(resp);
 
-    // 6) Decrementar cuota y setear cookie
-    quota.remaining -= 1;
+    // 6) Decrementar cuota y setear cookie (solo si NO hay bypass)
     const res = NextResponse.json({
       success: true,
       model: 'gpt-5-nano',
@@ -145,15 +183,18 @@ export async function POST(req: NextRequest) {
       quota: { remaining: quota.remaining, resetAt: quota.resetAt },
     });
 
-    // Cookie httpOnly para "sesión/cuota"
-    res.cookies.set(QUOTA_COOKIE, serializeQuota(quota), {
-      httpOnly: true,
-      sameSite: 'lax',
-      secure: true,
-      path: '/',
-      // maxAge en segundos:
-      maxAge: Math.floor(WINDOW_MS / 1000),
-    });
+    if (!hasBypass) {
+      quota.remaining -= 1;
+      // Cookie httpOnly para "sesión/cuota"
+      res.cookies.set(QUOTA_COOKIE, serializeQuota(quota), {
+        httpOnly: true,
+        sameSite: 'lax',
+        secure: true,
+        path: '/',
+        // maxAge en segundos:
+        maxAge: Math.floor(WINDOW_MS / 1000),
+      });
+    }
 
     return res;
   } catch (error: unknown) {

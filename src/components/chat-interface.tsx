@@ -4,21 +4,27 @@ import type React from "react";
 import { useLanguage } from "@/components/lang-context";
 import { useChat } from "@/hooks/useChat";
 
+// Datos personalizados de Alexis
+import { alexisData, getRandomMusicArtist, getRandomTech } from "./data/user-data";
+import { 
+  detectEnhancedIntent, 
+  buildEnhancedHint, 
+  ENHANCED_SUGGESTIONS,
+  ENHANCED_PLACEHOLDERS 
+} from "./data/chat-enhancements";
+
 type Lang = "en" | "es";
-type Intent = "casual" | "work";
+type Intent = "casual" | "work" | "about" | "projects" | "contact" | "music" | "travel" | "tech";
 type Suggestion = { en: string; es: string; intent: Intent };
 
-/* ========= Sugerencias/Prompts (NO reducidas) ========= */
-const suggestions: Suggestion[] = [
-  { en: "Music you're into lately", es: "Música que escuchas últimamente", intent: "casual" },
-  { en: "Movies or series you loved", es: "Películas o series que te gustaron", intent: "casual" },
-  { en: "A trip you'd like to take", es: "Un viaje que te gustaría hacer", intent: "casual" },
-  { en: "Hobbies or free-time stuff", es: "Hobbies o cosas de tu tiempo libre", intent: "casual" },
-  { en: "Projects", es: "Proyectos", intent: "work" },
-  { en: "Technologies", es: "Tecnologías", intent: "work" },
-  { en: "About me", es: "Sobre mí", intent: "work" },
-  { en: "Contact", es: "Contacto", intent: "work" },
-];
+/* ========= Sugerencias Personalizadas de Alexis ========= */
+// Función para obtener 5 sugerencias aleatorias
+const getRandomSuggestions = (allSuggestions: Suggestion[], count: number = 5): Suggestion[] => {
+  const shuffled = [...allSuggestions].sort(() => 0.5 - Math.random());
+  return shuffled.slice(0, count);
+};
+
+const suggestions: Suggestion[] = getRandomSuggestions(ENHANCED_SUGGESTIONS, 5);
 
 /* ========= Easter Egg (Marthiel) ========= */
 const EASTER_GIBBERISH_ES = [
@@ -73,26 +79,7 @@ const buildEasterFull = (seed: string) => Array.from({ length: 80 })
   .map((_, i) => (i % 5 === 4 ? `${seed}\n` : `${seed} `))
   .join("");
 
-const inputPlaceholders = [
-  { en: "What's on your mind?", es: "¿Qué tienes en mente?" },
-  { en: "Hit me with your best question...", es: "Dale con tu mejor pregunta..." },
-  { en: "Let's talk code (or anything else)...", es: "Hablemos de código (o lo que sea)..." },
-  { en: "Curious about something?", es: "¿Curioso por algo?" },
-  { en: "Type away, I don't bite...", es: "Escribe tranquilo, no muerdo..." },
-  { en: "What would you like to know?", es: "¿Qué te gustaría saber?" },
-  { en: "Got a tech question? Or just wanna chat?", es: "¿Pregunta técnica? ¿O solo charlar?" },
-  { en: "Fire away with your questions...", es: "Dispara tus preguntas..." },
-  { en: "Let's geek out together...", es: "Hagamos nerdismo juntos..." },
-  { en: "Ask me anything (within reason)...", es: "Pregunta lo que sea (dentro de lo razonable)..." },
-  { en: "Your question, my attempt at wisdom...", es: "Tu pregunta, mi intento de sabiduría..." },
-  { en: "What can this digital me help with?", es: "¿En qué puede ayudar este yo digital?" },
-  { en: "Ready when you are...", es: "Listo cuando tú lo estés..." },
-  { en: "Drop your question here...", es: "Suelta tu pregunta aquí..." },
-  { en: "Let's build something cool together...", es: "Construyamos algo cool juntos..." },
-  { en: "Coffee break chat? I'm here...", es: "¿Chat de coffee break? Aquí estoy..." },
-  { en: "What brings you here today?", es: "¿Qué te trae por aquí hoy?" },
-  { en: "Penny for your thoughts?", es: "¿Un centavo por tus pensamientos?" },
-];
+// Placeholders personalizados se obtienen de ENHANCED_PLACEHOLDERS
 
 /* ========= Detección de intención ========= */
 const WORK_EN = ["project","portfolio","resume","cv","hire","job","work","code","coding","programming","developer","stack","react","next","typescript","node","api","deploy","github","experience","tech","technology"];
@@ -103,43 +90,19 @@ const GREET_ES = ["hola","buenas","¿cómo estás","como estas","estoy bien","¿
 const isWorky = (t: string, lang: Lang) => (lang === "es" ? WORK_ES : WORK_EN).some(k => t.includes(k));
 const isGreetingish = (t: string, lang: Lang) => (lang === "es" ? GREET_ES : GREET_EN).some(g => t.includes(g)) && t.length <= 120;
 
-const deriveIntent = (text: string, lang: Lang): Intent => {
-  const t = text.toLowerCase();
-  if (isWorky(t, lang)) return "work";
-  if (isGreetingish(t, lang)) return "casual";
-  return "casual";
-};
+// Usar sistema mejorado de detección de intenciones
+const deriveIntent = detectEnhancedIntent;
 
 /* ========= Hints ocultos ========= */
 const HINT_START = "[[SYS]]";
 const HINT_END = "[[/SYS]]";
 
-const buildHint = (intent: Intent, lang: Lang) => {
-  if (intent === "casual") {
-    return lang === "es" ? `${HINT_START}
-Modo: CASUAL (ES)
-- Responde ESTRICTAMENTE en español.
-- Tono cálido y ligero; no menciones trabajo salvo que el usuario lo pida.
-- 1–2 oraciones, 25–40 palabras máx.
-- UNA pregunta abierta O UNA sugerencia breve.
-${HINT_END}` : `${HINT_START}
-Mode: CASUAL (EN)
-- Respond STRICTLY in English.
-- Warm, light tone; do not mention work unless the user asks.
-- 1–2 sentences, 25–40 words max.
-- ONE open-ended question OR ONE brief suggestion.
-${HINT_END}`;
-  }
-  return lang === "es" ? `${HINT_START}
-Modo: WORK (ES)
-- Español, claro y conciso, enfocado a lo que el usuario pida.
-${HINT_END}` : `${HINT_START}
-Mode: WORK (EN)
-- English, clear and concise, focused on what the user asks.
-${HINT_END}`;
+// Usar sistema mejorado de hints con información personalizada
+const buildHint = (intent: Intent, lang: Lang, userText: string) => {
+  return buildEnhancedHint(intent, lang, userText);
 };
 
-const withHint = (userText: string, intent: Intent, lang: Lang) => `${buildHint(intent, lang)}\n${userText.trim()}`;
+const withHint = (userText: string, intent: Intent, lang: Lang) => `${buildHint(intent, lang, userText)}\n${userText.trim()}`;
 
 // Remueve solo el bloque [[SYS]]...[[/SYS]] (sin regex dinámico)
 const stripHintFromUserMessage = (raw: unknown) => {
@@ -191,7 +154,7 @@ export default function ChatInterface() {
     if (!el) return;
     const ro = new ResizeObserver((entries) => {
       const h = entries[0].contentRect.height || el.clientHeight;
-      setChatHeightPx(Math.max(160, Math.floor(h * 0.5))); // mínimo razonable
+      setChatHeightPx(Math.max(300, Math.floor(h * 0.75))); // Aumentar tamaño: 75% del alto y mínimo 300px
     });
     ro.observe(el);
     return () => ro.disconnect();
@@ -328,7 +291,7 @@ export default function ChatInterface() {
   const [easterGifScale, setEasterGifScale] = useState(0.001);
 
   const pickPlaceholder = useCallback(() => {
-    const pool = isEs ? EASTER_PLACEHOLDERS_ES : EASTER_PLACEHOLDERS_EN;
+    const pool = ENHANCED_PLACEHOLDERS[isEs ? 'es' : 'en'];
     setCurrentPlaceholder(pool[Math.floor(Math.random() * pool.length)]);
   }, [isEs]);
 
@@ -338,8 +301,20 @@ export default function ChatInterface() {
 
   useEffect(() => {
     if (!showChat && !showNamePrompt) {
-      let i = 0; setDisplayed(""); setTypewriterComplete(false);
-      const id = setInterval(() => { setDisplayed(text.slice(0, i + 1)); i++; if (i >= text.length) { clearInterval(id); setTypewriterComplete(true); } }, 34);
+      let i = 0;
+      setDisplayed("");
+      setTypewriterComplete(false);
+      
+      const id = setInterval(() => {
+        if (i < text.length) {
+          setDisplayed(text.slice(0, i + 1));
+          i++;
+        } else {
+          clearInterval(id);
+          setTypewriterComplete(true);
+        }
+      }, 40); // Velocidad más lenta para mejor visibilidad
+      
       return () => clearInterval(id);
     }
   }, [text, showChat, showNamePrompt]);
@@ -389,7 +364,7 @@ export default function ChatInterface() {
     easterRafRef.current = window.requestAnimationFrame(step);
   }, [isEs, showChat, easterActive]);
 
-  // animar última respuesta nueva; iniciar con 1 char para evitar burbuja vacía
+  // animar última respuesta nueva - con dependencia estable
   useEffect(() => {
     const lastAssistant = [...messages].filter(m => m.role === "assistant").pop();
     if (!lastAssistant) return;
@@ -398,30 +373,40 @@ export default function ChatInterface() {
     if (doneById[key] || typedById[key] !== undefined) return;
 
     const full = (lastAssistant.content ?? "").toString();
-    if (full.length === 0) { // nada que animar
+    if (full.length === 0) {
       setDoneById(prev => ({ ...prev, [key]: true }));
       return;
     }
 
-    // preseed para evitar burbuja vacía
+    // Iniciar con primera letra
+    let currentIndex = 1;
     setTypedById(prev => ({ ...prev, [key]: full.slice(0, 1) }));
-
-    let i = 1;
-    let rafId = 0;
-    const step = () => {
-      i = Math.min(i + 2, full.length);
-      setTypedById(prev => ({ ...prev, [key]: full.slice(0, i) }));
-      if (i < full.length) {
-        rafId = window.requestAnimationFrame(step);
+    
+    const typeInterval = setInterval(() => {
+      if (currentIndex < full.length) {
+        currentIndex = Math.min(currentIndex + 2, full.length);
+        // Forzar actualización inmediata
+        setTypedById(prev => {
+          const newState = { ...prev, [key]: full.slice(0, currentIndex) };
+          return newState;
+        });
+        
+        // Autoscroll
+        setTimeout(() => {
+          if (messagesEndRef.current) {
+            messagesEndRef.current.scrollIntoView({ behavior: "smooth", block: "end" });
+          }
+        }, 10);
       } else {
+        // Completar y marcar como terminado
+        setTypedById(prev => ({ ...prev, [key]: full }));
         setDoneById(prev => ({ ...prev, [key]: true }));
+        clearInterval(typeInterval);
       }
-      // autoscroll durante la animación
-      if (messagesEndRef.current) messagesEndRef.current.scrollIntoView({ behavior: "smooth", block: "end" });
-    };
-    rafId = window.requestAnimationFrame(step);
-    return () => window.cancelAnimationFrame(rafId);
-  }, [messages, doneById, typedById]);
+    }, 50);
+    
+    return () => clearInterval(typeInterval);
+  }, [messages.length, messages.map(m => m.id || m.timestamp).join(',')]); // Usar dependencias estables
 
   // autoscroll al fondo al cambiar la lista o lo tipeado
   useEffect(() => {
@@ -464,9 +449,32 @@ export default function ChatInterface() {
       return;
     }
 
+    // Beatles Easter Egg - respuesta especial
+    if (/beatles/i.test(raw) || /paul mccartney/i.test(raw) || /john lennon/i.test(raw) || /george harrison/i.test(raw) || /ringo starr/i.test(raw)) {
+      const beatlesResponse = isEs 
+        ? "🎸 ¡FINALMENTE ALGUIEN HABLA DE LOS BEATLES! Son mi obsesión absoluta. Paul McCartney es un genio, George Harrison subestimado, y ni hablar del groove de Ringo. ¿Cuál es tu canción favorita?"
+        : "🎸 FINALLY SOMEONE TALKS ABOUT THE BEATLES! They're my absolute obsession. Paul McCartney is a genius, George Harrison underrated, and don't get me started on Ringo's groove. What's your favorite song?";
+      
+      // Simular respuesta inmediata
+      setInputValue("");
+      if (!showChat) setShowChat(true);
+      pickPlaceholder();
+      
+      // Simular respuesta del asistente de inmediato
+      const mockResponse = {
+        role: "assistant" as const,
+        content: beatlesResponse,
+        timestamp: new Date(),
+        id: `beatles-${Date.now()}`
+      };
+      
+      // Esto requerirías agregar al hook useChat para respuestas mock
+      // Por ahora, continúa con el flujo normal
+    }
+
     if (!userName) return setShowNamePrompt(true);
     const intent = deriveIntent(raw, currentLang);
-    const payload = withHint(raw, intent, currentLang);
+    const payload = buildHint(intent, currentLang, raw) + '\n' + raw;
     sendMessage(payload);
     setInputValue("");
     if (!showChat) setShowChat(true);
@@ -474,7 +482,7 @@ export default function ChatInterface() {
   };
   const handleSuggestionClick = (label: string, intent: Intent) => {
     if (!userName) return setShowNamePrompt(true);
-    const payload = withHint(label.trim(), intent, currentLang);
+    const payload = buildHint(intent, currentLang, label) + '\n' + label;
     sendMessage(payload);
     if (!showChat) setShowChat(true);
     pickPlaceholder();
@@ -482,9 +490,12 @@ export default function ChatInterface() {
 
 
   const sorted = [...messages].sort((a, b) => +a.timestamp - +b.timestamp);
+  // Identify the most recent assistant message to animate only that one
+  const lastAssistant = [...sorted].filter(m => m.role === "assistant").pop();
+  const lastAssistantKey = lastAssistant ? ((lastAssistant.id ?? String(+lastAssistant.timestamp)) as string) : null;
 
   return (
-    <div ref={rootRef} className="relative z-30 flex flex-col gap-4 px-4 w-full max-w-3xl mx-auto mb-20">
+    <div ref={rootRef} className="relative z-10 sm:z-10 md:z-10 lg:z-30 flex flex-col gap-4 px-4 w-full max-w-3xl mx-auto mb-20">
 
       {/* Portada (se oculta cuando inicia el chat) */}
       {!showChat && (
@@ -508,13 +519,18 @@ export default function ChatInterface() {
             {sorted.map((m) => {
               const isUser = m.role === "user";
               const key = (m.id ?? String(+m.timestamp)) as string;
-              const content = isUser ? stripHintFromUserMessage(m.content) : (doneById[key] ? (m.content ?? "") : (typedById[key] ?? (m.content ?? "").slice(0, 1)));
+              const isLastAssistant = !isUser && lastAssistantKey === key;
+              const content = isUser
+                ? stripHintFromUserMessage(m.content)
+                : isLastAssistant
+                  ? (doneById[key] ? (m.content ?? "") : (typedById[key] ?? (m.content ?? "").slice(0, 1)))
+                  : (m.content ?? "");
               return (
                 <div key={key} className={`flex ${isUser ? "justify-end" : "justify-start"}`}>
                   <div className={`pointer-events-auto w-full max-w-[80%] rounded-2xl px-5 py-4 border ${isUser ? "bg-black/40 border-white/10" : "bg-zinc-800/60 border-white/10"}`}>
                     <p className="text-base sm:text-lg text-gray-200 font-mono font-light leading-relaxed whitespace-pre-wrap">
                       {content}
-                      {!isUser && !doneById[key] ? " ▍" : null}
+                      {!isUser && (lastAssistantKey === key) && !doneById[key] ? " ▍" : null}
                     </p>
                     <span className="text-xs opacity-60 mt-2 block">
                       {m.timestamp.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
@@ -704,7 +720,7 @@ export default function ChatInterface() {
         <img
           src="/16.gif"
           alt="glitch"
-          className="fixed left-1/2 top-1/2 z-50 pointer-events-none select-none opacity-90"
+          className="fixed left-1/2 top-1/2 z-50 sm:z-10 md:z-10 lg:z-50 pointer-events-none select-none opacity-90"
           style={{ transform: `translate(-50%, -50%) scale(${easterGifScale}) rotate(${(easterGifScale * 8).toFixed(2)}deg)` }}
         />
       )}
