@@ -1,49 +1,49 @@
-// chat-enhancements.ts - Sistema mejorado de hints y detección de intenciones
+// chat-enhancements.ts - Enhanced hint system and intent detection
 
 import { alexisData, getRandomMusicArtist, getRandomTech, getRandomDestination } from './user-data';
 
 type Intent = "casual" | "work" | "about" | "projects" | "contact" | "music" | "travel" | "tech";
 type Lang = "en" | "es";
 
-// ===== KEYWORDS EXPANDIDOS PARA DETECCIÓN =====
+// ===== EXPANDED KEYWORDS FOR DETECTION =====
 const ENHANCED_KEYWORDS = {
   es: {
-    music: ["música", "musica", "canción", "cancion", "artista", "banda", "concierto", "guitarra", "beatles", "rock", "hip hop", "josé madero", "pxndx", "paul mccartney", "tocar", "instrumento"],
-    travel: ["viaje", "viajar", "destino", "lugar", "país", "pais", "vacaciones", "mochilero", "españa", "peru", "japón", "japon", "cancún", "cancun", "puerto vallarta", "inglaterra"],
-    about: ["sobre ti", "quien eres", "tu historia", "presentate", "cuentame de ti", "alexis", "como eres", "personalidad", "monterrey"],
-    projects: ["proyecto", "proyectos", "trabajo", "portfolio", "github", "codigo", "programar", "inverater", "plataforma"],
-    contact: ["contacto", "email", "linkedin", "cv", "curriculum", "contratar", "freelance", "let's talk", "hablemos"],
-    tech: ["tecnología", "tecnologia", "react", "vue", "nextjs", "node", "ruby", "typescript", "aws", "mongodb", "stack", "programación", "frontend", "backend"],
-    work: ["trabajo", "experiencia", "empresa", "inverater", "desarrollador", "programador", "ux", "ui", "profesional", "carrera", "empleo"]
+    music: ["música", "musica", "canción", "cancion", "artista", "banda", "concierto", "guitarra", "beatles", "rock", "hip hop", "josé madero", "pxndx", "paul mccartney", "tocar", "instrumento", "escuchar", "gusta", "favorita"],
+    travel: ["viaje", "viajar", "destino", "lugar", "país", "pais", "vacaciones", "mochilero", "españa", "peru", "japón", "japon", "cancún", "cancun", "puerto vallarta", "inglaterra", "visitado", "conocido"],
+    about: ["sobre ti", "quien eres", "tu historia", "presentate", "cuentame de ti", "alexis", "como eres", "personalidad", "monterrey", "edad", "años", "vives"],
+    projects: ["proyecto", "proyectos", "trabajo", "portfolio", "github", "codigo", "programar", "inverater", "plataforma", "desarrollado", "creado", "construido"],
+    contact: ["contacto", "email", "linkedin", "cv", "curriculum", "contratar", "freelance", "let's talk", "hablemos", "disponible", "contratación"],
+    tech: ["tecnología", "tecnologia", "react", "vue", "nextjs", "node", "ruby", "typescript", "aws", "mongodb", "stack", "programación", "frontend", "backend", "lenguaje", "framework"],
+    work: ["trabajo", "experiencia", "empresa", "inverater", "desarrollador", "programador", "ux", "ui", "profesional", "carrera", "empleo", "oficina", "jornada"]
   },
   en: {
-    music: ["music", "song", "artist", "band", "concert", "guitar", "beatles", "rock", "hip hop", "josé madero", "pxndx", "paul mccartney", "play", "instrument"],
-    travel: ["travel", "trip", "destination", "place", "country", "vacation", "backpack", "peru", "japan", "england", "cancun", "puerto vallarta", "monterrey"],
-    about: ["about you", "who are you", "tell me about", "introduce yourself", "your story", "alexis", "personality", "monterrey"],
-    projects: ["project", "projects", "work", "portfolio", "github", "code", "programming", "inverater", "platform"],
-    contact: ["contact", "email", "linkedin", "cv", "resume", "hire", "freelance", "let's talk"],
-    tech: ["technology", "tech", "react", "vue", "nextjs", "node", "ruby", "typescript", "aws", "mongodb", "stack", "programming", "frontend", "backend"],
-    work: ["work", "experience", "company", "inverater", "developer", "programmer", "ux", "ui", "professional", "career", "job"]
+    music: ["music", "song", "artist", "band", "concert", "guitar", "beatles", "rock", "hip hop", "josé madero", "pxndx", "paul mccartney", "play", "instrument", "listen", "like", "favorite"],
+    travel: ["travel", "trip", "destination", "place", "country", "vacation", "backpack", "peru", "japan", "england", "cancun", "puerto vallarta", "monterrey", "visited", "been to"],
+    about: ["about you", "who are you", "tell me about", "introduce yourself", "your story", "alexis", "personality", "monterrey", "age", "years old", "live"],
+    projects: ["project", "projects", "work", "portfolio", "github", "code", "programming", "inverater", "platform", "developed", "created", "built"],
+    contact: ["contact", "email", "linkedin", "cv", "resume", "hire", "freelance", "let's talk", "available", "hiring"],
+    tech: ["technology", "tech", "react", "vue", "nextjs", "node", "ruby", "typescript", "aws", "mongodb", "stack", "programming", "frontend", "backend", "language", "framework"],
+    work: ["work", "experience", "company", "inverater", "developer", "programmer", "ux", "ui", "professional", "career", "job", "office", "workday"]
   }
 };
 
-// ===== FUNCIÓN MEJORADA DE DETECCIÓN DE INTENCIÓN =====
+// ===== ENHANCED INTENT DETECTION FUNCTION =====
 export const detectEnhancedIntent = (text: string, lang: Lang): Intent => {
   const t = text.toLowerCase();
   const keywords = ENHANCED_KEYWORDS[lang];
   
-  // Priorizar intenciones específicas primero
+  // Prioritize specific intents first
   for (const [intent, words] of Object.entries(keywords)) {
     if (words.some(word => t.includes(word))) {
       return intent as Intent;
     }
   }
   
-  // Fallback a casual
+  // Fallback to casual
   return "casual";
 };
 
-// ===== SISTEMA DE HINTS PERSONALIZADO =====
+// ===== ENHANCED PERSONALIZED HINT SYSTEM =====
 export const buildEnhancedHint = (intent: Intent, lang: Lang, userText: string) => {
   const HINT_START = "[[SYS]]";
   const HINT_END = "[[/SYS]]";
@@ -61,7 +61,7 @@ DATOS CLAVE DE ALEXIS:
 - Toca guitarra electroacústica
 - Fue al Truck Fest 2025 (José Madero)
 - Le gusta hacer freestyle de guitarra mientras programa
-TONO: Apasionado sobre música, especialmente Los Beatles. 40-60 palabras máx.`
+TONO: Apasionado sobre música, especialmente Los Beatles. 40-60 palabras máx. NO mencionar trabajo/tech a menos que se pregunte específicamente.`
         : `Context: User asking about Alexis's music.
 KEY DATA ABOUT ALEXIS:
 - OBSESSED with The Beatles (ALWAYS mention this)
@@ -70,7 +70,7 @@ KEY DATA ABOUT ALEXIS:
 - Plays acoustic guitar
 - Went to Truck Fest 2025 (José Madero)
 - Likes guitar freestyle while coding
-TONE: Passionate about music, especially The Beatles. 40-60 words max.`;
+TONE: Passionate about music, especially The Beatles. 40-60 words max. DO NOT mention work/tech unless specifically asked.`;
       break;
       
     case "travel":
@@ -81,15 +81,15 @@ DATOS CLAVE DE ALEXIS:
 - Bucket list: España, Estados Unidos (beyond Texas), Inglaterra, Japón
 - Estilo: Mochilero
 - De Monterrey, N.L.
-TONO: Aventurero, con ganas de explorar. 40-60 palabras máx.`
+TONO: Aventurero, con ganas de explorar. 40-60 palabras máx. NO mencionar trabajo/tech a menos que se pregunte específicamente.`
         : `Context: User asking about Alexis's travel.
 KEY DATA ABOUT ALEXIS:
 - Visited: Cancún, Puerto Vallarta, Mexico City, Isla del Padre, Veracruz
 - Next: "Hopefully Peru..." (really wanting to go)
-- Bucket list:  United States (beyond Texas), England, Japan
+- Bucket list: United States (beyond Texas), England, Japan
 - Style: Backpacker
 - From Monterrey, Mexico
-TONE: Adventurous, eager to explore. 40-60 words max.`;
+TONE: Adventurous, eager to explore. 40-60 words max. DO NOT mention work/tech unless specifically asked.`;
       break;
       
     case "tech":
@@ -211,7 +211,7 @@ PERSONALIDAD DE ALEXIS:
 - De Monterrey, ex-jugador de LoL retirado
 - Artes marciales, mochilero
 - Meta: ser el mejor programador de N.L.
-TONO: Relajado, amigable, auténtico, con personalidad. 30-50 palabras máx.`
+TONO: Relajado, amigable, auténtico, con personalidad. 30-50 palabras máx. NO mencionar trabajo/tech a menos que se pregunte específicamente.`
         : `Context: Casual conversation with Alexis.
 ALEXIS'S PERSONALITY:
 - Passionate, direct, "I love excess"
@@ -219,13 +219,13 @@ ALEXIS'S PERSONALITY:
 - From Monterrey, retired LoL player
 - Martial arts, backpacker
 - Goal: best programmer in Nuevo León
-TONE: Relaxed, friendly, authentic, with personality. 30-50 words max.`;
+TONE: Relaxed, friendly, authentic, with personality. 30-50 words max. DO NOT mention work/tech unless specifically asked.`;
   }
   
   return `${HINT_START}\n${systemPrompt}\nResponde ÚNICAMENTE en ${lang === "es" ? "ESPAÑOL" : "ENGLISH"}.\n${HINT_END}`;
 };
 
-// ===== PLACEHOLDERS PERSONALIZADOS =====
+// ===== ENHANCED PERSONALIZED PLACEHOLDERS =====
 export const ENHANCED_PLACEHOLDERS = {
   es: [
     "¿Qué quieres saber sobre mí?",
@@ -249,12 +249,12 @@ export const ENHANCED_PLACEHOLDERS = {
   ]
 };
 
-// ===== SUGERENCIAS MEJORADAS =====
+// ===== ENHANCED SUGGESTIONS =====
 export const ENHANCED_SUGGESTIONS = [
-  // Música (destacar Beatles)
+  // Music (highlight Beatles)
   { en: "Music you're jamming to", es: "Música que andas escuchando", intent: "music" as Intent },
   
-  // Tech específico
+  // Specific tech
   { en: "Your React/Vue expertise", es: "Tu experiencia con React/Vue", intent: "tech" as Intent },
   { en: "Inverater project", es: "Proyecto en Inverater", intent: "work" as Intent },
   
@@ -262,7 +262,7 @@ export const ENHANCED_SUGGESTIONS = [
   { en: "Road to Microsoft", es: "Camino a Microsoft", intent: "about" as Intent },
   { en: "Life in Monterrey", es: "Vida en Monterrey", intent: "casual" as Intent },
   
-  // Hobbies únicos
+  // Unique hobbies
   { en: "Coffee obsession ☕", es: "Obsesión con el café ☕", intent: "casual" as Intent },
   
   // Professional

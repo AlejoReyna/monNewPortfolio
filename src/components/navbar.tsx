@@ -4,14 +4,12 @@ import { useEffect, useState } from "react";
 import { useLanguage } from "@/components/lang-context";
 import { useNavigation } from "@/contexts/navigation-context";
 
-
 export default function Navbar() {
   const { language } = useLanguage();
   const { navigateToSection, currentSection } = useNavigation();
   const isEs = language === 'es';
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
-
 
   useEffect(() => {
     const handleScroll = () => {
@@ -24,8 +22,6 @@ export default function Navbar() {
 
   return (
     <header className="fixed inset-x-0 top-0 z-[60]">
-      {/* Glass/gradient background matching hero */}
-      {/* Gutter igual al chat; sin padding derecho */}
       <div className="w-full site-gutter transition-colors duration-300 !px-0">
         <div
           className={
@@ -43,7 +39,6 @@ export default function Navbar() {
               onClick={() => navigateToSection("home")}
               className="group inline-flex items-center gap-2 h-full"
             >
-              {/* Logo Text */}
               <div className="flex flex-col items-start">
                 <div className="text-lg tracking-tight text-left">
                   <span className="bg-gradient-to-r from-white via-gray-100 to-gray-200 bg-clip-text text-transparent group-hover:from-white group-hover:via-white group-hover:to-gray-100 transition-all duration-200 font-mono font-light">
@@ -57,7 +52,7 @@ export default function Navbar() {
             </button>
           </div>
 
-          {/* Center: Nav links (desktop) */}
+          {/* Center: Nav links */}
           <nav className="relative z-10 hidden items-center gap-4 sm:flex font-mono font-light h-full">
             {[
               { section: "home", label: isEs ? "Inicio" : "Home" },
@@ -84,8 +79,11 @@ export default function Navbar() {
               onClick={() => navigateToSection("contact")}
               className="relative hidden sm:inline-flex items-center gap-2 text-xs bg-gray-700/30 hover:bg-gray-600/40 text-gray-300 hover:text-white px-3 py-2 rounded-lg border border-gray-600/30 transition-all duration-500 font-mono"
             >
-              <span>{isEs ? 'Hablemos' : "Let's talk"}</span>
-              <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <div className="flex flex-col items-start leading-tight">
+                <span>{isEs ? 'Hablemos' : "Let's talk"}</span>
+                <span className="text-[0.65rem] text-gray-400 italic">(in a human way)</span>
+              </div>
+              <svg className="h-4 w-4 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
               </svg>
             </button>
@@ -146,7 +144,7 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* Subtle gradient separator line */}
+      {/* Separator line */}
       <div className="pointer-events-none absolute inset-x-0 top-full h-px bg-gradient-to-r from-transparent via-white/15 to-transparent" />
     </header>
   );

@@ -69,7 +69,6 @@ type Suggestion = { en: string; es: string; intent: Intent };
 /* ========= Utils ========= */
 const getRandomSuggestions = (all: Suggestion[], count = 5) =>
   [...all].sort(() => 0.5 - Math.random()).slice(0, count);
-const suggestions: Suggestion[] = getRandomSuggestions(ENHANCED_SUGGESTIONS, 5);
 
 /* ========= Easter Egg (resumido, igual que antes) ========= */
 const EASTER_GIBBERISH_ES = ["weuhruqw wefhuqsbdchja scuwqe hfqusdncu"];
@@ -138,6 +137,7 @@ export default function ChatInterface() {
   );
   console.log('showChat:', showChat); // Debug showChat state
   const [inputValue, setInputValue] = useState("");
+  const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
 
   const rootRef = useRef<HTMLDivElement>(null);
   const [chatHeightPx, setChatHeightPx] = useState<number | undefined>();
@@ -197,6 +197,11 @@ export default function ChatInterface() {
     const interval = setInterval(pickPlaceholder, 5000);
     return () => clearInterval(interval);
   }, [pickPlaceholder]);
+
+  // Initialize suggestions on client side to prevent hydration mismatch
+  useEffect(() => {
+    setSuggestions(getRandomSuggestions(ENHANCED_SUGGESTIONS, 5));
+  }, []);
 
   // Messages end ref para autoscroll
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -321,14 +326,14 @@ export default function ChatInterface() {
       const timer = setTimeout(() => setVisibleButtons((p) => p + 1), 200);
       return () => clearTimeout(timer);
     }
-  }, [typewriterComplete, visibleButtons, showChat, showNamePrompt]);
+  }, [typewriterComplete, visibleButtons, showChat, showNamePrompt, suggestions.length]);
 
   useEffect(() => {
     if (!showNamePrompt && typewriterComplete && !showChat && visibleButtons === suggestions.length && !showInput) {
       const timer = setTimeout(() => setShowInput(true), 300);
       return () => clearTimeout(timer);
     }
-  }, [typewriterComplete, visibleButtons, showChat, showNamePrompt, showInput]);
+  }, [typewriterComplete, visibleButtons, showChat, showNamePrompt, showInput, suggestions.length]);
 
   /* ========= UI normal del chat (ya sin la burbuja de la imagen) ========= */
   const sorted = [...messages].sort((a, b) => +a.timestamp - +b.timestamp);
