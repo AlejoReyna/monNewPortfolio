@@ -1,32 +1,132 @@
 "use client";
 
+import type React from "react";
 import { useMemo } from "react";
 // @ts-ignore
 import { motion, useScroll, useSpring } from "framer-motion";
 import Link from "next/link";
 
-// ===== Utilities =====
+/* =========================
+   Util
+========================= */
 const cn = (...cls: (string | false | undefined)[]) => cls.filter(Boolean).join(" ");
 
-// ===== Reusable Section =====
+/* =========================
+   Tilt / parallax en hover
+========================= */
+function withTilt(e: React.MouseEvent<HTMLDivElement, MouseEvent>) {
+  const el = e.currentTarget as HTMLDivElement;
+  const rect = el.getBoundingClientRect();
+  const px = (e.clientX - rect.left) / rect.width;
+  const py = (e.clientY - rect.top) / rect.height;
+  el.style.setProperty("--px", String(px));
+  el.style.setProperty("--py", String(py));
+}
+
+/* =========================
+   Tarjeta visual estilo "projects"
+========================= */
+function VisualCard({
+  kind = "image",
+  media,
+  title,
+  badge,
+  gradient = "from-black/80 via-black/40 to-transparent",
+}: {
+  kind?: "image" | "video" | "empty";
+  media?: string;
+  title: string;
+  badge?: string;
+  gradient?: string;
+}) {
+  return (
+    <div
+      onMouseMove={withTilt}
+      className={cn(
+        "group relative w-full max-w-lg aspect-[16/10] rounded-3xl overflow-hidden",
+        "border border-white/10 bg-white/5 backdrop-blur-sm shadow-2xl will-change-transform"
+      )}
+      style={{
+        transform:
+          "perspective(900px) rotateX(calc((0.5 - var(--py, .5)) * 3deg)) rotateY(calc((var(--px, .5) - 0.5) * 6deg))",
+        transition: "transform 120ms ease-out",
+      }}
+    >
+      {/* Media */}
+      {kind !== "empty" && media && (
+        <>
+          {kind === "video" ? (
+            <video
+              className="absolute inset-0 h-full w-full object-cover"
+              autoPlay
+              muted
+              loop
+              playsInline
+            >
+              <source src={media} type="video/mp4" />
+            </video>
+          ) : (
+            <img
+              src={media}
+              alt={title}
+              className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
+            />
+          )}
+          <div className={`absolute inset-0 bg-gradient-to-t ${gradient}`} />
+          <div className="absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100 bg-white/5" />
+        </>
+      )}
+
+      {/* Chrome dots deco */}
+      <div className="absolute left-4 top-4 z-20 flex gap-2">
+        <span className="h-3 w-3 rounded-full bg-rose-400/90" />
+        <span className="h-3 w-3 rounded-full bg-amber-300/90" />
+        <span className="h-3 w-3 rounded-full bg-emerald-400/90" />
+      </div>
+
+      {/* Badge */}
+      {badge && (
+        <span className="absolute top-4 right-4 z-20 rounded-full bg-white/15 border border-white/20 backdrop-blur px-3 py-1 text-[10px] tracking-wide text-white">
+          {badge}
+        </span>
+      )}
+
+      {/* Footer strip */}
+      <div className="absolute inset-x-0 bottom-0 z-20">
+        <div className="m-3 rounded-xl bg-black/55 backdrop-blur-sm border border-white/10 px-4 py-3">
+          <h3 className="font-mono font-light text-white leading-tight">{title}</h3>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* =========================
+   Sección reusable
+========================= */
 function ServiceSection({
   id,
-  emoji,
   title,
   subtitle,
   bullets,
   cta,
   bg,
   reverse,
+  visual, // { kind, media, badge, gradient }
 }: {
   id: string;
-  emoji: string;
   title: string;
   subtitle: string;
   bullets: string[];
   cta: { label: string; href: string }[];
-  bg: string; // tailwind bg classes or inline gradient
+  bg: string;
   reverse?: boolean;
+  visual?: {
+    kind?: "image" | "video" | "empty";
+    media?: string;
+    badge?: string;
+    gradient?: string;
+  };
 }) {
   return (
     <section
@@ -34,11 +134,11 @@ function ServiceSection({
       className={cn(
         "snap-start h-screen w-full relative overflow-hidden",
         "flex items-center",
-        bg
+        "bg-black text-white"
       )}
       aria-label={title}
     >
-      {/* subtle vignette overlay */}
+      {/* Vignette suave */}
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/40" />
 
       <div
@@ -47,6 +147,7 @@ function ServiceSection({
           "md:grid-cols-2"
         )}
       >
+        {/* Texto */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -54,7 +155,6 @@ function ServiceSection({
           transition={{ duration: 0.6 }}
           className={cn("flex flex-col justify-center", reverse && "md:order-2")}
         >
-          <div className="mb-4 text-6xl md:text-7xl select-none">{emoji}</div>
           <h2 className="text-4xl md:text-5xl font-extrabold text-white tracking-tight">
             {title}
           </h2>
@@ -86,51 +186,43 @@ function ServiceSection({
           </div>
         </motion.div>
 
-        {/* Visual / Mockup column */}
+        {/* Visual tipo "projects" */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.3 }}
           transition={{ duration: 0.6, delay: 0.05 }}
-          className={cn("grid place-items-center", reverse && "md:order-1")}
+          className={cn(
+            "grid place-items-center",
+            reverse && "md:order-1"
+          )}
         >
-          <div className="relative aspect-[16/10] w-full max-w-lg rounded-3xl border border-white/10 bg-white/5 backdrop-blur-sm p-6 shadow-2xl">
-            {/* simple decorative lines to simulate a mockup */}
-            <div className="h-3 w-3 rounded-full bg-rose-400/90 absolute left-4 top-4" />
-            <div className="h-3 w-3 rounded-full bg-amber-300/90 absolute left-8 top-4" />
-            <div className="h-3 w-3 rounded-full bg-emerald-400/90 absolute left-12 top-4" />
-            <div className="mt-6 space-y-3">
-              <div className="h-6 w-2/3 rounded-md bg-white/20" />
-              <div className="h-4 w-5/6 rounded-md bg-white/10" />
-              <div className="h-4 w-4/6 rounded-md bg-white/10" />
-              <div className="h-4 w-3/6 rounded-md bg-white/10" />
-              <div className="h-40 w-full rounded-xl bg-gradient-to-r from-white/10 to-white/5" />
-            </div>
-          </div>
+          <VisualCard
+            kind={visual?.kind}
+            media={visual?.media}
+            badge={visual?.badge}
+            title={title}
+            gradient={visual?.gradient}
+          />
         </motion.div>
       </div>
     </section>
   );
 }
 
-// ===== Dots Nav =====
+/* =========================
+   Dots Nav
+========================= */
 function DotNav() {
   const items = [
     { id: "web" },
-    { id: "mobile" },
-    { id: "cloud" },
-    { id: "ai" },
-    { id: "consulting" },
+    { id: "mobile" }, // (UX/UI) mantenemos id para no romper anclas
+    { id: "cloud" },  // (AWS)   mantenemos id para no romper anclas
   ];
   return (
     <nav className="fixed right-5 top-1/2 -translate-y-1/2 hidden md:flex flex-col gap-3 z-50">
       {items.map((it) => (
-        <a
-          key={it.id}
-          href={`#${it.id}`}
-          className="group"
-          aria-label={`Ir a ${it.id}`}
-        >
+        <a key={it.id} href={`#${it.id}`} className="group" aria-label={`Ir a ${it.id}`}>
           <span className="block h-3 w-3 rounded-full bg-white/40 group-hover:bg-white transition" />
         </a>
       ))}
@@ -138,7 +230,9 @@ function DotNav() {
   );
 }
 
-// ===== Progress Bar (scroll) =====
+/* =========================
+   Barra de progreso scroll
+========================= */
 function TopProgress() {
   const { scrollYProgress } = useScroll();
   const scaleX = useSpring(scrollYProgress, { stiffness: 100, damping: 30, mass: 0.2 });
@@ -150,13 +244,30 @@ function TopProgress() {
   );
 }
 
-// ===== Page =====
+/* =========================
+   Página
+========================= */
+type VisualKind = "image" | "video" | "empty";
+type ServiceDef = {
+  id: string;
+  title: string;
+  subtitle: string;
+  bullets: string[];
+  cta: { label: string; href: string }[];
+  bg: string;
+  reverse?: boolean;
+  visual?: {
+    kind?: VisualKind;
+    media?: string;
+    badge?: string;
+    gradient?: string;
+  };
+};
 export default function ServicesPage() {
-  const sections = useMemo(
+  const sections = useMemo<ServiceDef[]>(
     () => [
       {
         id: "web",
-        emoji: "🌐",
         title: "Web Development",
         subtitle:
           "Modern, fast and responsive web apps using React/Next.js, Vue 3 and TypeScript.",
@@ -170,76 +281,57 @@ export default function ServicesPage() {
           { label: "Cotizar", href: "/contact" },
         ],
         bg: "bg-[radial-gradient(60%_80%_at_50%_10%,rgba(99,102,241,.35),transparent_70%)] bg-neutral-950 text-white",
+        visual: {
+          kind: "image",
+          media: "/services/web.jpg",
+          badge: "NEXT.JS · VUE",
+          gradient: "from-black/85 via-black/45 to-transparent",
+        },
       },
       {
         id: "mobile",
-        emoji: "📱",
-        title: "Mobile Apps",
+        title: "UX/UI Design", // <— solicitado
         subtitle:
-          "Experiencia nativa y multiplataforma. Prototipos rápidos y publicación en stores.",
+          "Diseño centrado en el usuario con prototipos interactivos, design systems y microinteracciones atractivas.",
         bullets: [
-          "Flutter y React Native",
-          "Integración con APIs, auth y notificaciones",
-          "UI/UX con motion y theming",
+          "Wireframes → prototipos de alta fidelidad",
+          "Design tokens y componentes reusables",
+          "Motion/UI states, accesibilidad y handoff",
         ],
         cta: [
-          { label: "Ver apps", href: "/projects?type=mobile" },
+          { label: "Ver casos de diseño", href: "/projects?type=design" },
           { label: "Hablemos", href: "/contact" },
         ],
         bg: "bg-[radial-gradient(60%_80%_at_50%_10%,rgba(244,114,182,.28),transparent_70%)] bg-neutral-950 text-white",
         reverse: true,
+        visual: {
+          kind: "image",
+          media: "/services/uxui.jpg",
+          badge: "FIGMA · MOTION",
+          gradient: "from-black/80 via-black/40 to-transparent",
+        },
       },
       {
         id: "cloud",
-        emoji: "☁️",
-        title: "Cloud Computing",
+        title: "AWS Managment", // <— solicitado (misma ortografía)
         subtitle:
-          "Infraestructura escalable, contenedores y despliegues confiables (AWS/GCP/Vercel).",
+          "Infraestructura escalable, automatizada y observable sobre AWS (ECS, Lambda, RDS, S3, CloudFront).",
         bullets: [
-          "Docker, CI/CD, observabilidad básica",
-          "APIs Node/Express y PostgreSQL gestionado",
-          "CDN, edge y caching inteligente",
+          "Docker + CI/CD (GitHub Actions) con despliegues azules/verdes",
+          "PostgreSQL gestionado, secrets y parámetros",
+          "Observabilidad: logs, alarms y costos bajo control",
         ],
         cta: [
           { label: "Infra demo", href: "/projects?type=cloud" },
           { label: "Revisar tu arquitectura", href: "/contact" },
         ],
         bg: "bg-[radial-gradient(60%_80%_at_50%_10%,rgba(45,212,191,.28),transparent_70%)] bg-neutral-950 text-white",
-      },
-      {
-        id: "ai",
-        emoji: "🤖",
-        title: "AI & Machine Learning",
-        subtitle:
-          "Integración de LLMs, clasificación de datos y automatización con pipelines sólidos.",
-        bullets: [
-          "Chatbots/agents, embeddings y retrieval",
-          "Etiquetado, evaluación y guardrails",
-          "Integraciones con productos existentes",
-        ],
-        cta: [
-          { label: "Casos de AI", href: "/projects?type=ai" },
-          { label: "Prototipar idea", href: "/contact" },
-        ],
-        bg: "bg-[radial-gradient(60%_80%_at_50%_10%,rgba(147,51,234,.28),transparent_70%)] bg-neutral-950 text-white",
-        reverse: true,
-      },
-      {
-        id: "consulting",
-        emoji: "🧭",
-        title: "Product Consulting",
-        subtitle:
-          "Auditorías técnicas, performance review y roadmaps priorizados para acelerar el delivery.",
-        bullets: [
-          "Descubrimiento y estimación",
-          "Revisiones de código y arquitectura",
-          "Mentoría para equipos junior",
-        ],
-        cta: [
-          { label: "Agenda una sesión", href: "/contact" },
-          { label: "Ver casos", href: "/projects?type=consulting" },
-        ],
-        bg: "bg-[radial-gradient(60%_80%_at_50%_10%,rgba(250,204,21,.25),transparent_70%)] bg-neutral-950 text-white",
+        visual: {
+          kind: "image",
+          media: "/services/aws.jpg",
+          badge: "ECS · LAMBDA · RDS",
+          gradient: "from-black/85 via-black/45 to-transparent",
+        },
       },
     ],
     []
@@ -250,14 +342,14 @@ export default function ServicesPage() {
       <TopProgress />
       <DotNav />
 
-      {/* Scroll container with snap */}
+      {/* Contenedor scroll con snap */}
       <div className="snap-y snap-mandatory h-screen overflow-y-scroll no-scrollbar">
-        {sections.map((s, i) => (
+        {sections.map((s) => (
           <ServiceSection key={s.id} {...s} />
         ))}
       </div>
 
-      {/* Footer CTA pinned after last screen */}
+      {/* Footer CTA */}
       <footer className="sticky bottom-0 z-40">
         <div className="mx-auto max-w-6xl px-6 md:px-10 py-4 flex items-center justify-between text-sm text-white/70">
           <span>¿Listo para construir algo? </span>
@@ -272,4 +364,3 @@ export default function ServicesPage() {
     </main>
   );
 }
-

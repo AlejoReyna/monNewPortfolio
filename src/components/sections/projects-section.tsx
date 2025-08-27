@@ -16,7 +16,7 @@ const item = {
   show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } },
 };
 
-// Tilt/parallax on hover (sin librerías)
+// Tilt/parallax on hover
 function withTilt(e: React.MouseEvent<HTMLDivElement, MouseEvent>) {
   const el = e.currentTarget as HTMLDivElement;
   const rect = el.getBoundingClientRect();
@@ -27,7 +27,7 @@ function withTilt(e: React.MouseEvent<HTMLDivElement, MouseEvent>) {
 }
 
 /* -------------------------------------------
-   Reusable Card
+   Reusable Card (compacta en mobile)
 ------------------------------------------- */
 type CardProps = {
   kind?: "video" | "image" | "empty";
@@ -40,6 +40,8 @@ type CardProps = {
   links?: { href: string; label: string }[];
   className?: string;
   gradient?: string;
+  /** relación de aspecto en mobile (default 16/10) */
+  mobileAspect?: "16/10" | "4/3" | "1/1";
 };
 
 function Card({
@@ -53,13 +55,24 @@ function Card({
   links = [],
   className = "",
   gradient = "from-black/70 via-black/40 to-transparent",
+  mobileAspect = "16/10",
 }: CardProps) {
+  const aspectClass =
+    mobileAspect === "4/3"
+      ? "aspect-[4/3]"
+      : mobileAspect === "1/1"
+      ? "aspect-[1/1]"
+      : "aspect-[16/10]";
+
   return (
     <motion.article
       variants={item}
       className={[
         "group relative overflow-hidden border border-white/10 rounded-2xl",
         "bg-black/40 backdrop-blur-sm will-change-transform",
+        // Altura controlada en mobile por aspect; alturas mayores solo en md+
+        aspectClass,
+        "md:aspect-auto",
         className,
       ].join(" ")}
       onMouseMove={withTilt}
@@ -90,21 +103,34 @@ function Card({
 
       {/* Badge */}
       {badge && (
-        <span className="absolute top-4 right-4 z-20 rounded-full bg-white/15 border border-white/20 backdrop-blur px-3 py-1 text-[10px] tracking-wide text-white">
+        <span className="absolute top-3 right-3 md:top-4 md:right-4 z-20 rounded-full bg-white/15 border border-white/20 backdrop-blur px-2.5 md:px-3 py-0.5 md:py-1 text-[10px] tracking-wide text-white">
           {badge}
         </span>
       )}
 
-      {/* Content */}
+      {/* Content (compact en mobile) */}
       <div className="relative z-10 flex h-full items-end">
-        <div className="w-full text-white bg-black/55 backdrop-blur-sm p-6 md:p-7 rounded-t-xl">
-          {date && <p className="text-white/70 text-xs md:text-sm mb-2">{date}</p>}
-          {kicker && <p className="text-white/70 text-xs mb-1">{kicker}</p>}
-          <h3 className="font-mono font-light leading-tight text-xl md:text-2xl">{title}</h3>
-          {desc && <p className="mt-2 text-white/85 text-sm md:text-[15px]">{desc}</p>}
+        <div className="w-full text-white bg-black/55 backdrop-blur-sm p-4 md:p-7 rounded-t-xl">
+          {date && <p className="text-white/70 text-[11px] md:text-sm mb-1.5 md:mb-2">{date}</p>}
+          {kicker && <p className="text-white/70 text-[11px] md:text-xs mb-1">{kicker}</p>}
+          <h3 className="font-mono font-light leading-tight text-lg md:text-2xl">{title}</h3>
+
+          {desc && (
+            <p
+              className="mt-2 text-white/85 text-[13px] md:text-[15px]"
+              style={{
+                display: "-webkit-box",
+                WebkitLineClamp: 2, // clamp 2 líneas en mobile
+                WebkitBoxOrient: "vertical",
+                overflow: "hidden",
+              }}
+            >
+              {desc}
+            </p>
+          )}
 
           {!!links.length && (
-            <div className="mt-3 flex flex-wrap items-center gap-4 text-[12px] text-white/80">
+            <div className="mt-2.5 md:mt-3 flex flex-wrap items-center gap-3 md:gap-4 text-[11px] md:text-[12px] text-white/80">
               {links.map((l) => (
                 <a
                   key={l.href + l.label}
@@ -146,13 +172,13 @@ export default function ProjectsSection() {
 
   return (
     <MotionConfig transition={{ duration: 0.5, ease: "easeOut" }}>
-      <div className="min-h-screen flex flex-col items-center justify-center p-8 bg-black mt-24">
+      <div className="min-h-screen flex flex-col items-center justify-center px-4 sm:px-6 md:px-8 bg-black mt-24">
         <motion.div
           variants={container}
           initial="hidden"
           whileInView="show"
           viewport={{ once: true, amount: 0.15 }}
-          className="w-full max-w-none px-4 text-center"
+          className="w-full max-w-6xl text-center"
         >
           {/* Header */}
           <motion.div variants={item} className="text-left mb-4">
@@ -162,8 +188,8 @@ export default function ProjectsSection() {
             <p className="text-white/70 text-sm md:text-base">{copy.featured.desc}</p>
           </motion.div>
 
-          {/* FILA SUPERIOR: 2/3 + 1/3 */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 auto-rows-[180px] md:auto-rows-[200px] xl:auto-rows-[240px] gap-6 lg:gap-8 text-left mx-auto">
+          {/* FILA SUPERIOR (stack en mobile, alturas controladas) */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 auto-rows-auto gap-4 md:gap-6 lg:gap-8 text-left mx-auto">
             <Card
               kind="video"
               media="/plebes_video.mp4"
@@ -175,8 +201,9 @@ export default function ProjectsSection() {
                   ? "Breve descripción del post: lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod."
                   : "Short post description: lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod."
               }
-              className="lg:col-span-2 lg:row-span-2 min-h-[360px]"
+              className="lg:col-span-2 lg:row-span-2 md:min-h-[360px]"
               gradient="from-black/85 via-black/50 to-transparent"
+              mobileAspect="16/10"
             />
 
             <Card
@@ -190,13 +217,14 @@ export default function ProjectsSection() {
                   ? "Breve descripción del post: lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod."
                   : "Short post description: lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod."
               }
-              className="lg:row-span-2 min-h-[360px]"
+              className="lg:row-span-2 md:min-h-[360px]"
               gradient="from-black/70 via-black/40 to-transparent"
+              mobileAspect="4/3"
             />
           </div>
 
-          {/* FILA INFERIOR 55% / 45% */}
-          <div className="mt-6 grid grid-cols-1 lg:[grid-template-columns:55%_45%] gap-6 lg:gap-8 text-left mx-auto">
+          {/* FILA INFERIOR (stack en mobile) */}
+          <div className="mt-4 md:mt-6 grid grid-cols-1 lg:[grid-template-columns:55%_45%] gap-4 md:gap-6 lg:gap-8 text-left mx-auto">
             <Card
               kind="image"
               media="/mk-banner.png"
@@ -212,8 +240,9 @@ export default function ProjectsSection() {
                 { href: "https://github.com/AlejoReyna/MortalKombat", label: "GitHub" },
                 { href: "https://next-mk.vercel.app", label: isEs ? "Demo en vivo" : "Live demo" },
               ]}
-              className="min-h-[240px] xl:min-h-[280px]"
+              className="md:min-h-[240px] xl:min-h-[280px]"
               gradient="from-[#5e0032]/40 via-[#28175e]/40 to-black/60"
+              mobileAspect="16/10"
             />
 
             <Card
@@ -229,16 +258,17 @@ export default function ProjectsSection() {
                 { href: "https://github.com/AlejoReyna/PokeFolio", label: "GitHub" },
                 { href: "https://poke-folio.vercel.app", label: isEs ? "Demo en vivo" : "Live demo" },
               ]}
-              className="min-h-[200px] xl:min-h-[240px]"
+              className="md:min-h-[200px] xl:min-h-[240px]"
               gradient="from-black/45 via-[#28175e]/30 to-[#5e0032]/40"
+              mobileAspect="4/3"
             />
           </div>
 
-          {/* -------- OPEN SOURCE: 100vh -------- */}
+          {/* -------- OPEN SOURCE: h-auto en mobile -------- */}
           <motion.div
             variants={item}
             id="open-source"
-            className="h-screen flex flex-col justify-center text-left mt-10"
+            className="h-auto md:h-screen flex flex-col justify-center text-left mt-10"
           >
             <div className="h-px bg-gradient-to-r from-white/30 via-white/15 to-transparent mb-4" />
             <h4 className="font-mono text-2xl md:text-3xl text-white/90 tracking-wide">
@@ -248,39 +278,39 @@ export default function ProjectsSection() {
               </span>
             </h4>
 
-            <section className="mt-6 flex-1 grid grid-cols-1 lg:grid-cols-5 gap-6 lg:gap-8 items-stretch">
+            <section className="mt-6 flex-1 grid grid-cols-1 lg:grid-cols-5 gap-4 md:gap-6 lg:gap-8 items-stretch">
               {/* Texto */}
               <motion.article
                 variants={item}
-                className="relative lg:col-span-3 overflow-hidden bg-black/40 p-6 md:p-8 text-white rounded-2xl border border-white/10 flex flex-col justify-center"
+                className="relative lg:col-span-3 overflow-hidden bg-black/40 p-4 md:p-8 text-white rounded-2xl border border-white/10 flex flex-col justify-center"
               >
-                <span className="absolute top-4 right-4 z-20 inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/15 px-3 py-1 text-[10px] font-medium text-white backdrop-blur shadow-sm">
+                <span className="absolute top-3 right-3 md:top-4 md:right-4 z-20 inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/15 px-2.5 md:px-3 py-0.5 md:py-1 text-[10px] font-medium text-white backdrop-blur shadow-sm">
                   status: still working on it
                 </span>
 
-                <p className="text-white/70 text-sm mb-2">
+                <p className="text-white/70 text-[13px] md:text-sm mb-2">
                   {isEs ? "Extensión Chrome/Firefox (MV3) · Vite + TypeScript" : "Chrome/Firefox Extension (MV3) · Vite + TypeScript"}
                 </p>
 
-                <h5 className="text-2xl md:text-3xl font-mono font-light leading-tight">
+                <h5 className="text-xl md:text-3xl font-mono font-light leading-tight">
                   UANL Interface+ — {isEs ? "Actualiza la UI de SIASE/Deimos" : "Modernizes SIASE/Deimos UI"}
                 </h5>
 
-                <p className="mt-3 text-white/85 text-sm max-w-2xl">
+                <p className="mt-3 text-white/85 text-[13px] md:text-sm max-w-2xl">
                   {isEs
                     ? "Inyecta UI propia, reorganiza menús y mejora la UX en páginas con frames. Content scripts + Shadow DOM."
                     : "Injects a custom UI layer, reorganizes menus and improves UX on frame-based pages. Content scripts + Shadow DOM."}
                 </p>
 
-                <h6 className="mt-5 font-mono text-lg">{isEs ? "Cómo ejecutar" : "How to run"}</h6>
-                <pre className="mt-2 rounded-lg bg-black/60 p-4 text-[12px] leading-relaxed overflow-x-auto border border-white/10">
+                <h6 className="mt-5 font-mono text-base md:text-lg">{isEs ? "Cómo ejecutar" : "How to run"}</h6>
+                <pre className="mt-2 rounded-lg bg-black/60 p-3 md:p-4 text-[12px] leading-relaxed overflow-x-auto border border-white/10">
 {`git clone https://github.com/AlejoReyna/UANLInterface.git
 cd UANLInterface
 npm install   # pnpm i / yarn
 npm run build # genera /dist con manifest.json`}
                 </pre>
 
-                <div className="mt-5 flex flex-wrap items-center gap-4 text-[12px] text-white/80">
+                <div className="mt-4 md:mt-5 flex flex-wrap items-center gap-3 md:gap-4 text-[11px] md:text-[12px] text-white/80">
                   <a
                     href="https://github.com/AlejoReyna/UANLInterface"
                     target="_blank"
@@ -303,7 +333,7 @@ npm run build # genera /dist con manifest.json`}
               {/* Video */}
               <motion.aside
                 variants={item}
-                className="relative lg:col-span-2 overflow-hidden border border-white/10 rounded-2xl"
+                className="relative lg:col-span-2 overflow-hidden border border-white/10 rounded-2xl aspect-[16/10] md:aspect-auto"
               >
                 <video className="absolute inset-0 w-full h-full object-cover" autoPlay muted loop playsInline>
                   <source src="/preview-siase.mp4" type="video/mp4" />
@@ -313,14 +343,14 @@ npm run build # genera /dist con manifest.json`}
             </section>
           </motion.div>
 
-          {/* -------- Hackathon -------- */}
+          {/* -------- Hackathon (compact en mobile) -------- */}
           <motion.section variants={item} className="mt-10 text-left">
             <div className="h-px bg-gradient-to-r from-white/30 via-white/15 to-transparent mb-4" />
             <h4 className="font-mono text-2xl md:text-3xl text-white/90 tracking-wide mb-6">
               {copy.hack}
             </h4>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 lg:gap-8">
               <Card
                 kind="image"
                 media="/eth_merida.png"
@@ -335,8 +365,9 @@ npm run build # genera /dist con manifest.json`}
                   { href: "https://github.com/AlejoReyna/mpBOT", label: "GitHub" },
                   { href: "https://t.me/PoolitoAssistantBot", label: isEs ? "Probar en Telegram" : "Try on Telegram" },
                 ]}
-                className="min-h-[520px]"
+                className="md:min-h-[520px]"
                 gradient="from-[#5e0032]/40 via-[#28175e]/40 to-black/60"
+                mobileAspect="4/3"
               />
 
               <Card
@@ -353,7 +384,8 @@ npm run build # genera /dist con manifest.json`}
                   { href: "https://github.com/AlejoReyna/Birdlypay", label: "GitHub" },
                   { href: "https://birdlypay.vercel.app", label: isEs ? "Demo en vivo" : "Live demo" },
                 ]}
-                className="min-h-[520px]"
+                className="md:min-h-[520px]"
+                mobileAspect="4/3"
               />
 
               <Card
@@ -367,8 +399,9 @@ npm run build # genera /dist con manifest.json`}
                 }
                 date={isEs ? "Jun 2023 · Proyecto personal" : "Jun 2023 · Side project"}
                 links={[{ href: "https://github.com/eliasg24/NiftyRewards", label: "GitHub" }]}
-                className="min-h-[520px]"
+                className="md:min-h-[520px]"
                 gradient="from-[#5e0032]/30 via-black/40 to-[#28175e]/50"
+                mobileAspect="4/3"
               />
             </div>
           </motion.section>
