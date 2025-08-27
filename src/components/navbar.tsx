@@ -26,7 +26,7 @@ export default function Navbar() {
     <header className="fixed inset-x-0 top-0 z-[60]">
       {/* Glass/gradient background matching hero */}
       {/* Gutter igual al chat; sin padding derecho */}
-      <div className="w-full site-gutter transition-colors duration-300">
+      <div className="w-full site-gutter transition-colors duration-300 !px-0">
         <div
           className={
             `relative w-full flex items-center justify-between border-b ` +
