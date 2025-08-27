@@ -155,11 +155,6 @@ export default function ChatInterface() {
   /* ========= Load persisted ========= */
   useEffect(() => {
     try {
-      // Limpiar localStorage para testing
-      localStorage.removeItem("userName");
-      localStorage.removeItem("preferredLanguage");
-
-      console.log('Loading persisted data...'); // Debug
       const savedName =
         typeof window !== "undefined"
           ? (localStorage.getItem("userName") || "").trim()
@@ -169,8 +164,6 @@ export default function ChatInterface() {
           ? (localStorage.getItem("preferredLanguage") as Lang | null)
           : null;
 
-      console.log('Saved data:', { savedName, savedLang }); // Debug
-
       if (savedLang === "en" || savedLang === "es") {
         setPreferredLang(savedLang);
         setCtxLanguage?.(savedLang);
@@ -178,36 +171,13 @@ export default function ChatInterface() {
       if (savedName) setUserName(savedName);
 
       const needsSetup = !(savedName && (savedLang === "en" || savedLang === "es"));
-      console.log('Needs setup:', needsSetup); // Debug
       setShowNamePrompt(needsSetup);
 
-      // Flow inicial:
-      if (needsSetup) {
-        console.log('Starting setup flow...'); // Debug
-        // 1) Welcome (columna izquierda)
-        setShowWelcome(true);
-        requestAnimationFrame(() => setWelcomeOpacity(1));
-        const t1 = setTimeout(() => setWelcomeOpacity(0), 1400);
-        const t2 = setTimeout(() => {
-          setShowWelcome(false);
-          // 2) Language step en columna izquierda (con interacción)
-          setShowLangStep(true);
-          requestAnimationFrame(() => setLangOpacity(1));
-        }, 2100);
-        return () => {
-          clearTimeout(t1);
-          clearTimeout(t2);
-        };
-      } else {
-        // Si ya hay datos, directo al chat
-        console.log('Going directly to chat...'); // Debug
+      if (!needsSetup) {
         setShowChat(true);
       }
-    } catch (error) {
-      console.error('Error loading persisted data:', error); // Debug
+    } catch {
       setShowNamePrompt(true);
-      setShowWelcome(true);
-      requestAnimationFrame(() => setWelcomeOpacity(1));
     }
   }, [setCtxLanguage]);
 
@@ -298,118 +268,55 @@ export default function ChatInterface() {
     pickPlaceholder();
   };
 
-  /* ========= EARLY RETURN: mientras Welcome/Language/Name están activos ========= */
-  if (!showChat && (showWelcome || showLangStep || showNameStep || showNameInput)) {
-    return (
-      <div
-        ref={rootRef}
-        className="relative flex flex-col items-center justify-center gap-6 px-4 w-full max-w-3xl mx-auto min-h-screen"
-      >
-        {/* Columna centrada */}
-        <div className="flex flex-col items-center text-center">
-          {/* Welcome (solo texto grande, fade) */}
-          {showWelcome && (
-            <h1
-              className={`transition-opacity duration-700 ease-out ${
-                welcomeOpacity ? "opacity-100" : "opacity-0"
-              } text-5xl md:text-7xl font-mono font-light text-white/90`}
-            >
-              {currentLang === "es" ? "¡Bienvenido!" : "Welcome!"}
-            </h1>
-          )}
+  /* ========= Intro text (portada) ========= */
+  const [displayed, setDisplayed] = useState("");
+  const [typewriterComplete, setTypewriterComplete] = useState(false);
+  const [visibleButtons, setVisibleButtons] = useState(0);
+  const [showInput, setShowInput] = useState(false);
 
-          {/* Language (texto + botones, con interacción) */}
-          {showLangStep && (
-            <div
-              className={`transition-opacity duration-500 ease-out ${
-                langOpacity ? "opacity-100" : "opacity-0"
-              }`}
-            >
-              <TypewriterText 
-                text={currentLang === "es" ? "¿Qué idioma prefieres?" : "Which language do you prefer?"}
-                className="mt-6 text-2xl md:text-4xl font-mono font-light text-white/90"
-              />
-              <div className="mt-5 flex justify-center gap-3">
-                <button
-                  type="button"
-                  onClick={() => handleLanguageSelection("es")}
-                  className="text-xs font-mono font-light px-4 py-2 rounded-lg border transition-all duration-300 border-gray-600/30 bg-gray-700/30 text-gray-200 hover:bg-gray-600/40"
-                >
-                  Español
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleLanguageSelection("en")}
-                  className="text-xs font-mono font-light px-4 py-2 rounded-lg border transition-all duration-300 border-gray-600/30 bg-gray-700/30 text-gray-200 hover:bg-gray-600/40"
-                >
-                  English
-                </button>
-              </div>
-            </div>
-          )}
+  const greetings = [
+    { en: "Hey there! I'm Alexis. I code things that live on the internet, and this GPT version of me is here to chat.", es: "¡Hey! Soy Alexis. Programo cosas que viven en internet, y esta versión GPT de mí está aquí para charlar." },
+    { en: "Hi, I'm Alexis. Web developer by day, debugging wizard by night. This is my AI twin.", es: "Hola, soy Alexis. Desarrollador web de día, mago del debugging de noche. Este es mi gemelo AI." },
+    { en: "Hello! Alexis here. I turn coffee into code, and this GPT knows most of my tricks.", es: "¡Hola! Alexis aquí. Convierto café en código, y este GPT conoce la mayoría de mis trucos." },
+    { en: "Hey, I'm Alexis. I make pixels dance on screens, powered by GPT magic.", es: "Hey, soy Alexis. Hago que los píxeles bailen en pantallas, con magia GPT." },
+  ];
+  const [greetingIndex] = useState(() => Math.floor(Math.random() * greetings.length));
+  const baseGreeting = isEs ? greetings[greetingIndex].es : greetings[greetingIndex].en;
+  const text = userName
+    ? (isEs ? `${baseGreeting} ¿Cómo estás, ${userName}?` : `${baseGreeting} How are you, ${userName}?`)
+    : (isEs ? `${baseGreeting} ¿Cómo estás?` : `${baseGreeting} How are you?`);
 
-          {/* Name Step (texto con typewriter + input) */}
-          {showNameStep && (
-            <div
-              className={`transition-opacity duration-500 ease-out ${
-                nameOpacity ? "opacity-100" : "opacity-0"
-              } flex flex-col items-center`}
-            >
-              <TypewriterText 
-                text={currentLang === "es" ? "¿Cómo te llamas?" : "What's your name?"}
-                className="mt-6 text-2xl md:text-6xl font-mono font-light text-white/90 mb-8"
-                onComplete={handleNameStepComplete}
-              />
-              
-              {/* Name Input aparece debajo del texto */}
-              {showNameInput && (
-                <div 
-                  className={`flex flex-col items-center w-full transition-opacity duration-500 ease-out ${
-                    nameInputOpacity ? "opacity-100" : "opacity-0"
-                  }`}
-                >
-                  {/* Input y botón en la misma línea - ancho completo */}
-                  <div className="flex items-center w-full max-w-4xl gap-3">
-                    <div className="relative flex-1">
-                      <input
-                        type="text"
-                        className="w-full bg-transparent border-none border-b-2 border-white/70 focus:border-cyan-400 outline-none px-0 py-3 text-xl text-white placeholder-gray-400 font-mono transition-all duration-300"
-                        placeholder={currentLang === "es" ? "Escribe tu nombre..." : "Type your name..."}
-                        value={nameInput}
-                        onChange={(e) => setNameInput(e.target.value)}
-                        onKeyDown={handleNameKey}
-                        maxLength={60}
-                        autoFocus
-                      />
-                    </div>
-                    
-                    {/* Button al lado del input */}
-                    <button
-                      onClick={handleNameSubmit}
-                      disabled={!nameInput.trim()}
-                      className="text-sm font-mono font-light px-4 py-2 rounded-lg border border-cyan-500/30 bg-cyan-600/40 text-cyan-200 hover:bg-cyan-500/50 hover:text-white transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      →
-                    </button>
-                  </div>
-                  
-                  {/* Disclaimer reactivo al idioma */}
-                  <p className="text-xs text-gray-400 mt-3 text-center font-mono">
-                    {currentLang === "es" 
-                      ? "Estos datos son sólo almacenados en tu navegador. " 
-                      : "This data is only stored in your browser. "}
-                    <button className="text-cyan-400 hover:text-cyan-300 underline transition-colors">
-                      {currentLang === "es" ? "Ver más" : "See more"}
-                    </button>
-                  </p>
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-      </div>
-    );
-  }
+  useEffect(() => {
+    if (!showChat) {
+      let i = 0;
+      setDisplayed("");
+      setTypewriterComplete(false);
+      const id = setInterval(() => {
+        if (i < text.length) {
+          setDisplayed(text.slice(0, i + 1));
+          i++;
+        } else {
+          clearInterval(id);
+          setTypewriterComplete(true);
+        }
+      }, 40);
+      return () => clearInterval(id);
+    }
+  }, [text, showChat]);
+
+  useEffect(() => {
+    if (!showNamePrompt && typewriterComplete && !showChat && visibleButtons < suggestions.length) {
+      const timer = setTimeout(() => setVisibleButtons((p) => p + 1), 200);
+      return () => clearTimeout(timer);
+    }
+  }, [typewriterComplete, visibleButtons, showChat, showNamePrompt]);
+
+  useEffect(() => {
+    if (!showNamePrompt && typewriterComplete && !showChat && visibleButtons === suggestions.length && !showInput) {
+      const timer = setTimeout(() => setShowInput(true), 300);
+      return () => clearTimeout(timer);
+    }
+  }, [typewriterComplete, visibleButtons, showChat, showNamePrompt, showInput]);
 
   /* ========= UI normal del chat (ya sin la burbuja de la imagen) ========= */
   const sorted = [...messages].sort((a, b) => +a.timestamp - +b.timestamp);
@@ -419,6 +326,17 @@ export default function ChatInterface() {
       ref={rootRef}
       className="relative z-10 flex flex-col gap-4 px-4 w-full max-w-3xl mx-auto mb-12"
     >
+      {/* Portada (se oculta cuando inicia el chat) */}
+      {!showChat && (
+        <div className="pointer-events-auto w-full rounded-2xl border border-white/10 bg-black/40 backdrop-blur-md px-5 py-6 shadow-2xl shadow-black/30">
+          <p className="relative text-base sm:text-lg text-gray-200 font-mono font-light leading-relaxed">
+            {displayed || text}
+            {!showNamePrompt && displayed.length < text.length && (
+              <span className="ml-1 inline-block h-5 w-0.5 align-[-0.15em] bg-cyan-300 animate-pulse" />
+            )}
+          </p>
+        </div>
+      )}
       {/* Ventana de chat (el contenedor clásico solo se monta después) */}
       {(sorted.length > 0 || showChat) && (
         <div
@@ -488,19 +406,17 @@ export default function ChatInterface() {
         </div>
       )}
 
-      {/* Suggestions */}
-      {showChat && (
-        <div className="flex flex-wrap gap-2 mb-4">
-          {suggestions.map((suggestion, index) => (
+      {/* Sugerencias antes de iniciar chat */}
+      {!showNamePrompt && !showChat && sorted.length === 0 && (
+        <div className="flex flex-wrap gap-2">
+          {suggestions.map((s, index) => (
             <button
-              key={index}
-              onClick={() => {
-                setInputValue(suggestion[currentLang]);
-                handleSendMessage();
-              }}
-              className="text-xs bg-black/30 hover:bg-black/40 text-gray-300 hover:text-white px-3 py-2 rounded-lg border border-white/10 transition-all duration-300 font-mono"
+              key={s.en}
+              onClick={() => handleSuggestionClick(isEs ? s.es : s.en, s.intent)}
+              className={`text-xs bg-gray-700/30 hover:bg-gray-600/40 text-gray-300 hover:text-white px-3 py-2 rounded-lg border border-gray-600/30 transition-all duration-500 font-mono transform ${index < visibleButtons ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2"}`}
+              style={{ transitionDelay: `${index * 100}ms` }}
             >
-              {suggestion[currentLang]}
+              {isEs ? s.es : s.en}
             </button>
           ))}
         </div>

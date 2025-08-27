@@ -86,7 +86,7 @@ TONO: Aventurero, con ganas de explorar. 40-60 palabras máx.`
 KEY DATA ABOUT ALEXIS:
 - Visited: Cancún, Puerto Vallarta, Mexico City, Isla del Padre, Veracruz
 - Next: "Hopefully Peru..." (really wanting to go)
-- Bucket list: Peru, United States (beyond Texas), England, Japan
+- Bucket list:  United States (beyond Texas), England, Japan
 - Style: Backpacker
 - From Monterrey, Mexico
 TONE: Adventurous, eager to explore. 40-60 words max.`;
@@ -246,7 +246,6 @@ export const ENHANCED_PLACEHOLDERS = {
     "React, Vue, or guitar freestyle?",
     "Fire away, I don't bite...",
     "Curious about martial arts?",
-    "Peru, Japan, or let's talk tech?"
   ]
 };
 
@@ -264,7 +263,6 @@ export const ENHANCED_SUGGESTIONS = [
   { en: "Life in Monterrey", es: "Vida en Monterrey", intent: "casual" as Intent },
   
   // Hobbies únicos
-  { en: "Martial arts (LIMA LAMA)", es: "Artes marciales (LIMA LAMA)", intent: "casual" as Intent },
   { en: "Coffee obsession ☕", es: "Obsesión con el café ☕", intent: "casual" as Intent },
   
   // Professional
