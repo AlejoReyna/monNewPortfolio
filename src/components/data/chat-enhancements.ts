@@ -253,7 +253,6 @@ export const ENHANCED_PLACEHOLDERS = {
 // ===== SUGERENCIAS MEJORADAS =====
 export const ENHANCED_SUGGESTIONS = [
   // Música (destacar Beatles)
-  { en: "Your Beatles obsession 🎸", es: "Tu obsesión con Los Beatles 🎸", intent: "music" as Intent },
   { en: "Music you're jamming to", es: "Música que andas escuchando", intent: "music" as Intent },
   
   // Tech específico

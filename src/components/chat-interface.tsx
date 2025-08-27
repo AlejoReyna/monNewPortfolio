@@ -44,12 +44,15 @@ function TypewriterText({ text, className = "", speed = 50, onComplete }: Typewr
 }
 
 import { alexisData, getRandomMusicArtist, getRandomTech } from "./data/user-data";
+// Debug imports
 import {
   detectEnhancedIntent,
   buildEnhancedHint,
   ENHANCED_SUGGESTIONS,
   ENHANCED_PLACEHOLDERS,
 } from "./data/chat-enhancements";
+
+console.log('Imported ENHANCED_PLACEHOLDERS:', ENHANCED_PLACEHOLDERS);
 
 type Lang = "en" | "es";
 type Intent =
@@ -133,6 +136,7 @@ export default function ChatInterface() {
   const [currentPlaceholder, setCurrentPlaceholder] = useState(
     isEs ? "Pregúntame algo..." : "Ask me something..."
   );
+  console.log('showChat:', showChat); // Debug showChat state
   const [inputValue, setInputValue] = useState("");
 
   const rootRef = useRef<HTMLDivElement>(null);
@@ -151,6 +155,11 @@ export default function ChatInterface() {
   /* ========= Load persisted ========= */
   useEffect(() => {
     try {
+      // Limpiar localStorage para testing
+      localStorage.removeItem("userName");
+      localStorage.removeItem("preferredLanguage");
+
+      console.log('Loading persisted data...'); // Debug
       const savedName =
         typeof window !== "undefined"
           ? (localStorage.getItem("userName") || "").trim()
@@ -160,6 +169,8 @@ export default function ChatInterface() {
           ? (localStorage.getItem("preferredLanguage") as Lang | null)
           : null;
 
+      console.log('Saved data:', { savedName, savedLang }); // Debug
+
       if (savedLang === "en" || savedLang === "es") {
         setPreferredLang(savedLang);
         setCtxLanguage?.(savedLang);
@@ -167,10 +178,12 @@ export default function ChatInterface() {
       if (savedName) setUserName(savedName);
 
       const needsSetup = !(savedName && (savedLang === "en" || savedLang === "es"));
+      console.log('Needs setup:', needsSetup); // Debug
       setShowNamePrompt(needsSetup);
 
       // Flow inicial:
       if (needsSetup) {
+        console.log('Starting setup flow...'); // Debug
         // 1) Welcome (columna izquierda)
         setShowWelcome(true);
         requestAnimationFrame(() => setWelcomeOpacity(1));
@@ -187,9 +200,11 @@ export default function ChatInterface() {
         };
       } else {
         // Si ya hay datos, directo al chat
+        console.log('Going directly to chat...'); // Debug
         setShowChat(true);
       }
-    } catch {
+    } catch (error) {
+      console.error('Error loading persisted data:', error); // Debug
       setShowNamePrompt(true);
       setShowWelcome(true);
       requestAnimationFrame(() => setWelcomeOpacity(1));
@@ -199,9 +214,19 @@ export default function ChatInterface() {
   // Placeholders dinámicos
   const pickPlaceholder = useCallback(() => {
     const pool = ENHANCED_PLACEHOLDERS[isEs ? "es" : "en"];
-    setCurrentPlaceholder(pool[Math.floor(Math.random() * pool.length)]);
+    const randomIndex = Math.floor(Math.random() * pool.length);
+    const newPlaceholder = pool[randomIndex];
+    console.log('New placeholder:', newPlaceholder); // Debug
+    setCurrentPlaceholder(newPlaceholder);
   }, [isEs]);
-  useEffect(() => { pickPlaceholder(); }, [pickPlaceholder]);
+
+  // Cambiar placeholder cada 5 segundos y al inicio
+  useEffect(() => {
+    console.log('Setting up placeholder effect'); // Debug
+    pickPlaceholder(); // Inicial
+    const interval = setInterval(pickPlaceholder, 5000);
+    return () => clearInterval(interval);
+  }, [pickPlaceholder]);
 
   // Messages end ref para autoscroll
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -274,7 +299,7 @@ export default function ChatInterface() {
   };
 
   /* ========= EARLY RETURN: mientras Welcome/Language/Name están activos ========= */
-  if (showWelcome || showLangStep || showNameStep || showNameInput) {
+  if (!showChat && (showWelcome || showLangStep || showNameStep || showNameInput)) {
     return (
       <div
         ref={rootRef}
@@ -301,7 +326,7 @@ export default function ChatInterface() {
               }`}
             >
               <TypewriterText 
-                text="Which language do you prefer?"
+                text={currentLang === "es" ? "¿Qué idioma prefieres?" : "Which language do you prefer?"}
                 className="mt-6 text-2xl md:text-4xl font-mono font-light text-white/90"
               />
               <div className="mt-5 flex justify-center gap-3">
@@ -331,7 +356,7 @@ export default function ChatInterface() {
               } flex flex-col items-center`}
             >
               <TypewriterText 
-                text="What's your name?"
+                text={currentLang === "es" ? "¿Cómo te llamas?" : "What's your name?"}
                 className="mt-6 text-2xl md:text-6xl font-mono font-light text-white/90 mb-8"
                 onComplete={handleNameStepComplete}
               />
@@ -382,8 +407,6 @@ export default function ChatInterface() {
             </div>
           )}
         </div>
-
-
       </div>
     );
   }
@@ -465,6 +488,24 @@ export default function ChatInterface() {
         </div>
       )}
 
+      {/* Suggestions */}
+      {showChat && (
+        <div className="flex flex-wrap gap-2 mb-4">
+          {suggestions.map((suggestion, index) => (
+            <button
+              key={index}
+              onClick={() => {
+                setInputValue(suggestion[currentLang]);
+                handleSendMessage();
+              }}
+              className="text-xs bg-black/30 hover:bg-black/40 text-gray-300 hover:text-white px-3 py-2 rounded-lg border border-white/10 transition-all duration-300 font-mono"
+            >
+              {suggestion[currentLang]}
+            </button>
+          ))}
+        </div>
+      )}
+
       {/* Input */}
       <div className="w-full">
         <div className="flex gap-2">
@@ -478,10 +519,17 @@ export default function ChatInterface() {
                 handleSendMessage();
               }
             }}
-            placeholder={
-              currentPlaceholder || (isEs ? "Pregúntame algo..." : "Ask me something...")
-            }
-            className="flex-1 rounded-xl border border-white/10 bg-black/30 backdrop-blur-md px-4 py-3 text-gray-200 placeholder-gray-400 font-mono focus:outline-none focus:ring-2 focus:ring-cyan-400 shadow-xl transition-all duration-300"
+            placeholder={currentPlaceholder || (isEs ? "Pregúntame algo..." : "Ask me something...")}
+            // Debug placeholder and states
+            onFocus={() => {
+              console.log('Input focus - States:', {
+                showChat,
+                isLoading,
+                currentPlaceholder,
+                isDisabled: isLoading || !showChat
+              });
+            }}
+            className="flex-1 rounded-xl border border-white/10 bg-black/30 backdrop-blur-md px-4 py-3 text-gray-200 placeholder-gray-200 font-mono focus:outline-none focus:ring-2 focus:ring-cyan-400 shadow-xl transition-all duration-300"
             disabled={isLoading || !showChat}
             maxLength={500}
           />

@@ -11,13 +11,13 @@ export default function Hero({ className }: HeroProps) {
     <section className={`relative min-h-screen overflow-hidden bg-black ${className ?? ""}`}>
       {/* Grid: 1 col en mobile; 60/40 desde lg */}
       <div className="grid min-h-screen grid-cols-1 lg:grid-cols-[60%_40%] items-stretch">
-        {/* Chat (izquierda) - Mayor z-index en sm/md para estar al frente */}
-        <div className="relative flex flex-col justify-end sm:justify-end lg:justify-center px-4 sm:px-6 lg:px-8 z-20 sm:z-20 md:z-20 lg:z-10 min-h-screen pt-0 sm:pt-0 lg:pt-28 pb-0 sm:pb-0">
+        {/* Chat (izquierda) - Siempre al frente */}
+        <div className="relative flex flex-col justify-end sm:justify-end lg:justify-center px-4 sm:px-6 lg:px-8 z-30 min-h-screen pt-0 sm:pt-0 lg:pt-28 pb-0 sm:pb-0">
           <ChatInterface />
         </div>
 
-        {/* GIF overlay: detrás de las bubbles en sm/md; layout original en lg+ */}
-        <div className="pointer-events-none absolute inset-0 h-full lg:relative lg:h-auto lg:overflow-visible z-0 sm:z-0 md:z-0 lg:z-20">
+        {/* GIF overlay: Siempre detrás */}
+        <div className="pointer-events-none absolute inset-0 h-full lg:relative lg:h-auto lg:overflow-visible z-10">
           <Image
             src="/16.gif"
             alt="Animated background"
