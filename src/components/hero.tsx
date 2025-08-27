@@ -10,9 +10,10 @@ export default function Hero({ className }: HeroProps) {
   return (
     <section className={`relative min-h-screen overflow-hidden bg-black ${className ?? ""}`}>
       {/* Grid: 1 col en mobile; 60/40 desde lg */}
-      <div className="grid min-h-screen grid-cols-1 lg:grid-cols-[60%_40%] items-stretch pt-64 sm:pt-72 lg:pt-80">
+      <div className="grid min-h-screen grid-cols-1 lg:grid-cols-[60%_40%] items-stretch">
         {/* Chat (izquierda) - Mayor z-index en sm/md para estar al frente */}
-        <div className="relative flex flex-col justify-center px-4 sm:px-6 lg:px-8 z-20 sm:z-20 md:z-20 lg:z-10">          <ChatInterface />
+        <div className="relative flex flex-col justify-center px-4 sm:px-6 lg:px-8 z-20 sm:z-20 md:z-20 lg:z-10 min-h-screen pt-20 sm:pt-24 lg:pt-28">
+          <ChatInterface />
         </div>
 
         {/* GIF overlay: detrás de las bubbles en sm/md; layout original en lg+ */}
@@ -24,8 +25,8 @@ export default function Hero({ className }: HeroProps) {
             priority
             unoptimized
             // En mobile y tablet centrado; desde lg, más hacia la izquierda y con zoom
-            className="object-contain sm:object-contain lg:object-left origin-left
-                       scale-[1.15] sm:scale-[1.25] md:scale-[1.125] lg:scale-[2.0] xl:scale-[1.7] 2xl:scale-[1.55] lg:translate-x-[-20px]"
+            className="mt-[22vh] object-contain sm:object-contain lg:object-left origin-left
+                       scale-[1.152] sm:scale-[1.296] md:scale-[1.224] lg:scale-[1.728] xl:scale-[1.44] 2xl:scale-[1.296] lg:translate-x-[-200px]"
           />
         </div>
       </div>
