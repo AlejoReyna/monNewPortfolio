@@ -297,7 +297,15 @@ export default function ChatInterface() {
     { en: "Hello! Alexis here. I turn coffee into code, and this GPT knows most of my tricks.", es: "¡Hola! Alexis aquí. Convierto café en código, y este GPT conoce la mayoría de mis trucos." },
     { en: "Hey, I'm Alexis. I make pixels dance on screens, powered by GPT magic.", es: "Hey, soy Alexis. Hago que los píxeles bailen en pantallas, con magia GPT." },
   ];
-  const [greetingIndex] = useState(() => Math.floor(Math.random() * greetings.length));
+  
+  // Fix hydration mismatch by using a consistent greeting selection
+  const [greetingIndex, setGreetingIndex] = useState(0);
+  
+  // Use effect to set random greeting only on client side after hydration
+  useEffect(() => {
+    setGreetingIndex(Math.floor(Math.random() * greetings.length));
+  }, []);
+  
   const baseGreeting = isEs ? greetings[greetingIndex].es : greetings[greetingIndex].en;
   const text = userName
     ? (isEs ? `${baseGreeting} ¿Cómo estás, ${userName}?` : `${baseGreeting} How are you, ${userName}?`)
