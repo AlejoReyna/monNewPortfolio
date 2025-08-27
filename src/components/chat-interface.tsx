@@ -268,6 +268,18 @@ export default function ChatInterface() {
     pickPlaceholder();
   };
 
+  const handleSuggestionClick = (text: string, intent: Intent) => {
+    if (isLoading) return;
+    if (!userName) {
+      setShowNamePrompt(true);
+      return;
+    }
+    const payload = buildHint(intent, currentLang, text) + "\n" + text;
+    sendMessage(payload);
+    if (!showChat) setShowChat(true);
+    pickPlaceholder();
+  };
+
   /* ========= Intro text (portada) ========= */
   const [displayed, setDisplayed] = useState("");
   const [typewriterComplete, setTypewriterComplete] = useState(false);

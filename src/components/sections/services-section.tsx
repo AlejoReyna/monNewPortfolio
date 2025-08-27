@@ -2,7 +2,6 @@
 
 import type React from "react";
 import { useMemo } from "react";
-// @ts-ignore
 import { motion, useScroll, useSpring } from "framer-motion";
 import Link from "next/link";
 

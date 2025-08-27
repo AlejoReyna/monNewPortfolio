@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import { motion, MotionConfig } from "framer-motion";
+import { motion, MotionConfig, easeOut } from "framer-motion";
 import { useLanguage } from "@/components/lang-context";
 
 /* -------------------------------------------
@@ -13,7 +13,7 @@ const container = {
 };
 const item = {
   hidden: { opacity: 0, y: 16 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } },
+  show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: easeOut } },
 };
 
 // Tilt/parallax on hover
