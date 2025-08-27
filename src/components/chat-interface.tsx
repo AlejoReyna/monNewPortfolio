@@ -278,7 +278,7 @@ export default function ChatInterface() {
     return (
       <div
         ref={rootRef}
-        className="relative flex flex-col items-center justify-center gap-6 px-4 w-full max-w-3xl mx-auto mb-20 min-h-screen"
+        className="relative flex flex-col items-center justify-center gap-6 px-4 w-full max-w-3xl mx-auto min-h-screen"
       >
         {/* Columna centrada */}
         <div className="flex flex-col items-center text-center">
@@ -394,7 +394,7 @@ export default function ChatInterface() {
   return (
     <div
       ref={rootRef}
-      className="relative z-10 flex flex-col gap-4 px-4 w-full max-w-3xl mx-auto mb-20"
+      className="relative z-10 flex flex-col gap-4 px-4 w-full max-w-3xl mx-auto mb-12"
     >
       {/* Ventana de chat (el contenedor clásico solo se monta después) */}
       {(sorted.length > 0 || showChat) && (

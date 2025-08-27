@@ -38,7 +38,7 @@
 3. **"cuéntame sobre ti"** → Monterrey, Inverater, "me mama el exceso"
 4. **"beatles"** → Easter egg especial 🎸
 5. **"trabajas en inverater"** → Info sobre startup inmobiliaria
-6. **"perú"** → Tu sueño de viajar allí
+6. **"españa"** → Tu sueño de viajar allí
 7. **"artes marciales"** → LIMA LAMA, UANL FIME
 8. **"contacto"** → Freelance, "let's talk" section
 

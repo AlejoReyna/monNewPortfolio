@@ -9,7 +9,7 @@ type Lang = "en" | "es";
 const ENHANCED_KEYWORDS = {
   es: {
     music: ["música", "musica", "canción", "cancion", "artista", "banda", "concierto", "guitarra", "beatles", "rock", "hip hop", "josé madero", "pxndx", "paul mccartney", "tocar", "instrumento"],
-    travel: ["viaje", "viajar", "destino", "lugar", "país", "pais", "vacaciones", "mochilero", "perú", "peru", "japón", "japon", "cancún", "cancun", "puerto vallarta", "inglaterra"],
+    travel: ["viaje", "viajar", "destino", "lugar", "país", "pais", "vacaciones", "mochilero", "españa", "peru", "japón", "japon", "cancún", "cancun", "puerto vallarta", "inglaterra"],
     about: ["sobre ti", "quien eres", "tu historia", "presentate", "cuentame de ti", "alexis", "como eres", "personalidad", "monterrey"],
     projects: ["proyecto", "proyectos", "trabajo", "portfolio", "github", "codigo", "programar", "inverater", "plataforma"],
     contact: ["contacto", "email", "linkedin", "cv", "curriculum", "contratar", "freelance", "let's talk", "hablemos"],
@@ -78,8 +78,7 @@ TONE: Passionate about music, especially The Beatles. 40-60 words max.`;
         ? `Contexto: Usuario pregunta sobre viajes de Alexis.
 DATOS CLAVE DE ALEXIS:
 - Visitado: Cancún, Puerto Vallarta, Ciudad de México, Isla del Padre, Veracruz
-- Próximo: "Ojalá Perú..." (con muchas ganas)
-- Bucket list: Perú, Estados Unidos (beyond Texas), Inglaterra, Japón
+- Bucket list: España, Estados Unidos (beyond Texas), Inglaterra, Japón
 - Estilo: Mochilero
 - De Monterrey, N.L.
 TONO: Aventurero, con ganas de explorar. 40-60 palabras máx.`
@@ -237,7 +236,6 @@ export const ENHANCED_PLACEHOLDERS = {
     "¿React, Vue, o mejor freestyle de guitarra?",
     "Dispara tu pregunta, no muerdo...",
     "¿Curiosidad sobre artes marciales?",
-    "¿Perú, Japón, o mejor hablamos de tech?"
   ],
   en: [
     "What would you like to know about me?",
@@ -274,6 +272,5 @@ export const ENHANCED_SUGGESTIONS = [
   { en: "Freelance availability", es: "Disponibilidad freelance", intent: "contact" as Intent },
   { en: "UX/UI + Backend combo", es: "Combo UX/UI + Backend", intent: "tech" as Intent },
   
-  // Travel general (sin Perú específico)
   { en: "Backpacking adventures", es: "Aventuras de mochilero", intent: "travel" as Intent }
 ];

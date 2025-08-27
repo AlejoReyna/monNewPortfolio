@@ -12,7 +12,7 @@ export default function Hero({ className }: HeroProps) {
       {/* Grid: 1 col en mobile; 60/40 desde lg */}
       <div className="grid min-h-screen grid-cols-1 lg:grid-cols-[60%_40%] items-stretch">
         {/* Chat (izquierda) - Mayor z-index en sm/md para estar al frente */}
-        <div className="relative flex flex-col justify-center px-4 sm:px-6 lg:px-8 z-20 sm:z-20 md:z-20 lg:z-10 min-h-screen pt-20 sm:pt-24 lg:pt-28">
+        <div className="relative flex flex-col justify-end sm:justify-end lg:justify-center px-4 sm:px-6 lg:px-8 z-20 sm:z-20 md:z-20 lg:z-10 min-h-screen pt-0 sm:pt-0 lg:pt-28 pb-0 sm:pb-0">
           <ChatInterface />
         </div>
 
@@ -25,8 +25,8 @@ export default function Hero({ className }: HeroProps) {
             priority
             unoptimized
             // En mobile y tablet centrado; desde lg, más hacia la izquierda y con zoom
-            className="mt-[22vh] object-contain sm:object-contain lg:object-left origin-left
-                       scale-[1.152] sm:scale-[1.296] md:scale-[1.224] lg:scale-[1.728] xl:scale-[1.44] 2xl:scale-[1.296] lg:translate-x-[-200px]"
+            className="mt-[8vh] md:mt-[20vh] lg:mt-[32vh] object-contain sm:object-contain object-center sm:object-center lg:object-left origin-center lg:origin-left
+                       scale-[1.4] md:scale-[1.224] lg:scale-[1.728] xl:scale-[1.50]  lg:translate-x-[-200px]"
           />
         </div>
       </div>

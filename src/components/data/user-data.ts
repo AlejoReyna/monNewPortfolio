@@ -225,8 +225,8 @@ export const alexisData: UserData = {
     
     travel: {
       visited: ["Cancún", "Puerto Vallarta", "Ciudad de México", "Isla del Padre", "Veracruz"],
-      planned: "Ojalá Perú...",
-      bucketList: ["Perú", "Estados Unidos (beyond Texas)", "Inglaterra", "Japón"],
+      planned: "Ojalá España...",
+      bucketList: ["Estados Unidos (beyond Texas)", "Inglaterra", "Japón"],
       style: "Mochilero"
     },
     
