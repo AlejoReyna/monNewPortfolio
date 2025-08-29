@@ -353,8 +353,8 @@ export default function ChatInterface() {
     >
       {/* Portada (se oculta cuando inicia el chat) */}
       {!showChat && (
-        <div className="pointer-events-auto w-full rounded-2xl border border-white/10 bg-black/40 backdrop-blur-md px-5 py-6 shadow-2xl shadow-black/30">
-          <p className="relative text-base sm:text-lg text-gray-200 font-mono font-light leading-relaxed">
+        <div className="pointer-events-auto w-full rounded-2xl  bg-black/40 backdrop-blur-md px-5 py-6 shadow-2xl shadow-black/30">
+          <p className="relative text-base text-lg md:text-xl lg:text-2xl text-gray-200 font-mono font-light leading-relaxed">
             {displayed || text}
             {!showNamePrompt && displayed.length < text.length && (
               <span className="ml-1 inline-block h-5 w-0.5 align-[-0.15em] bg-cyan-300 animate-pulse" />

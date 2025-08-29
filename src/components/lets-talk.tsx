@@ -19,6 +19,7 @@ export default function LetsTalk() {
   const [message, setMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const interests: Interest[] = [
     "UI/UX design",
@@ -31,15 +32,37 @@ export default function LetsTalk() {
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (!name || !email || !message) return;
+    
     setIsSubmitting(true);
+    setError(null);
     try {
-      // Placeholder de envío
-      await new Promise((r) => setTimeout(r, 800));
-      setSubmitted(true);
-      setName("");
-      setEmail("");
-      setMessage("");
-      setSelectedInterest("UI/UX design");
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name,
+          email,
+          message,
+          interest: selectedInterest
+        })
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        setSubmitted(true);
+        setName("");
+        setEmail("");
+        setMessage("");
+        setSelectedInterest("UI/UX design");
+      } else {
+        throw new Error(result.error || "Error al enviar el mensaje");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      setError(isEs ? "Error al enviar el mensaje. Inténtalo de nuevo." : "Error sending message. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
@@ -230,6 +253,9 @@ export default function LetsTalk() {
                 />
               </div>
 
+              {/* Hidden input for Web3Forms spam protection */}
+              <input type="hidden" name="redirect" value="https://web3forms.com/success" />
+
               <div className="flex items-center justify-between gap-3">
                 <p className="text-xs text-gray-400 font-mono">
                   {isEs
@@ -261,7 +287,13 @@ export default function LetsTalk() {
                 <p className="mt-2 text-sm text-emerald-400 font-mono">
                   {isEs
                     ? "¡Gracias! Me pondré en contacto pronto."
-                    : "Thanks! I’ll get back to you shortly."}
+                    : "Thanks! I'll get back to you shortly."}
+                </p>
+              )}
+              
+              {error && (
+                <p className="mt-2 text-sm text-red-400 font-mono">
+                  {error}
                 </p>
               )}
             </div>
