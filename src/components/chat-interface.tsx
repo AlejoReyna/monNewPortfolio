@@ -163,6 +163,10 @@ export default function ChatInterface() {
         typeof window !== "undefined"
           ? (localStorage.getItem("preferredLanguage") as Lang | null)
           : null;
+      const hasVisitedBefore =
+        typeof window !== "undefined"
+          ? localStorage.getItem("hasVisitedBefore")
+          : null;
 
       if (savedLang === "en" || savedLang === "es") {
         setPreferredLang(savedLang);
@@ -171,13 +175,24 @@ export default function ChatInterface() {
       if (savedName) setUserName(savedName);
 
       const needsSetup = !(savedName && (savedLang === "en" || savedLang === "es"));
-      setShowNamePrompt(needsSetup);
-
-      if (!needsSetup) {
+      
+      // Si es primera visita y no tiene configuración, mostrar selección de idioma
+      if (!hasVisitedBefore && needsSetup) {
+        setShowLangStep(true);
+        requestAnimationFrame(() => setLangOpacity(1));
+      } else if (needsSetup) {
+        setShowNamePrompt(true);
+      } else {
         setShowChat(true);
       }
+      
+      // Marcar como visitado
+      if (typeof window !== "undefined" && !hasVisitedBefore) {
+        localStorage.setItem("hasVisitedBefore", "true");
+      }
     } catch {
-      setShowNamePrompt(true);
+      setShowLangStep(true);
+      requestAnimationFrame(() => setLangOpacity(1));
     }
   }, [setCtxLanguage]);
 
@@ -219,25 +234,36 @@ export default function ChatInterface() {
     setTimeout(() => {
       setShowLangStep(false);
       setShowNameStep(true);
-      requestAnimationFrame(() => setNameOpacity(1));
+      requestAnimationFrame(() => {
+        setNameOpacity(1);
+        // Activar automáticamente el input después de mostrar el texto
+        handleNameStepComplete();
+      });
     }, 350);
   };
 
   const handleNameStepComplete = () => {
-    // Mostrar el input con fade in
-    setShowNameInput(true);
-    requestAnimationFrame(() => setNameInputOpacity(1));
+    // Mostrar el input con fade in después de un pequeño delay
+    setTimeout(() => {
+      setShowNameInput(true);
+      requestAnimationFrame(() => setNameInputOpacity(1));
+    }, 800);
   };
 
-  const handleNameSubmit = () => {
-    const trimmed = nameInput.trim();
-    if (!trimmed) return;
-    setUserName(trimmed);
+  const handleNameSubmit = (overrideName?: string) => {
+    const nameToUse = overrideName || nameInput.trim();
+    if (!nameToUse) return;
+    
+    const finalName = overrideName === "Anónimo" 
+      ? (isEs ? "Anónimo" : "Anonymous")
+      : nameToUse;
+    
+    setUserName(finalName);
     
     // Guardar datos y continuar al chat
     const langToSave: Lang = preferredLang ?? initialCtxLang;
     try {
-      localStorage.setItem("userName", trimmed);
+      localStorage.setItem("userName", finalName);
       localStorage.setItem("preferredLanguage", langToSave);
     } catch {}
     
@@ -351,8 +377,133 @@ export default function ChatInterface() {
       ref={rootRef}
       className="relative z-10 flex flex-col gap-4 px-4 w-full max-w-3xl mx-auto mb-12"
     >
+      {/* Selección de idioma para primera visita */}
+      {showLangStep && (
+        <div 
+          className="pointer-events-auto w-full rounded-2xl bg-black/40 backdrop-blur-md px-5 py-6 shadow-2xl shadow-black/30 transition-opacity duration-300"
+          style={{ opacity: langOpacity }}
+        >
+          <div className="text-center space-y-6">
+            <div className="space-y-3">
+              <h2 className="text-xl md:text-2xl text-gray-200 font-mono font-light">
+                Welcome! / ¡Bienvenido!
+              </h2>
+              <p className="text-sm md:text-base text-gray-400 font-mono font-light">
+                Choose your preferred language / Elige tu idioma preferido
+              </p>
+            </div>
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              <button
+                onClick={() => handleLanguageSelection("en")}
+                className="px-6 py-3 bg-cyan-600/20 hover:bg-cyan-600/40 border border-cyan-500/30 hover:border-cyan-400/50 text-cyan-200 hover:text-white rounded-xl transition-all duration-300 font-mono text-sm"
+              >
+                🇺🇸 English
+              </button>
+              <button
+                onClick={() => handleLanguageSelection("es")}
+                className="px-6 py-3 bg-cyan-600/20 hover:bg-cyan-600/40 border border-cyan-500/30 hover:border-cyan-400/50 text-cyan-200 hover:text-white rounded-xl transition-all duration-300 font-mono text-sm"
+              >
+                🇪🇸 Español
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Paso de nombre */}
+      {showNameStep && (
+        <div 
+          className="pointer-events-auto w-full rounded-2xl bg-black/40 backdrop-blur-md px-5 py-6 shadow-2xl shadow-black/30 transition-opacity duration-300"
+          style={{ opacity: nameOpacity }}
+        >
+          <div className="space-y-4">
+            <p className="text-lg md:text-xl text-gray-200 font-mono font-light leading-relaxed">
+              {isEs 
+                ? "¡Perfecto! Ahora, ¿cómo te llamas?" 
+                : "Perfect! Now, what's your name?"
+              }
+              <span className="ml-1 inline-block h-5 w-0.5 align-[-0.15em] bg-cyan-300 animate-pulse" />
+            </p>
+            {showNameInput && (
+              <div 
+                className="transition-opacity duration-300 space-y-4"
+                style={{ opacity: nameInputOpacity }}
+              >
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={nameInput}
+                    onChange={(e) => setNameInput(e.target.value)}
+                    onKeyPress={handleNameKey}
+                    placeholder={isEs ? "Tu nombre..." : "Your name..."}
+                    className="flex-1 rounded-xl border border-white/10 bg-black/30 backdrop-blur-md px-4 py-3 text-gray-200 placeholder-gray-400 font-mono focus:outline-none focus:ring-2 focus:ring-cyan-400 shadow-xl transition-all duration-300"
+                    maxLength={50}
+                    autoFocus
+                  />
+                  <button
+                    onClick={() => handleNameSubmit()}
+                    disabled={!nameInput.trim()}
+                    className="px-4 py-3 bg-cyan-600/40 hover:bg-cyan-500/50 text-cyan-200 hover:text-white rounded-xl border border-cyan-500/30 transition-all duration-300 font-mono disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isEs ? "Continuar" : "Continue"}
+                  </button>
+                </div>
+                
+                {/* Opción de ser anónimo */}
+                <div className="text-center">
+                  <button
+                    onClick={() => handleNameSubmit("Anónimo")}
+                    className="text-sm text-gray-400 hover:text-gray-300 underline underline-offset-2 transition-colors duration-200 font-mono"
+                  >
+                    {isEs ? "Prefiero ser anónimo" : "I prefer to be anonymous"}
+                  </button>
+                </div>
+
+                {/* Aviso de privacidad */}
+                <div className="relative flex items-center justify-center">
+                  <div className="group relative">
+                    <div className="flex items-center gap-1 text-xs text-gray-500 hover:text-gray-400 transition-colors duration-200 cursor-help">
+                      <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                      </svg>
+                      <span className="font-mono">
+                        {isEs ? "Información sobre datos" : "Data information"}
+                      </span>
+                    </div>
+                    
+                    {/* Tooltip */}
+                    <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900/95 backdrop-blur-md border border-gray-700/50 rounded-lg text-xs text-gray-300 font-mono leading-relaxed opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none w-80 z-50">
+                      <p className="mb-2">
+                        {isEs 
+                          ? "Solo almacenamos tu nombre y preferencia de idioma en el almacenamiento local de tu navegador (localStorage). No enviamos datos a servidores externos."
+                          : "We only store your name and language preference in your browser's local storage (localStorage). No data is sent to external servers."
+                        }
+                      </p>
+                      <p className="mb-3 text-gray-400 italic">
+                        {isEs 
+                          ? "(puedes comprobarlo borrando de tu historial esta visita)"
+                          : "(you can verify this by clearing this visit from your history)"
+                        }
+                      </p>
+                      <a 
+                        href="https://github.com/AlejoReyna/monNewPortfolio" 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="text-cyan-400 hover:text-cyan-300 underline underline-offset-2 pointer-events-auto"
+                      >
+                        {isEs ? "Ver código fuente" : "View source code"}
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* Portada (se oculta cuando inicia el chat) */}
-      {!showChat && (
+      {!showChat && !showLangStep && !showNameStep && (
         <div className="pointer-events-auto w-full rounded-2xl  bg-black/40 backdrop-blur-md px-5 py-6 shadow-2xl shadow-black/30">
           <p className="relative text-base text-lg md:text-xl lg:text-2xl text-gray-200 font-mono font-light leading-relaxed">
             {displayed || text}
@@ -432,7 +583,7 @@ export default function ChatInterface() {
       )}
 
       {/* Sugerencias antes de iniciar chat */}
-      {!showNamePrompt && !showChat && sorted.length === 0 && (
+      {!showNamePrompt && !showChat && !showLangStep && !showNameStep && sorted.length === 0 && (
         <div className="flex flex-wrap gap-2">
           {suggestions.map((s, index) => (
             <button
@@ -447,58 +598,60 @@ export default function ChatInterface() {
         </div>
       )}
 
-      {/* Input */}
-      <div className="w-full">
-        <div className="flex gap-2">
-          <input
-            type="text"
-            value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-            onKeyPress={(e) => {
-              if (e.key === "Enter") {
-                e.preventDefault();
-                handleSendMessage();
-              }
-            }}
-            placeholder={currentPlaceholder || (isEs ? "Pregúntame algo..." : "Ask me something...")}
-            // Debug placeholder and states
-            onFocus={() => {
-              console.log('Input focus - States:', {
-                showChat,
-                isLoading,
-                currentPlaceholder,
-                isDisabled: isLoading || !showChat
-              });
-            }}
-            className="flex-1 rounded-xl border border-white/10 bg-black/30 backdrop-blur-md px-4 py-3 text-gray-200 placeholder-gray-200 font-mono focus:outline-none focus:ring-2 focus:ring-cyan-400 shadow-xl transition-all duration-300"
-            disabled={isLoading || !showChat}
-            maxLength={500}
-          />
-          <button
-            onClick={handleSendMessage}
-            disabled={!inputValue.trim() || isLoading || !showChat || !userName}
-            className="text-xs bg-cyan-600/40 hover:bg-cyan-500/50 text-cyan-200 hover:text-white px-4 py-3 rounded-lg border border-cyan-500/30 transition-all duration-300 font-mono disabled:opacity-50 disabled:cursor-not-allowed"
-            aria-disabled={!userName}
-          >
-            {isLoading ? "⏳" : (
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="m22 2-7 20-4-9-9-4 20-7z" />
-                <path d="M22 2 11 13" />
-              </svg>
-            )}
-          </button>
+      {/* Input - Solo visible después de completar la configuración */}
+      {!showLangStep && !showNameStep && (
+        <div className="w-full">
+          <div className="flex gap-2">
+            <input
+              type="text"
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              onKeyPress={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  handleSendMessage();
+                }
+              }}
+              placeholder={currentPlaceholder || (isEs ? "Pregúntame algo..." : "Ask me something...")}
+              // Debug placeholder and states
+              onFocus={() => {
+                console.log('Input focus - States:', {
+                  showChat,
+                  isLoading,
+                  currentPlaceholder,
+                  isDisabled: isLoading || !showChat
+                });
+              }}
+              className="flex-1 rounded-xl border border-white/10 bg-black/30 backdrop-blur-md px-4 py-3 text-gray-200 placeholder-gray-200 font-mono focus:outline-none focus:ring-2 focus:ring-cyan-400 shadow-xl transition-all duration-300"
+              disabled={isLoading || !showChat}
+              maxLength={500}
+            />
+            <button
+              onClick={handleSendMessage}
+              disabled={!inputValue.trim() || isLoading || !showChat || !userName}
+              className="text-xs bg-cyan-600/40 hover:bg-cyan-500/50 text-cyan-200 hover:text-white px-4 py-3 rounded-lg border border-cyan-500/30 transition-all duration-300 font-mono disabled:opacity-50 disabled:cursor-not-allowed"
+              aria-disabled={!userName}
+            >
+              {isLoading ? "⏳" : (
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="m22 2-7 20-4-9-9-4 20-7z" />
+                  <path d="M22 2 11 13" />
+                </svg>
+              )}
+            </button>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }
