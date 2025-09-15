@@ -1,40 +1,517 @@
 "use client";
 
-import { useNavigation } from "@/contexts/navigation-context";
-import HomeSection from "@/components/sections/home-section";
-import ServicesSection from "@/components/sections/services-section";
-import ProjectsSection from "@/components/sections/projects-section";
-import ContactSection from "@/components/sections/contact-section";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 export default function Home() {
-  const { currentSection, isTransitioning } = useNavigation();
+  const GREETINGS = useMemo(
+    () => [
+      "hola, forastero. ¿has venido solo?",
+      "bienvenido a la oscuridad, visitante",
+      "¿puedo susurrarte un secreto?",
+      "toc, toc… ¿me dejas entrar?",
+      "te estaba esperando desde anoche",
+      "no mires detrás de ti",
+      "tu sombra acaba de parpadear",
+      "las paredes escuchan, saluda",
+      "hola, corazón que late deprisa",
+      "cierra la puerta… ya empezó",
+      "el eco de tu nombre suena hueco",
+      "buenas noches, aunque sea de día",
+      "bienvenido al pasillo sin fin",
+      "hoy alguien te nombró en voz baja",
+      "el frío no es del clima",
+      "¿también oyes pasos?",
+      "buenas… ¿eres tú o tu sombra?",
+      "hola, viajero de pasillos largos",
+      "bienvenido, la casa ya te conoce",
+      "alguien dejó la luz encendida para ti",
+      "toca dos veces si puedes leer esto",
+      "escuché tu nombre en la escalera",
+      "saludos desde el otro lado de la puerta",
+      "no cierres los ojos, yo tampoco",
+      "feliz entrada al silencio que respira",
+      "hola, eco de tus propios pasos",
+      "buenas noches, aunque nadie duerme",
+      "saludos, acompañado de tus sombras",
+      "entra, el frío ya se acomodó",
+      "te vi llegar antes de que llegaras",
+      "quién anda ahí, además de ti",
+      "hola, yo ya estaba en la habitación",
+      "te encontré siguiendo el susurro",
+      "bienvenido, el piso cruje por gusto",
+      "no temas a la puerta, tema a lo que cruza",
+      "alguien dejó un saludo en la ventana",
+      "hola, piel erizada y ojos atentos",
+      "¿sientes la casa respirar contigo?",
+      "buenas, la sombra tardó en alcanzarte",
+      "paso a paso te traje hasta aquí",
+      "saludos, la lámpara parpadea por ti",
+      "bienvenido al rincón que te recuerda",
+      "hola, escuché tu llave girar sola",
+      "el reloj marcó tu nombre a medianoche",
+      "no te asustes, yo siempre saludo así",
+      "buenas, el pasillo acaba de alargarse",
+      "hola, te abrí la puerta sin tocar",
+      "alguien respiró cuando entraste",
+      "saludos, hay pasos detrás del eco",
+      "bienvenido a la habitación sin esquinas",
+      "hola, tu sombra llegó primero",
+      "buenas, la escalera contó trece",
+      "entra, ya aprendimos tu ritmo",
+      "saludos, los espejos quieren hablar",
+      "hola, no busques el interruptor",
+      "la casa te llamó por tu apellido",
+      "buenas, hay una silla que cruje tu nombre",
+      "no huyas, el pasillo te alcanza",
+      "hola, el viento te respondió",
+      "alguien dejó huellas hacia adentro",
+      "bienvenido, no cierres la cortina",
+      "saludos, la ventana mira de vuelta",
+      "hola, no estabas solo en el ascensor",
+      "buenas, el timbre sonó sin dedo",
+      "entra, el piso aprendió tu peso",
+      "saludos, la noche se quedó a vivir",
+      "hola, ¿te siguió el silbido?",
+      "el pasillo dobló una vez más",
+      "bienvenido, alguien ya te esperaba",
+      "saludos desde atrás del marco",
+      "hola, el umbral guardó tu temperatura",
+      "buenas, no cuentes las luces",
+      "entra, el aire sabe a recuerdo",
+      "saludos, el pomo giró solo",
+      "hola, escuché tus pasos dos veces",
+      "la silla meció tu ausencia",
+      "bienvenido, no te sientes de espaldas",
+      "saludos, la puerta cerró en silencio",
+      "hola, hay alguien bajo la escalera",
+      "buenas, la lámpara te guiña",
+      "entra, el reloj saltó un minuto",
+      "saludos, no abras ese cajón",
+      "hola, tus llaves tintinearon solas",
+      "el recibidor te llamó suave",
+      "bienvenido, los marcos te miran",
+      "saludos, no pises la tercera tabla",
+      "hola, hubo un susurro en tu nombre",
+      "buenas, el cristal dijo hola",
+      "entra, el corredor cambió de largo",
+      "saludos, la pared sabe secretos",
+      "hola, la esquina te conoce",
+      "el pomo está tibio, como un pulso",
+      "bienvenido, no mires la rendija",
+      "saludos, hay polvo que te recuerda",
+      "hola, escucho tu respiración doble",
+      "buenas, alguien subió sin subir",
+      "entra, el piso aprendió tu nombre",
+      "saludos, el foco late despacio",
+      "hola, el timbre dijo tu apellido",
+      "la cortina susurra contigo",
+      "bienvenido, el eco llega antes",
+      "saludos, no enciendas esa luz",
+      "hola, el marco tiene frío",
+      "buenas, la puerta está despierta",
+      "entra, alguien apagó el pasillo",
+      "saludos, tu sombra te alcanzó",
+      "hola, no sacudas ese polvo",
+      "el zaguán tiene memoria",
+      "bienvenido, conté tus pasos mal",
+      "saludos, hay una silla vacía",
+      "hola, abrí sin manos",
+      "buenas, la bisagra cantó bajito",
+      "entra, el aire pesa más aquí",
+      "saludos, la madera te reconoció",
+      "hola, alguien dijo shhh",
+      "el pasillo dobló por ti",
+      "bienvenido, hoy late distinto",
+      "saludos, el armario sueña ruidos",
+      "hola, no camines tan rápido",
+      "buenas, el suelo te sigue",
+      "entra, los retratos respiran",
+      "saludos, hay un espejo despierto",
+      "hola, perdón por el frío",
+      "el apagador te ignoró",
+      "bienvenido, no cuentes ventanas",
+      "saludos, hay pasos sin dueño",
+      "hola, el umbral te probó",
+      "buenas, la escalera contestó",
+      "entra, el corredor susurra",
+      "saludos, no cierres demasiado",
+      "hola, hay una risa lejana",
+      "el reloj mira fijo",
+      "bienvenido, hay viento detenido",
+      "saludos, la puerta recuerda",
+      "hola, ¿traes frío ajeno?",
+      "buenas, alguien te nombró aquí",
+      "entra, el piso cambia de ánimo",
+      "saludos, el pomo vigila",
+      "hola, la luz se escondió",
+      "el pasillo te contó",
+      "bienvenido, no estás antes que yo",
+      "saludos, las paredes respiran",
+      "hola, no te quedes al centro",
+      "buenas, el foco pestañeó",
+      "entra, alguien dejó la puerta entornada",
+      "saludos, el zócalo cruje nombres",
+      "hola, el felpudo te habló",
+      "el recibidor te pesó",
+      "bienvenido, no apagues todo",
+      "saludos, hay ruido bajo la madera",
+      "hola, el aire dijo hola",
+      "buenas, tus pasos no van solos",
+      "entra, hay eco delante",
+      "saludos, el pomo vuelve solo",
+      "hola, no soples la vela",
+      "el reloj adelantó un latido",
+      "bienvenido, alguien cruzó antes",
+      "saludos, hay frío que mira",
+      "hola, el marco se tensó",
+      "buenas, no llames a nadie",
+      "entra, la sombra quiere entrar",
+      "saludos, el silencio huele a lluvia",
+      "hola, el pasillo aprendió tu voz",
+      "el piso recuerda tus zapatos",
+      "bienvenido, no corras",
+      "saludos, la escalera susurra",
+      "hola, no mires el techo",
+      "buenas, hay un golpe lejano",
+      "entra, las paredes oyen",
+      "saludos, el cristal tiembló",
+      "hola, no cierres tan fuerte",
+      "el pomo gira sin manos",
+      "bienvenido, la casa exhala",
+      "saludos, alguien respira bajo la puerta",
+      "hola, te seguimos desde el portal",
+      "buenas, el pasillo se duplicó",
+      "entra, el silencio hace eco",
+      "saludos, hay viento en el suelo",
+      "hola, el foco no parpadea por ti… o sí",
+      "el marco está más frío",
+      "bienvenido, la puerta sueña contigo",
+      "saludos, alguien dejó un susurro",
+      "hola, no camines de espaldas",
+      "buenas, el reloj te espera",
+      "entra, la cortina oyó tu nombre",
+      "saludos, hay polvo inquieto",
+      "hola, el felpudo tirita",
+      "el muro te llama bajito",
+      "bienvenido, guarda silencio un segundo",
+      "saludos, alguien bajó sin bajar",
+      "hola, la esquina mueve sombra",
+      "buenas, hay eco fuera de lugar",
+      "entra, el pasillo respira contigo",
+      "saludos, el pomo rechina historias",
+      "hola, no toques ese marco",
+      "el aire se espesó al verte",
+      "bienvenido, el zaguán te conoce",
+      "saludos, hay un nombre viejo aquí",
+      "hola, la madera cuenta hasta doce",
+      "buenas, alguien te siguió pegado",
+      "entra, la escalera guarda voces",
+      "saludos, el foco suspira",
+      "hola, no te des la vuelta aún",
+      "el piso aprendió tu ritmo",
+      "bienvenido, tu abrigo pesa ruido",
+      "saludos, hay ojos en la ventana",
+      "hola, el timbre recordó tu tono",
+      "buenas, el cristal te vio pasar",
+      "entra, hay sombra que se ríe",
+      "saludos, la rendija observa",
+      "hola, el marco dijo basta",
+      "el silencio camina contigo",
+      "bienvenido, no te atrases",
+      "saludos, la pared te acompaña",
+      "hola, la casa te llamó bajito",
+      "buenas, el eco se retrasó",
+      "entra, hay pasos que no cuentas",
+      "saludos, el suelo murmura",
+      "hola, no cierres del todo",
+      "el pomo se enfrió de golpe",
+      "bienvenido, alguien ya apagó",
+      "saludos, el pasillo dobla lento",
+      "hola, la lámpara tiene sueño",
+      "buenas, el marco cruje nombres",
+      "entra, el aire pidió silencio",
+      "saludos, tu sombra llegó temprano",
+      "hola, hay una voz sin boca",
+      "el reloj respira hondo",
+      "bienvenido, no cruces tan rápido",
+      "saludos, alguien llamó bajito",
+      "hola, te esperaba el frío",
+      "buenas, el piso está despierto",
+      "entra, hay un susurro colgado",
+      "saludos, el foco te escucha",
+      "hola, la ventana colecciona nombres",
+      "el felpudo cuenta historias",
+      "bienvenido, no olvides mirar atrás",
+      "saludos, hay polvo que canta",
+      "hola, el pomo palpita lento",
+      "buenas, la puerta suspira",
+      "entra, el corredor te mide",
+      "saludos, el silencio aprendió tu forma",
+      "hola, no nombres a nadie",
+      "el aire te respondió",
+      "bienvenido, hay un rincón despierto",
+      "saludos, las sombras conversan",
+      "hola, el marco no parpadea",
+      "buenas, el foco te guiña a destiempo",
+      "entra, el reloj te guardó un minuto",
+      "saludos, el pasillo ya giró",
+      "hola, alguien dejó la luz en ámbar",
+      "el pomo te olió primero",
+      "bienvenido, hay ojos en la cerradura",
+      "saludos, la madera canta tu peso",
+      "hola, el umbral pide calma",
+      "buenas, hay frío en los marcos",
+      "entra, el eco se adelanta",
+      "saludos, la cortina ve sin ojos",
+      "hola, se oyen pasos en pausa",
+      "el piso espera tu talón",
+      "bienvenido, el vidrio está atento",
+      "saludos, la sombra late",
+      "hola, quien llama ya entró",
+      "buenas, hubo un golpe al pensar",
+      "entra, la casa gira lento",
+      "saludos, el pomo sueña contigo",
+      "hola, el escalón te sonríe",
+      "el zaguán te acompaña",
+      "bienvenido, hoy la noche es más densa",
+      "saludos, hay un eco torcido",
+      "hola, la pared dice ven",
+      "buenas, la ventana avisa tarde",
+      "entra, hay un susurro detrás",
+      "saludos, el techo escuchó nombres",
+      "hola, tu sombra se detuvo",
+      "el corredor cuenta al revés",
+      "bienvenido, no quites el abrigo",
+      "saludos, el felpudo pesa",
+      "hola, hay un saludo en la grieta",
+      "buenas, la lámpara bosteza",
+      "entra, el reloj atrasa a propósito",
+      "saludos, el marco sabe cosas",
+      "hola, el pomo tiembla leve",
+      "el piso se estira contigo",
+      "bienvenido, no cierres aún",
+      "saludos, hay visos en el vidrio",
+      "hola, el umbral cruje despacio",
+      "buenas, la puerta piensa",
+      "entra, la noche firma asistencia",
+      "saludos, alguien llegó sin ruido",
+      "hola, el silencio te saluda primero",
+      "el pasillo aplaude en madera",
+      "bienvenido, hay eco que no es tuyo",
+      "saludos, la pared traza tu silueta",
+      "hola, el foco pulsa a tu ritmo",
+      "buenas, la escalera tarda de más",
+      "entra, hay un hueco en el aire",
+      "saludos, alguien se quedó afuera",
+      "hola, el pomo aprendió tu nombre",
+      "el marco repite tu paso",
+      "bienvenido, no dejes la puerta sola",
+      "saludos, hay un frío curioso",
+      "hola, la cortina odia el viento",
+      "buenas, el reloj te contradice",
+      "entra, el felpudo retiene",
+      "saludos, el vidrio no duerme",
+      "hola, la sombra te prefiere",
+      "el aire dice que sí",
+      "bienvenido, la casa te ubica",
+      "saludos, hay un rumor en el marco",
+      "hola, el eco cambió de dueño",
+      "buenas, el pasillo se arquea",
+      "entra, la madera te mide",
+      "saludos, alguien dejó marcas",
+      "hola, el timbre tose tu nombre",
+      "el piso olvida y recuerda",
+      "bienvenido, el silencio pesa",
+      "saludos, hay una sombra nueva",
+      "hola, la lámpara sueña de pie",
+      "buenas, el zaguán huele a lluvia",
+      "entra, el marco abrió un ojo",
+      "saludos, el pomo no descansa",
+      "hola, alguien ya cruzó",
+      "el corredor te probó",
+      "bienvenido, la puerta te reconoce",
+      "saludos, hay un eco sentado",
+      "hola, el cristal se empañó solo",
+      "buenas, la escalera aprendió un nombre",
+      "entra, la pared llama bajito",
+      "saludos, el techo guarda pisadas",
+      "hola, el aire te huele",
+      "el marco canta sin voz",
+      "bienvenido, no hables muy alto",
+      "saludos, la sombra adelgaza",
+      "hola, la línea de luz vibra",
+      "buenas, el pomo pestañea",
+      "entra, hay un susurro hecho niebla",
+      "saludos, el reloj mastica minutos",
+      "hola, el pasillo te guiña",
+      "el piso te cuenta historias",
+      "bienvenido, hay frío en las bisagras",
+      "saludos, alguien oyó tu llave",
+      "hola, el felpudo suspira",
+      "buenas, la puerta aprendió a esperar",
+      "entra, el cristal finge dormir",
+      "saludos, el eco se sienta",
+      "hola, la pared mira fijo",
+      "el marco te sigue de reojo",
+      "bienvenido, hay un brillo extraño",
+      "saludos, la escalera no se acaba",
+      "hola, el foco zumba tu nombre",
+      "buenas, el aire tropieza",
+      "entra, la casa sabe tus pasos",
+      "saludos, alguien aplaude muy lejos",
+      "hola, el silencio te copia",
+      "el pasillo guarda tus sombras",
+      "bienvenido, la noche te huele",
+      "saludos, el reloj te contradijo",
+      "hola, la ventana te repite",
+      "buenas, el pomo canta solo",
+      "entra, el piso cuenta uno menos",
+      "saludos, hay un hueco en la luz",
+      "hola, el marco respira hondo",
+      "el vidrio recuerda rostros",
+      "bienvenido, el zaguán te nombra",
+      "saludos, la lámpara no parpadea ya",
+      "hola, la cortina no cae del todo",
+      "buenas, el pasillo dobló tarde",
+      "entra, el eco se esconde",
+      "saludos, el aire guarda secretos",
+      "hola, la puerta te olfatea",
+      "el piso se queja contento",
+      "bienvenido, la casa no duerme",
+      "saludos, alguien te puso un lugar",
+      "hola, el foco se quedó quieto",
+      "buenas, el marco pide silencio",
+      "entra, hay pasos suspendidos",
+      "saludos, la sombra aprendió tu forma",
+      "hola, el viento supo tu nombre",
+      "el reloj dobló un segundo",
+      "bienvenido, la escalera te esperaba",
+      "saludos, el pasillo cierra despacio",
+      "hola, la lámpara te escucha",
+      "buenas, el aire tiene memoria",
+      "entra, el silencio abre camino",
+      "saludos, hay ojos detrás del cristal",
+      "hola, la puerta sonrió sin dientes",
+      "el marco dejó de temblar",
+      "bienvenido, el zaguán te protege",
+      "saludos, la sombra cruza primero",
+      "hola, el pasillo gira contigo",
+      "buenas, hay frío en la voz",
+      "entra, el piso canta despacio",
+      "saludos, el eco roza tu espalda",
+      "hola, la pared respira contigo",
+      "el aire aplaude bajito",
+      "bienvenido, alguien abrió antes",
+      "saludos, el reloj guiña un ojo",
+      "hola, la ventana tantea tu nombre",
+      "buenas, la casa ajusta el silencio",
+      "entra, hay una luz que tiembla",
+      "saludos, el marco pesa distinto",
+      "hola, la sombra se coló contigo",
+      "el pasillo humedece el eco",
+      "bienvenido, la puerta recuerda tu mano",
+      "saludos, el piso archiva tus pasos",
+      "hola, la lámpara sueña contigo",
+      "buenas, el aire raspa leve",
+      "entra, el reloj espera callado",
+      "saludos, hay polvo que te nombra",
+      "hola, la casa inclina la cabeza",
+      "el foco apunta a tu sombra",
+      "bienvenido, la noche ya llegó",
+      "saludos, el eco vuelve sin ti",
+      "hola, el marco dobla la esquina",
+      "buenas, el pasillo cruza lento",
+      "entra, la escalera habla en madera",
+      "saludos, alguien tose muy lejos",
+      "hola, el silencio sostiene la puerta",
+      "el piso memoriza tus huellas",
+      "bienvenido, la sombra sonríe",
+      "saludos, la luz se arrepiente",
+      "hola, el viento trae tu nombre",
+      "buenas, la ventana mastica la noche",
+      "entra, el marco mira primero",
+      "saludos, la puerta aprende tu latido"
+    ],
+    []
+  );
 
-  const renderSection = () => {
-    switch (currentSection) {
-      case "home":
-        return <HomeSection />;
-      case "services":
-        return <ServicesSection />;
-      case "projects":
-        return <ProjectsSection />;
-      case "contact":
-        return <ContactSection />;
-      default:
-        return <HomeSection />;
+  const typingSpeedMs = 70; // velocidad de tipeo
+  const pauseAfterMessageMs = 8000; // pausa antes de la siguiente frase
+
+  const [currentMessage, setCurrentMessage] = useState<string>("");
+  const [displayText, setDisplayText] = useState<string>("");
+
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const getNextMessage = (prev: string) => {
+    if (GREETINGS.length === 0) return "";
+    if (GREETINGS.length === 1) return GREETINGS[0];
+    let next = prev;
+    while (next === prev) {
+      next = GREETINGS[Math.floor(Math.random() * GREETINGS.length)];
     }
+    return next;
   };
 
-  return (
-    <main className="relative">
+  useEffect(() => {
+    setCurrentMessage(getNextMessage(""));
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    };
+  }, []);
 
-      
-      {/* Contenedor con transiciones fade */}
-      <div 
-        className={`transition-opacity duration-300 ease-in-out ${
-          isTransitioning ? "opacity-0" : "opacity-100"
-        }`}
-      >
-        {renderSection()}
+  useEffect(() => {
+    if (!currentMessage) return;
+
+    setDisplayText("");
+    if (intervalRef.current) clearInterval(intervalRef.current);
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+
+    let i = 0;
+    intervalRef.current = setInterval(() => {
+      i += 1;
+      setDisplayText(currentMessage.slice(0, i));
+
+      if (i >= currentMessage.length) {
+        if (intervalRef.current) {
+          clearInterval(intervalRef.current);
+          intervalRef.current = null;
+        }
+        timeoutRef.current = setTimeout(() => {
+          setCurrentMessage(getNextMessage(currentMessage));
+        }, pauseAfterMessageMs);
+      }
+    }, typingSpeedMs);
+
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
+      }
+    };
+  }, [currentMessage]);
+
+  return (
+    <main className="relative h-screen w-screen bg-black overflow-hidden flex items-center justify-center">
+      {/* Psychedelic Polybius B/W background layers */}
+      <div className="polybius-bg">
+        <div className="polybius-rings"></div>
+        <div className="polybius-ripple"></div>
+        <div className="polybius-scan"></div>
+        <div className="polybius-strobe"></div>
+      </div>
+
+      <div className="relative text-center z-10">
+        <p className="text-white font-mono text-2xl tracking-wider">
+          {displayText}
+          <span className="blink ml-1">|</span>
+        </p>
       </div>
     </main>
   );
