@@ -195,6 +195,7 @@ body {
   inset: 0;
   overflow: hidden;
   pointer-events: none;
+  opacity: 0.3;
 }
 
 /* Concentric rings made from repeating radial gradients */
@@ -203,8 +204,8 @@ body {
   inset: 0;
   background: repeating-radial-gradient(
     circle at 50% 50%,
-    rgba(255,255,255,0.22) 0 1px,
-    rgba(0,0,0,0) 1px 18px
+    rgba(255,255,255,0.38) 0 2px,
+    rgba(0,0,0,0) 2px 18px
   );
   filter: contrast(130%) saturate(0%);
 }
@@ -219,8 +220,8 @@ body {
   border-radius: 50%;
   background: repeating-radial-gradient(
     circle at center,
-    rgba(255,255,255,0.16) 0 1px,
-    rgba(255,255,255,0) 1px 22px
+    rgba(255,255,255,0.28) 0 2px,
+    rgba(255,255,255,0) 2px 22px
   );
   animation: ripple-rings 4.5s ease-in-out infinite;
   mix-blend-mode: screen;
@@ -250,3 +251,26 @@ body {
               radial-gradient(circle at 30% 70%, rgba(255,255,255,0.11), transparent 40%);
   animation: strobe 5.2s steps(10, end) infinite;
 }
+
+/* === Colorized overlay masked by ring lines === */
+.polybius-colorize {
+  position: absolute;
+  inset: 0;
+  mix-blend-mode: screen;
+  opacity: 0.44; /* reduced ~20% to emphasize ring lines */
+  /* Mask to reveal color only on ring outlines */
+  -webkit-mask: repeating-radial-gradient(circle at 50% 50%, #000 0 1px, transparent 1px 18px);
+  mask: repeating-radial-gradient(circle at 50% 50%, #000 0 1px, transparent 1px 18px);
+}
+
+/* 10 rotating psychedelic palettes */
+.palette-0 { background: conic-gradient(from 0deg, #ff006e, #ffbe0b, #00f5d4, #8338ec, #ff006e); }
+.palette-1 { background: conic-gradient(from 0deg, #00f, #0ff, #0f0, #ff0, #f00, #f0f, #00f); }
+.palette-2 { background: radial-gradient(circle at 40% 60%, #f72585, transparent 40%), radial-gradient(circle at 70% 30%, #4cc9f0, transparent 45%), radial-gradient(circle at 20% 20%, #fee440, transparent 45%), radial-gradient(circle at 80% 80%, #7209b7, transparent 45%); }
+.palette-3 { background: linear-gradient(45deg, #111, #ff1b6b 20%, #45caff 50%, #2af598 80%, #111); filter: hue-rotate(30deg) saturate(1.4); }
+.palette-4 { background: repeating-conic-gradient(from 0deg, #ffffff 0 6deg, #000000 6deg 12deg); filter: invert(1) hue-rotate(200deg) saturate(2); opacity: 0.35; }
+.palette-5 { background: conic-gradient(from 180deg, #ff9a9e, #fad0c4, #fbc2eb, #a1c4fd, #c2e9fb, #ff9a9e); }
+.palette-6 { background: radial-gradient(circle, #00c6ff, #0072ff); filter: hue-rotate(90deg) saturate(2); }
+.palette-7 { background: conic-gradient(from 60deg, #f00, #ff8c00, #ff0, #0f0, #0ff, #00f, #8a2be2, #f00); }
+.palette-8 { background: linear-gradient(90deg, #e600ff, #00ffe1, #ffd400, #ff0066); filter: saturate(1.8); }
+.palette-9 { background: radial-gradient(circle at 50% 50%, #fff 0%, #000 100%); filter: hue-rotate(140deg) invert(0.1) saturate(3); opacity: 0.4; }

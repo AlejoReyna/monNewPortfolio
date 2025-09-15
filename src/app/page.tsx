@@ -437,12 +437,16 @@ export default function Home() {
 
   const typingSpeedMs = 70; // velocidad de tipeo
   const pauseAfterMessageMs = 8000; // pausa antes de la siguiente frase
+  const paletteSwapMs = 6000; // cambiar paleta cada 6s
 
   const [currentMessage, setCurrentMessage] = useState<string>("");
   const [displayText, setDisplayText] = useState<string>("");
 
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const paletteRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const [paletteIndex, setPaletteIndex] = useState<number>(0);
 
   const getNextMessage = (prev: string) => {
     if (GREETINGS.length === 0) return "";
@@ -456,9 +460,14 @@ export default function Home() {
 
   useEffect(() => {
     setCurrentMessage(getNextMessage(""));
+    // iniciar rotación de paletas
+    paletteRef.current = setInterval(() => {
+      setPaletteIndex((idx) => (idx + 1) % 10);
+    }, paletteSwapMs);
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
+      if (paletteRef.current) clearInterval(paletteRef.current);
     };
   }, []);
 
@@ -505,6 +514,8 @@ export default function Home() {
         <div className="polybius-ripple"></div>
         <div className="polybius-scan"></div>
         <div className="polybius-strobe"></div>
+        {/* Color overlay masked by ring lines */}
+        <div className={`polybius-colorize palette-${paletteIndex}`}></div>
       </div>
 
       <div className="relative text-center z-10">
