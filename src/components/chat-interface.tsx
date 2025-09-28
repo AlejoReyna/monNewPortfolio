@@ -19,8 +19,8 @@ function TypewriterText({ text, className = "", speed = 50, onComplete }: Typewr
   useEffect(() => {
     if (currentIndex < text.length) {
       const timer = setTimeout(() => {
-        setDisplayedText(prev => prev + text[currentIndex]);
-        setCurrentIndex(prev => prev + 1);
+        setDisplayedText((prev) => prev + text[currentIndex]);
+        setCurrentIndex((prev) => prev + 1);
       }, speed);
       return () => clearTimeout(timer);
     } else if (currentIndex === text.length && onComplete) {
@@ -42,9 +42,9 @@ function LoadingSpinner() {
   return (
     <div className="flex justify-center items-center p-1">
       <div className="relative w-4 h-4">
-        <div className="absolute inset-0 rounded-full border-2 border-orange-400/20"></div>
-        <div className="absolute inset-0 rounded-full border-2 border-transparent border-t-orange-400 animate-spin"></div>
-        <div className="absolute inset-1 rounded-full border border-orange-300/40"></div>
+        <div className="absolute inset-0 rounded-full border-2 border-orange-400/20" />
+        <div className="absolute inset-0 rounded-full border-2 border-transparent border-t-orange-400 animate-spin" />
+        <div className="absolute inset-1 rounded-full border border-orange-300/40" />
       </div>
     </div>
   );
@@ -81,7 +81,8 @@ const buildEasterFull = (seed: string) =>
 const HINT_START = "[[SYS]]";
 const HINT_END = "[[/SYS]]";
 const deriveIntent = detectEnhancedIntent;
-const buildHint = (intent: Intent, lang: Lang, userText: string) => buildEnhancedHint(intent, lang, userText);
+const buildHint = (intent: Intent, lang: Lang, userText: string) =>
+  buildEnhancedHint(intent, lang, userText);
 const stripHintFromUserMessage = (raw: unknown) => {
   const text = (raw ?? "").toString();
   if (text.startsWith(HINT_START)) {
@@ -154,8 +155,12 @@ export default function ChatInterface() {
   /* ========= Load persisted ========= */
   useEffect(() => {
     try {
-      const savedName = typeof window !== "undefined" ? (localStorage.getItem("userName") || "").trim() : "";
-      const savedLang = typeof window !== "undefined" ? (localStorage.getItem("preferredLanguage") as Lang | null) : null;
+      const savedName =
+        typeof window !== "undefined" ? (localStorage.getItem("userName") || "").trim() : "";
+      const savedLang =
+        typeof window !== "undefined"
+          ? (localStorage.getItem("preferredLanguage") as Lang | null)
+          : null;
 
       if (savedLang === "en" || savedLang === "es") {
         setPreferredLang(savedLang);
@@ -307,9 +312,18 @@ export default function ChatInterface() {
       en: "Hey there! I'm Alexis. I code things that live on the internet, and this GPT version of me is here to chat.",
       es: "¡Hey! Soy Alexis. Programo cosas que viven en internet, y esta versión GPT de mí está aquí para charlar.",
     },
-    { en: "Hi, I'm Alexis. Web developer by day, debugging wizard by night. This is my AI twin.", es: "Hola, soy Alexis. Desarrollador web de día, mago del debugging de noche. Este es mi gemelo AI." },
-    { en: "Hello! Alexis here. I turn coffee into code, and this GPT knows most of my tricks.", es: "¡Hola! Alexis aquí. Convierto café en código, y este GPT conoce la mayoría de mis trucos." },
-    { en: "Hey, I'm Alexis. I make pixels dance on screens, powered by GPT magic.", es: "Hey, soy Alexis. Hago que los píxeles bailen en pantallas, con magia GPT." },
+    {
+      en: "Hi, I'm Alexis. Web developer by day, debugging wizard by night. This is my AI twin.",
+      es: "Hola, soy Alexis. Desarrollador web de día, mago del debugging de noche. Este es mi gemelo AI.",
+    },
+    {
+      en: "Hello! Alexis here. I turn coffee into code, and this GPT knows most of my tricks.",
+      es: "¡Hola! Alexis aquí. Convierto café en código, y este GPT conoce la mayoría de mis trucos.",
+    },
+    {
+      en: "Hey, I'm Alexis. I make pixels dance on screens, powered by GPT magic.",
+      es: "Hey, soy Alexis. Hago que los píxeles bailen en pantallas, con magia GPT.",
+    },
   ];
 
   const [greetingIndex, setGreetingIndex] = useState(0);
@@ -367,11 +381,14 @@ export default function ChatInterface() {
       {/* Terminal unificada */}
       <div className="pointer-events-auto w-full rounded-lg border border-orange-500/30 bg-black/30 backdrop-blur-md shadow-2xl shadow-orange-500/10 overflow-hidden">
         {/* Terminal header */}
-        <div className="flex items-center justify-between px-4 py-3 bg-black/40 border-b border-orange-500/30 cursor-move" data-drag-handle>
+        <div
+          className="flex items-center justify-between px-4 py-3 bg-black/40 border-b border-orange-500/30 cursor-move"
+          data-drag-handle
+        >
           <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full bg-red-500 border border-red-600"></div>
-            <div className="w-3 h-3 rounded-full bg-yellow-500 border border-yellow-600"></div>
-            <div className="w-3 h-3 rounded-full bg-green-500 border border-green-600"></div>
+            <div className="w-3 h-3 rounded-full bg-red-500 border border-red-600" />
+            <div className="w-3 h-3 rounded-full bg-yellow-500 border border-yellow-600" />
+            <div className="w-3 h-3 rounded-full bg-green-500 border border-green-600" />
           </div>
           <div className="text-xs text-gray-300 font-mono">admin — alexis@portfolio — ~ — zsh — 80x24</div>
           <div className="flex items-center gap-2">
@@ -386,21 +403,25 @@ export default function ChatInterface() {
             Last login: {new Date().toDateString()} {new Date().toTimeString().split(" ")[0]} on ttys009
           </div>
 
-          {/* Portada (una sola línea junto al $) */}
+          {/* Portada (misma línea con el $, envuelve debajo si falta ancho) */}
           {!showChat && (
             <div className="mb-4">
-              <div className="flex items-baseline font-mono text-[13px] leading-6 mb-2 whitespace-nowrap overflow-x-auto">
-                <span className="text-green-400">➜</span>
-                <span className="text-blue-400 ml-2">~</span>
-                <span className="text-orange-400 ml-2">alexis@portfolio:</span>
-                <span className="text-blue-400">~</span>
-                <span className="text-orange-400">$</span>
-                <span className="text-gray-100 ml-2">
+              <div className="grid grid-cols-[auto_1fr] gap-x-2 font-mono text-[13px] leading-6 mb-2">
+                {/* Prefix fijo */}
+                <div className="flex items-baseline shrink-0 text-nowrap">
+                  <span className="text-green-400">➜</span>
+                  <span className="text-blue-400 ml-2">~</span>
+                  <span className="text-orange-400 ml-2">alexis@portfolio:</span>
+                  <span className="text-blue-400">~</span>
+                  <span className="text-orange-400">$</span>
+                </div>
+                {/* Texto que envuelve */}
+                <div className="min-w-0 text-gray-100 whitespace-pre-wrap break-words">
                   {displayed || text}
                   {!showNamePrompt && displayed.length < text.length && (
                     <span className="ml-1 inline-block h-4 w-0.5 align-[-0.15em] bg-gray-300 animate-pulse" />
                   )}
-                </span>
+                </div>
               </div>
             </div>
           )}
@@ -421,17 +442,23 @@ export default function ChatInterface() {
                 return (
                   <div key={key} className="font-mono text-[13px] leading-6 animate-fadeIn">
                     {isUser ? (
-                      // Usuario - estilo comando de terminal
+                      // Usuario - estilo comando de terminal con wrap correcto
                       <div className="mb-2">
-                        <div className="flex items-baseline text-[13px] mb-1 whitespace-nowrap overflow-x-auto">
-                          <span className="text-green-400">➜</span>
-                          <span className="text-blue-400 ml-2">~</span>
-                          <span className="text-orange-400 ml-2">alexis@portfolio:</span>
-                          <span className="text-blue-400">~</span>
-                          <span className="text-orange-400">$</span>
-                          <span className="text-gray-100 ml-2">{content}</span>
+                        <div className="grid grid-cols-[auto_1fr] gap-x-2 text-[13px]">
+                          {/* Prefix */}
+                          <div className="flex items-baseline shrink-0 text-nowrap">
+                            <span className="text-green-400">➜</span>
+                            <span className="text-blue-400 ml-2">~</span>
+                            <span className="text-orange-400 ml-2">alexis@portfolio:</span>
+                            <span className="text-blue-400">~</span>
+                            <span className="text-orange-400">$</span>
+                          </div>
+                          {/* Contenido que envuelve */}
+                          <div className="min-w-0 text-gray-100 whitespace-pre-wrap break-words">
+                            {content}
+                          </div>
                         </div>
-                        <div className="text-[11px] text-gray-500 ml-6">
+                        <div className="text-[11px] text-gray-500 ml-6 mt-1">
                           {m.timestamp.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
                         </div>
                       </div>
@@ -492,7 +519,9 @@ export default function ChatInterface() {
                   <button
                     key={s.en}
                     onClick={() => handleSuggestionClick(isEs ? s.es : s.en, s.intent)}
-                    className={`text-xs bg-black/20 hover:bg-orange-900/30 text-gray-300 hover:text-orange-200 px-3 py-2 rounded border border-orange-500/30 hover:border-orange-400/60 transition-all duration-300 font-mono transform hover:scale-105 ${index < visibleButtons ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2"}`}
+                    className={`text-xs bg-black/20 hover:bg-orange-900/30 text-gray-300 hover:text-orange-200 px-3 py-2 rounded border border-orange-500/30 hover:border-orange-400/60 transition-all duration-300 font-mono transform hover:scale-105 ${
+                      index < visibleButtons ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2"
+                    }`}
                     style={{ transitionDelay: `${index * 100}ms` }}
                   >
                     ./{isEs ? s.es.replace(/\s+/g, "_").toLowerCase() : s.en.replace(/\s+/g, "_").toLowerCase()}
