@@ -30,8 +30,8 @@ export default function Navbar() {
 
   return (
     <>
-      {/* macOS-style Top Menu Bar - Now visible from sm+ */}
-      <div className="hidden sm:fixed sm:inset-x-0 sm:top-0 sm:z-[70] sm:flex sm:h-7 sm:bg-black/60 sm:backdrop-blur-xl sm:border-b sm:border-white/10">
+      {/* macOS-style Top Menu Bar - visible on all breakpoints (match md view) */}
+      <div className="fixed inset-x-0 top-0 z-[70] flex h-7 bg-black/60 backdrop-blur-xl border-b border-white/10">
         <div className="flex w-full items-center justify-between px-4">
           {/* Left side - App name */}
           <div className="flex items-center gap-4">
@@ -189,29 +189,7 @@ export default function Navbar() {
         </div>
       </aside>
 
-      {/* Mobile Navigation - Only for xs screens */}
-      <div className="sm:hidden fixed bottom-4 left-1/2 -translate-x-1/2 z-[60]">
-        <div className="flex items-center gap-2 bg-black/80 backdrop-blur-xl border border-white/20 rounded-2xl p-2">
-          {[
-            { section: "home", label: "🏠" },
-            { section: "services", label: "⚡" },
-            { section: "projects", label: "💼" },
-            { section: "contact", label: "💬" },
-          ].map((item) => (
-            <button
-              key={item.section}
-              onClick={() => navigateToSection(item.section as "home" | "services" | "projects" | "contact")}
-              className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-200 ${
-                currentSection === item.section
-                  ? "bg-white/20 text-white"
-                  : "text-white/70 hover:bg-white/10 hover:text-white"
-              }`}
-            >
-              {item.label}
-            </button>
-          ))}
-        </div>
-      </div>
+      {/* Mobile Navigation removed to avoid overlaying the chat on small screens */}
     </>
   );
 }
