@@ -138,6 +138,7 @@ export default function ChatInterface() {
   console.log('showChat:', showChat); // Debug showChat state
   const [inputValue, setInputValue] = useState("");
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
+  const [pendingUserText, setPendingUserText] = useState<string | null>(null);
 
   const rootRef = useRef<HTMLDivElement>(null);
   const [chatHeightPx, setChatHeightPx] = useState<number | undefined>();
@@ -249,6 +250,19 @@ export default function ChatInterface() {
       setShowNameInput(false);
       setShowNamePrompt(false);
       setShowChat(true);
+
+      // Si había un mensaje pendiente, envíalo ahora
+      if (pendingUserText) {
+        const raw = pendingUserText.trim();
+        if (raw) {
+          const intent = deriveIntent(raw, currentLang);
+          const payload = buildHint(intent, currentLang, raw) + "\n" + raw;
+          sendMessage(payload);
+          setInputValue("");
+          setPendingUserText(null);
+          pickPlaceholder();
+        }
+      }
     }, 350);
   };
 
@@ -264,7 +278,15 @@ export default function ChatInterface() {
   const handleSendMessage = () => {
     const raw = inputValue.trim();
     if (!raw || isLoading) return;
-    if (!userName) return setShowNamePrompt(true);
+    if (!userName) {
+      const autoName = isEs ? "Amigo" : "Guest";
+      setUserName(autoName);
+      try {
+        localStorage.setItem("userName", autoName);
+      } catch {}
+      setShowNamePrompt(false);
+      setShowChat(true);
+    }
     const intent = deriveIntent(raw, currentLang);
     const payload = buildHint(intent, currentLang, raw) + "\n" + raw;
     sendMessage(payload);
@@ -276,8 +298,13 @@ export default function ChatInterface() {
   const handleSuggestionClick = (text: string, intent: Intent) => {
     if (isLoading) return;
     if (!userName) {
-      setShowNamePrompt(true);
-      return;
+      const autoName = isEs ? "Amigo" : "Guest";
+      setUserName(autoName);
+      try {
+        localStorage.setItem("userName", autoName);
+      } catch {}
+      setShowNamePrompt(false);
+      setShowChat(true);
     }
     const payload = buildHint(intent, currentLang, text) + "\n" + text;
     sendMessage(payload);
@@ -467,16 +494,16 @@ export default function ChatInterface() {
                 showChat,
                 isLoading,
                 currentPlaceholder,
-                isDisabled: isLoading || !showChat
+                isDisabled: isLoading
               });
             }}
             className="flex-1 rounded-xl border border-white/10 bg-black/30 backdrop-blur-md px-4 py-3 text-gray-200 placeholder-gray-200 font-mono focus:outline-none focus:ring-2 focus:ring-cyan-400 shadow-xl transition-all duration-300"
-            disabled={isLoading || !showChat}
+            disabled={isLoading}
             maxLength={500}
           />
           <button
             onClick={handleSendMessage}
-            disabled={!inputValue.trim() || isLoading || !showChat || !userName}
+            disabled={!inputValue.trim() || isLoading}
             className="text-xs bg-cyan-600/40 hover:bg-cyan-500/50 text-cyan-200 hover:text-white px-4 py-3 rounded-lg border border-cyan-500/30 transition-all duration-300 font-mono disabled:opacity-50 disabled:cursor-not-allowed"
             aria-disabled={!userName}
           >
