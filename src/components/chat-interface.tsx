@@ -394,7 +394,7 @@ export default function ChatInterface() {
       {/* Terminal unificada */}
       <div className="pointer-events-auto w-full rounded-lg border border-orange-500/30 bg-black/30 backdrop-blur-md shadow-2xl shadow-orange-500/10 overflow-hidden">
         {/* Terminal header - siempre visible */}
-        <div className="flex items-center justify-between px-4 py-3 bg-black/40 border-b border-orange-500/30">
+        <div className="flex items-center justify-between px-4 py-3 bg-black/40 border-b border-orange-500/30 cursor-move" data-drag-handle>
           <div className="flex items-center gap-2">
             <div className="w-3 h-3 rounded-full bg-red-500 border border-red-600"></div>
             <div className="w-3 h-3 rounded-full bg-yellow-500 border border-yellow-600"></div>
