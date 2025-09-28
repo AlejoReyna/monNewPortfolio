@@ -49,7 +49,7 @@ export default function LetsTalk() {
   return (
     <section
       id="contact"
-      className="relative overflow-hidden bg-black py-24 sm:py-28 lg:pl-24 xl:pl-28 lg:pt-7"
+      className="relative overflow-hidden bg-black py-24 sm:py-28 lg:pl-24 xl:pl-28 sm:pt-7"
       aria-labelledby="contact-title"
     >
       {/* Background image: focal.png */}

@@ -338,7 +338,7 @@ export default function ServicesPage() {
   );
 
   return (
-    <main className="relative min-h-screen bg-neutral-950 text-white lg:pl-24 xl:pl-28 lg:pt-7">
+    <main className="relative min-h-screen bg-neutral-950 text-white lg:pl-24 xl:pl-28 sm:pt-7">
       {/* Background image: focal.png */}
       <div className="absolute inset-0 z-0">
         <Image

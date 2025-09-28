@@ -173,7 +173,7 @@ export default function ProjectsSection() {
 
   return (
     <MotionConfig transition={{ duration: 0.5, ease: "easeOut" }}>
-      <div className="relative min-h-screen flex flex-col items-center justify-center px-4 sm:px-6 md:px-8 bg-black pt-16 sm:pt-20 lg:pt-7 lg:pl-24 xl:pl-28">
+      <div className="relative min-h-screen flex flex-col items-center justify-center px-4 sm:px-6 md:px-8 bg-black pt-16 sm:pt-7 lg:pl-24 xl:pl-28">
         {/* Background image: focal.png */}
         <div className="absolute inset-0 z-0">
           <Image

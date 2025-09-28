@@ -8,7 +8,6 @@ export default function Navbar() {
   const { language } = useLanguage();
   const { navigateToSection, currentSection } = useNavigation();
   const isEs = language === 'es';
-  const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
 
@@ -31,8 +30,8 @@ export default function Navbar() {
 
   return (
     <>
-      {/* macOS-style Top Menu Bar */}
-      <div className="hidden lg:fixed lg:inset-x-0 lg:top-0 lg:z-[70] lg:flex lg:h-7 lg:bg-black/60 lg:backdrop-blur-xl lg:border-b lg:border-white/10">
+      {/* macOS-style Top Menu Bar - Now visible from sm+ */}
+      <div className="hidden sm:fixed sm:inset-x-0 sm:top-0 sm:z-[70] sm:flex sm:h-7 sm:bg-black/60 sm:backdrop-blur-xl sm:border-b sm:border-white/10">
         <div className="flex w-full items-center justify-between px-4">
           {/* Left side - App name */}
           <div className="flex items-center gap-4">
@@ -190,99 +189,29 @@ export default function Navbar() {
         </div>
       </aside>
 
-      {/* Mobile Header */}
-      <header className="lg:hidden fixed inset-x-0 top-0 z-[60]">
-        <div className="w-full transition-colors duration-300">
-        <div
-          className={
-            `relative w-full flex items-center justify-between border-b ` +
-            `px-4 sm:px-5 h-16 sm:h-20 ` +
-            `transition-all duration-300 ` +
-            (isScrolled
-              ? `bg-black/70 border-white/15`
-              : `bg-black/50 border-white/10`)
-          }
-        >
-          {/* Left: Brand */}
-          <div className="relative z-10 flex min-w-0 items-center gap-2 h-full">
-            <button 
-              onClick={() => navigateToSection("home")}
-              className="group inline-flex items-center gap-2 h-full"
-            >
-              <div className="flex flex-col items-start">
-                <div className="text-lg tracking-tight text-left">
-                  <span className="bg-gradient-to-r from-white via-gray-100 to-gray-200 bg-clip-text text-transparent group-hover:from-white group-hover:via-white group-hover:to-gray-100 transition-all duration-200 font-mono font-light">
-                    Alexis&#39; desktop
-                  </span>
-                </div>
-                <div className="text-xs text-gray-400 uppercase tracking-tight font-mono font-light text-left">
-                  Full-Stack Developer
-                </div>
-              </div>
-            </button>
-          </div>
-
-            {/* Right: Mobile toggle */}
-          <div className="relative z-10 flex items-center gap-2 h-full">
+      {/* Mobile Navigation - Only for xs screens */}
+      <div className="sm:hidden fixed bottom-4 left-1/2 -translate-x-1/2 z-[60]">
+        <div className="flex items-center gap-2 bg-black/80 backdrop-blur-xl border border-white/20 rounded-2xl p-2">
+          {[
+            { section: "home", label: "🏠" },
+            { section: "services", label: "⚡" },
+            { section: "projects", label: "💼" },
+            { section: "contact", label: "💬" },
+          ].map((item) => (
             <button
-              aria-label="Toggle menu"
-              onClick={() => setIsOpen((v) => !v)}
-                className="inline-flex items-center justify-center rounded-full border border-white/10 bg-black/30 p-2 text-gray-200 shadow-sm hover:bg-black/40"
-              style={{ backgroundColor: 'rgba(0, 0, 0, 0.3)', borderColor: 'rgba(255, 255, 255, 0.1)' }}
+              key={item.section}
+              onClick={() => navigateToSection(item.section as "home" | "services" | "projects" | "contact")}
+              className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-200 ${
+                currentSection === item.section
+                  ? "bg-white/20 text-white"
+                  : "text-white/70 hover:bg-white/10 hover:text-white"
+              }`}
             >
-              <svg
-                className={`h-5 w-5 transition-transform ${isOpen ? "rotate-90" : "rotate-0"}`}
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-              >
-                {isOpen ? (
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                ) : (
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-                )}
-              </svg>
+              {item.label}
             </button>
-          </div>
-        </div>
-
-        {/* Mobile panel */}
-        <div
-          className={
-              `overflow-hidden transition-[max-height,opacity] duration-300 ` +
-            (isOpen ? `max-h-64 opacity-100` : `max-h-0 opacity-0`)
-          }
-        >
-          <div className="mx-2 mt-2 rounded-2xl border border-white/10 bg-black/40 backdrop-blur-md p-2">
-            {[
-              { section: "home", label: isEs ? "Inicio" : "Home" },
-              { section: "services", label: isEs ? "Servicios" : "Services" },
-              { section: "projects", label: isEs ? "Proyectos" : "Projects" },
-              { section: "contact", label: isEs ? "Contacto" : "Contact" },
-            ].map((item) => (
-              <button
-                key={item.label}
-                onClick={() => {
-                  navigateToSection(item.section as "home" | "services" | "projects" | "contact");
-                  setIsOpen(false);
-                }}
-                className={`block w-full text-left rounded-xl px-3 py-2 text-sm transition-colors font-mono font-extralight ${
-                  currentSection === item.section
-                    ? "text-white bg-white/10"
-                    : "text-gray-200 hover:bg-white/5"
-                }`}
-              >
-                {item.label}
-              </button>
-            ))}
-          </div>
+          ))}
         </div>
       </div>
-
-      {/* Separator line */}
-      <div className="pointer-events-none absolute inset-x-0 top-full h-px bg-gradient-to-r from-transparent via-white/15 to-transparent" />
-    </header>
     </>
   );
 }

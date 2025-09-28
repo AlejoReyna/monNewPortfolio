@@ -389,81 +389,78 @@ export default function ChatInterface() {
   return (
     <div
       ref={rootRef}
-      className="relative z-10 flex flex-col gap-4 px-4 w-full max-w-3xl mx-auto mb-12"
+      className="relative z-10 flex flex-col px-4 w-full max-w-3xl mx-auto mb-12"
     >
-      {/* Portada (se oculta cuando inicia el chat) */}
-      {!showChat && (
-        <div className="pointer-events-auto w-full rounded-lg border border-orange-500/30 bg-black/30 backdrop-blur-md px-6 py-6 shadow-2xl shadow-orange-500/10 relative overflow-hidden">
-          {/* Ubuntu-style subtle pattern */}
-          <div className="absolute inset-0 opacity-10">
-            <div className="absolute inset-0" style={{
-              backgroundImage: `
-                radial-gradient(circle at 1px 1px, rgba(233, 84, 32, 0.3) 1px, transparent 0)
-              `,
-              backgroundSize: '20px 20px'
-            }}></div>
+      {/* Terminal unificada */}
+      <div className="pointer-events-auto w-full rounded-lg border border-orange-500/30 bg-black/30 backdrop-blur-md shadow-2xl shadow-orange-500/10 overflow-hidden">
+        {/* Terminal header - siempre visible */}
+        <div className="flex items-center justify-between px-4 py-3 bg-black/40 border-b border-orange-500/30">
+          <div className="flex items-center gap-2">
+            <div className="w-3 h-3 rounded-full bg-red-500 border border-red-600"></div>
+            <div className="w-3 h-3 rounded-full bg-yellow-500 border border-yellow-600"></div>
+            <div className="w-3 h-3 rounded-full bg-green-500 border border-green-600"></div>
           </div>
-          
-          <p className="relative text-base text-lg md:text-xl lg:text-2xl text-gray-100 font-mono font-normal leading-relaxed">
-            <span className="text-orange-400">alexis@portfolio:</span>
-            <span className="text-blue-400">~</span>
-            <span className="text-orange-400">$</span> {displayed || text}
-            {!showNamePrompt && displayed.length < text.length && (
-              <span className="ml-1 inline-block h-5 w-0.5 align-[-0.15em] bg-gray-300 animate-pulse" />
-            )}
-          </p>
+          <div className="text-xs text-gray-300 font-mono">admin — alexis@portfolio — ~ — zsh — 80x24</div>
+          <div className="flex items-center gap-2">
+            <div className="text-xs text-orange-400 font-mono">●</div>
+          </div>
         </div>
-      )}
-      {/* Ventana de chat (el contenedor clásico solo se monta después) */}
-      {(sorted.length > 0 || showChat) && (
-        <div
-          className="relative w-full rounded-lg border border-orange-500/30 bg-black/30 backdrop-blur-md shadow-2xl shadow-orange-500/10 overflow-hidden"
-          style={{
-            height: chatHeightPx ? `${chatHeightPx}px` : undefined,
-            maxHeight: chatHeightPx ? `${chatHeightPx}px` : undefined,
-          }}
-        >
-          {/* Ubuntu terminal header */}
-          <div className="flex items-center justify-between px-4 py-2 bg-black/40 border-b border-orange-500/30">
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-red-500 border border-red-600"></div>
-              <div className="w-3 h-3 rounded-full bg-yellow-500 border border-yellow-600"></div>
-              <div className="w-3 h-3 rounded-full bg-green-500 border border-green-600"></div>
-            </div>
-            <div className="text-xs text-gray-300 font-mono">alexis@portfolio: ~</div>
-            <div className="flex items-center gap-2">
-              <div className="text-xs text-orange-400 font-mono">Terminal</div>
-            </div>
+
+        {/* Contenido de la terminal */}
+        <div className="p-4">
+          {/* Mensaje inicial o última línea de login */}
+          <div className="text-xs text-gray-500 font-mono mb-2">
+            Last login: {new Date().toDateString()} {new Date().toTimeString().split(' ')[0]} on ttys009
           </div>
           
-          <div className="p-4 space-y-4 overflow-y-auto" style={{
-            height: chatHeightPx ? `${chatHeightPx - 40}px` : undefined,
-            maxHeight: chatHeightPx ? `${chatHeightPx - 40}px` : undefined,
-          }}>
-            {sorted.map((m) => {
-              const isUser = m.role === "user";
-              const key = (m.id ?? String(+m.timestamp)) as string;
-              const content = isUser
-                ? stripHintFromUserMessage(m.content)
-                : (m.content ?? "");
-              return (
-                <div
-                  key={key}
-                  className={`flex ${isUser ? "justify-end" : "justify-start"} animate-fadeIn`}
-                >
-                  <div className="max-w-[90%] font-mono text-sm leading-relaxed">
+          {/* Portada (se oculta cuando inicia el chat) */}
+          {!showChat && (
+            <div className="mb-4">
+              <div className="flex items-center font-mono text-sm mb-2">
+                <span className="text-green-400">➜</span>
+                <span className="text-blue-400 ml-2">~</span>
+                <span className="text-orange-400 ml-2">alexis@portfolio:</span>
+                <span className="text-blue-400">~</span>
+                <span className="text-orange-400">$</span>
+                <span className="text-gray-100 ml-2 text-base md:text-lg lg:text-xl">
+                  {displayed || text}
+                  {!showNamePrompt && displayed.length < text.length && (
+                    <span className="ml-1 inline-block h-5 w-0.5 align-[-0.15em] bg-gray-300 animate-pulse" />
+                  )}
+                </span>
+              </div>
+            </div>
+          )}
+
+          {/* Chat messages */}
+          {(sorted.length > 0 || showChat) && (
+            <div 
+              className="space-y-4 overflow-y-auto mb-4"
+              style={{
+                height: chatHeightPx ? `${chatHeightPx - 120}px` : '400px',
+                maxHeight: chatHeightPx ? `${chatHeightPx - 120}px` : '400px',
+              }}
+            >
+              {sorted.map((m) => {
+                const isUser = m.role === "user";
+                const key = (m.id ?? String(+m.timestamp)) as string;
+                const content = isUser
+                  ? stripHintFromUserMessage(m.content)
+                  : (m.content ?? "");
+                return (
+                  <div key={key} className="font-mono text-sm leading-relaxed animate-fadeIn">
                     {isUser ? (
                       // Usuario - estilo comando de terminal
                       <div className="mb-2">
-                        <div className="flex items-center gap-1 text-orange-400 mb-1">
-                          <span>alexis@portfolio:</span>
+                        <div className="flex items-center text-sm mb-1">
+                          <span className="text-green-400">➜</span>
+                          <span className="text-blue-400 ml-2">~</span>
+                          <span className="text-orange-400 ml-2">alexis@portfolio:</span>
                           <span className="text-blue-400">~</span>
-                          <span>$</span>
+                          <span className="text-orange-400">$</span>
+                          <span className="text-gray-100 ml-2">{content}</span>
                         </div>
-                        <div className="text-gray-100 pl-4">
-                          {content}
-                        </div>
-                        <div className="text-xs text-gray-500 mt-1 pl-4">
+                        <div className="text-xs text-gray-500 ml-6">
                           {m.timestamp.toLocaleTimeString([], {
                             hour: "2-digit",
                             minute: "2-digit"
@@ -485,121 +482,107 @@ export default function ChatInterface() {
                       </div>
                     )}
                   </div>
-                </div>
-              );
-            })}
-            {isLoading && (
-              <div className="flex justify-start animate-fadeIn">
-                <div className="max-w-[90%] font-mono text-sm">
+                );
+              })}
+              {isLoading && (
+                <div className="font-mono text-sm animate-fadeIn">
                   <div className="text-gray-100 bg-black/10 rounded p-3 border-l-4 border-orange-500 flex items-center gap-3">
                     <LoadingSpinner />
                     <span>Procesando respuesta...</span>
                   </div>
                 </div>
+              )}
+              <div ref={messagesEndRef} />
+            </div>
+          )}
+
+          {/* Error */}
+          {error && (
+            <div className="bg-black/30 border-l-4 border-red-500 text-red-100 p-4 rounded font-mono text-sm animate-fadeIn mb-4">
+              <div className="flex items-center text-sm mb-2">
+                <span className="text-green-400">➜</span>
+                <span className="text-blue-400 ml-2">~</span>
+                <span className="text-red-400 ml-2">alexis@portfolio:</span>
+                <span className="text-blue-400">~</span>
+                <span className="text-red-400">$</span>
+                <span className="text-red-300 ml-2">error</span>
               </div>
-            )}
-            <div ref={messagesEndRef} />
-          </div>
-        </div>
-      )}
+              <div className="ml-6">
+                <p className="text-red-200">bash: {error}</p>
+                {isRateLimit && (
+                  <p className="text-xs mt-2 opacity-80 text-red-300">
+                    {isEs
+                      ? "Límite de velocidad alcanzado. Intenta en unos segundos..."
+                      : "Rate limit reached. Try in a few seconds..."}
+                  </p>
+                )}
+              </div>
+            </div>
+          )}
 
-      {/* Error */}
-      {error && (
-        <div className="bg-black/30 border-l-4 border-red-500 text-red-100 p-4 rounded font-mono text-sm animate-fadeIn">
-          <div className="flex items-center gap-2 mb-2">
-            <span className="text-red-400">alexis@portfolio:</span>
-            <span className="text-blue-400">~</span>
-            <span className="text-red-400">$</span>
-            <span className="text-red-300">error</span>
-          </div>
-          <div className="pl-4">
-            <p className="text-red-200">bash: {error}</p>
-            {isRateLimit && (
-              <p className="text-xs mt-2 opacity-80 text-red-300">
-                {isEs
-                  ? "Límite de velocidad alcanzado. Intenta en unos segundos..."
-                  : "Rate limit reached. Try in a few seconds..."}
-              </p>
-            )}
-          </div>
-        </div>
-      )}
+          {/* Sugerencias antes de iniciar chat */}
+          {!showNamePrompt && !showChat && sorted.length === 0 && (
+            <div className="space-y-2 mb-4">
+              <div className="text-xs text-gray-400 font-mono mb-3">
+                Comandos disponibles:
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {suggestions.map((s, index) => (
+                  <button
+                    key={s.en}
+                    onClick={() => handleSuggestionClick(isEs ? s.es : s.en, s.intent)}
+                    className={`text-xs bg-black/20 hover:bg-orange-900/30 text-gray-300 hover:text-orange-200 px-3 py-2 rounded border border-orange-500/30 hover:border-orange-400/60 transition-all duration-300 font-mono transform hover:scale-105 ${index < visibleButtons ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2"}`}
+                    style={{ transitionDelay: `${index * 100}ms` }}
+                  >
+                    ./{isEs ? s.es.replace(/\s+/g, '_').toLowerCase() : s.en.replace(/\s+/g, '_').toLowerCase()}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
 
-      {/* Sugerencias antes de iniciar chat */}
-      {!showNamePrompt && !showChat && sorted.length === 0 && (
-        <div className="space-y-2">
-          <div className="text-xs text-gray-400 font-mono mb-3">
-            Comandos disponibles:
-          </div>
-          <div className="flex flex-wrap gap-2">
-            {suggestions.map((s, index) => (
-              <button
-                key={s.en}
-                onClick={() => handleSuggestionClick(isEs ? s.es : s.en, s.intent)}
-                className={`text-xs bg-black/20 hover:bg-orange-900/30 text-gray-300 hover:text-orange-200 px-3 py-2 rounded border border-orange-500/30 hover:border-orange-400/60 transition-all duration-300 font-mono transform hover:scale-105 ${index < visibleButtons ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2"}`}
-                style={{ transitionDelay: `${index * 100}ms` }}
-              >
-                ./{isEs ? s.es.replace(/\s+/g, '_').toLowerCase() : s.en.replace(/\s+/g, '_').toLowerCase()}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Input */}
-      <div className="w-full">
-        <div className="relative">
-          {/* Ubuntu terminal input */}
-          <div className="relative flex items-center bg-black/30 border border-orange-500/30 rounded-lg p-3 backdrop-blur-md shadow-xl shadow-orange-500/10">
-            {/* Ubuntu terminal prompt */}
-            <div className="flex items-center font-mono text-sm mr-2">
-              <span className="text-orange-400">alexis@portfolio:</span>
-              <span className="text-blue-400">~</span>
-              <span className="text-orange-400">$</span>
+          {/* Input - siempre al final */}
+          <div className="border-t border-orange-500/20 pt-3">
+            <div className="flex items-center font-mono text-sm">
+              <span className="text-green-400">➜</span>
+              <span className="text-blue-400 ml-2">~</span>
+              
+              <input
+                type="text"
+                value={inputValue}
+                onChange={(e) => setInputValue(e.target.value)}
+                onKeyPress={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    handleSendMessage();
+                  }
+                }}
+                placeholder={currentPlaceholder || (isEs ? "Pregúntame algo..." : "Ask me something...")}
+                onFocus={() => {
+                  console.log('Input focus - States:', {
+                    showChat,
+                    isLoading,
+                    currentPlaceholder,
+                    isDisabled: isLoading
+                  });
+                }}
+                className="flex-1 bg-transparent text-gray-100 placeholder-gray-400 font-mono text-sm focus:outline-none disabled:opacity-50 caret-gray-300 ml-2"
+                disabled={isLoading}
+                maxLength={500}
+              />
+              
+              {isLoading && (
+                <div className="ml-2">
+                  <LoadingSpinner />
+                </div>
+              )}
             </div>
             
-            <input
-              type="text"
-              value={inputValue}
-              onChange={(e) => setInputValue(e.target.value)}
-              onKeyPress={(e) => {
-                if (e.key === "Enter") {
-                  e.preventDefault();
-                  handleSendMessage();
-                }
-              }}
-              placeholder={currentPlaceholder || (isEs ? "Pregúntame algo..." : "Ask me something...")}
-              onFocus={() => {
-                console.log('Input focus - States:', {
-                  showChat,
-                  isLoading,
-                  currentPlaceholder,
-                  isDisabled: isLoading
-                });
-              }}
-              className="flex-1 bg-transparent text-gray-100 placeholder-gray-400 font-mono text-sm focus:outline-none disabled:opacity-50 caret-gray-300"
-              disabled={isLoading}
-              maxLength={500}
-            />
-            
-            <button
-              onClick={handleSendMessage}
-              disabled={!inputValue.trim() || isLoading}
-              className="ml-3 px-3 py-1 bg-orange-600/60 hover:bg-orange-500/70 text-orange-100 rounded border border-orange-500/50 hover:border-orange-400/80 transition-all duration-300 font-mono text-xs disabled:opacity-50 disabled:cursor-not-allowed"
-              aria-disabled={!userName}
-            >
-              {isLoading ? (
-                <LoadingSpinner />
-              ) : (
-                "Enter"
-              )}
-            </button>
-          </div>
-          
-          {/* Terminal status line */}
-          <div className="flex justify-between items-center mt-1 text-xs text-gray-500 font-mono">
-            <span>{isLoading ? 'Ejecutando comando...' : 'Listo para comandos'}</span>
-            <span>{inputValue.length}/500</span>
+            {/* Terminal status line */}
+            <div className="flex justify-between items-center mt-1 text-xs text-gray-500 font-mono">
+              <span>{isLoading ? 'Ejecutando comando...' : 'Listo para comandos'}</span>
+              <span>{inputValue.length}/500</span>
+            </div>
           </div>
         </div>
       </div>
