@@ -9,18 +9,29 @@ type HeroProps = {
 export default function Hero({ className }: HeroProps) {
   return (
     <section className={`relative min-h-screen overflow-hidden bg-black ${className ?? ""}`}>
-      {/* Grid: 1 col en mobile; 60/40 desde lg */}
-      <div className="grid min-h-screen grid-cols-1 lg:grid-cols-[60%_40%] items-stretch">
+      {/* Background image: focal.png */}
+      <div className="absolute inset-0 z-0">
+        <Image
+          src="/focal.png"
+          alt="Background"
+          fill
+          priority
+          className="object-cover"
+        />
+      </div>
+
+        {/* Grid: 1 col en mobile; 60/40 desde lg with padding for macOS-style navbar and top bar */}
+        <div className="grid min-h-screen grid-cols-1 lg:grid-cols-[60%_40%] items-stretch lg:pl-24 xl:pl-28 lg:pt-7">
         {/* Chat (izquierda) - Siempre al frente */}
-        <div className="relative flex flex-col justify-end sm:justify-end lg:justify-center px-4 sm:px-6 lg:px-8 z-30 min-h-screen pt-0 sm:pt-0 lg:pt-28 pb-0 sm:pb-0">
+        <div className="relative flex flex-col justify-end sm:justify-end lg:justify-center px-4 sm:px-6 lg:px-8 z-30 min-h-screen pt-16 sm:pt-20 lg:pt-0 pb-0 sm:pb-0">
           <ChatInterface />
         </div>
 
-        {/* GIF overlay: Siempre detrás */}
+        {/* GIF overlay: Encima del background pero detrás del chat */}
         <div className="pointer-events-none absolute inset-0 h-full lg:relative lg:h-auto lg:overflow-visible z-10">
           <Image
             src="/16.gif"
-            alt="Animated background"
+            alt="Animated overlay"
             fill
             priority
             unoptimized

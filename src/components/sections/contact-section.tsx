@@ -2,6 +2,7 @@
 
 import { useState, FormEvent } from "react";
 import { useLanguage } from "@/components/lang-context";
+import Image from "next/image";
 
 type Interest =
   | "UI/UX design"
@@ -48,9 +49,19 @@ export default function LetsTalk() {
   return (
     <section
       id="contact"
-      className="relative overflow-hidden bg-black py-24 sm:py-28"
+      className="relative overflow-hidden bg-black py-24 sm:py-28 lg:pl-24 xl:pl-28 lg:pt-7"
       aria-labelledby="contact-title"
     >
+      {/* Background image: focal.png */}
+      <div className="absolute inset-0 z-0">
+        <Image
+          src="/focal.png"
+          alt="Background"
+          fill
+          priority
+          className="object-cover"
+        />
+      </div>
       {/* Orbes sutiles (match con tu estética) */}
       <div className="pointer-events-none absolute inset-0">
         <div
@@ -67,7 +78,7 @@ export default function LetsTalk() {
         />
       </div>
 
-      <div className="relative z-10 mx-auto grid max-w-7xl grid-cols-1 gap-8 px-4 sm:px-6 lg:grid-cols-2">
+      <div className="relative z-20 mx-auto grid max-w-7xl grid-cols-1 gap-8 px-4 sm:px-6 lg:grid-cols-2">
         {/* Columna izquierda: copy + contacto */}
         <div className="flex flex-col justify-center gap-6">
           <h2

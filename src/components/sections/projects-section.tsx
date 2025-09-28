@@ -3,6 +3,7 @@
 import { useMemo } from "react";
 import { motion, MotionConfig, easeOut } from "framer-motion";
 import { useLanguage } from "@/components/lang-context";
+import Image from "next/image";
 
 /* -------------------------------------------
    Motion helpers
@@ -172,13 +173,23 @@ export default function ProjectsSection() {
 
   return (
     <MotionConfig transition={{ duration: 0.5, ease: "easeOut" }}>
-      <div className="min-h-screen flex flex-col items-center justify-center px-4 sm:px-6 md:px-8 bg-black mt-24">
+      <div className="relative min-h-screen flex flex-col items-center justify-center px-4 sm:px-6 md:px-8 bg-black pt-16 sm:pt-20 lg:pt-7 lg:pl-24 xl:pl-28">
+        {/* Background image: focal.png */}
+        <div className="absolute inset-0 z-0">
+          <Image
+            src="/focal.png"
+            alt="Background"
+            fill
+            priority
+            className="object-cover"
+          />
+        </div>
         <motion.div
           variants={container}
           initial="hidden"
           whileInView="show"
           viewport={{ once: true, amount: 0.15 }}
-          className="w-full max-w-6xl text-center"
+          className="relative z-10 w-full max-w-6xl text-center"
         >
           {/* Header */}
           <motion.div variants={item} className="text-left mb-4">

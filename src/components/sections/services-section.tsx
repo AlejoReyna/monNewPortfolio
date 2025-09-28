@@ -4,6 +4,7 @@ import type React from "react";
 import { useMemo } from "react";
 import { motion, useScroll, useSpring } from "framer-motion";
 import Link from "next/link";
+import Image from "next/image";
 
 /* =========================
    Util
@@ -337,29 +338,42 @@ export default function ServicesPage() {
   );
 
   return (
-    <main className="relative min-h-screen bg-neutral-950 text-white">
-      <TopProgress />
-      <DotNav />
-
-      {/* Contenedor scroll con snap */}
-      <div className="snap-y snap-mandatory h-screen overflow-y-scroll no-scrollbar">
-        {sections.map((s) => (
-          <ServiceSection key={s.id} {...s} />
-        ))}
+    <main className="relative min-h-screen bg-neutral-950 text-white lg:pl-24 xl:pl-28 lg:pt-7">
+      {/* Background image: focal.png */}
+      <div className="absolute inset-0 z-0">
+        <Image
+          src="/focal.png"
+          alt="Background"
+          fill
+          priority
+          className="object-cover"
+        />
       </div>
 
-      {/* Footer CTA */}
-      <footer className="sticky bottom-0 z-40">
-        <div className="mx-auto max-w-6xl px-6 md:px-10 py-4 flex items-center justify-between text-sm text-white/70">
-          <span>¿Listo para construir algo? </span>
-          <Link
-            href="/contact"
-            className="rounded-xl bg-white px-4 py-2 font-semibold text-black shadow-md hover:bg-white/90"
-          >
-            Contáctame
-          </Link>
+      <div className="relative z-10">
+        <TopProgress />
+        <DotNav />
+
+        {/* Contenedor scroll con snap */}
+        <div className="snap-y snap-mandatory h-screen overflow-y-scroll no-scrollbar">
+          {sections.map((s) => (
+            <ServiceSection key={s.id} {...s} />
+          ))}
         </div>
-      </footer>
+
+        {/* Footer CTA */}
+        <footer className="sticky bottom-0 z-40">
+          <div className="mx-auto max-w-6xl px-6 md:px-10 py-4 flex items-center justify-between text-sm text-white/70">
+            <span>¿Listo para construir algo? </span>
+            <Link
+              href="/contact"
+              className="rounded-xl bg-white px-4 py-2 font-semibold text-black shadow-md hover:bg-white/90"
+            >
+              Contáctame
+            </Link>
+          </div>
+        </footer>
+      </div>
     </main>
   );
 }
