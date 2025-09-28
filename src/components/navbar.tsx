@@ -95,27 +95,6 @@ export default function Navbar() {
                 <path d="M12 2C6.477 2 2 6.484 2 12.01c0 4.424 2.865 8.18 6.839 9.504.5.092.682-.218.682-.486 0-.24-.009-.876-.014-1.72-2.782.605-3.369-1.343-3.369-1.343-.454-1.157-1.11-1.467-1.11-1.467-.908-.622.069-.609.069-.609 1.003.071 1.53 1.032 1.53 1.032.892 1.542 2.341 1.096 2.91.838.091-.654.35-1.096.636-1.349-2.22-.254-4.555-1.114-4.555-4.957 0-1.095.39-1.991 1.029-2.693-.103-.253-.446-1.274.098-2.656 0 0 .84-.27 2.75 1.028A9.564 9.564 0 0112 6.844c.851.004 1.707.115 2.507.337 1.909-1.298 2.748-1.028 2.748-1.028.546 1.382.203 2.403.1 2.656.64.702 1.028 1.598 1.028 2.693 0 3.854-2.339 4.701-4.566 4.951.359.31.679.924.679 1.862 0 1.344-.012 2.428-.012 2.758 0 .27.18.582.688.483A10.02 10.02 0 0022 12.01C22 6.484 17.523 2 12 2z"/>
               </svg>
             </a>
-            {/* SoundCloud icon */}
-            <a
-              href="https://soundcloud.com/"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Open SoundCloud"
-              className="group relative ml-2 flex items-center justify-center w-10 h-10 xl:w-11 xl:h-11 rounded-xl bg-black shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 active:scale-95"
-            >
-              <svg className="w-5 h-5 xl:w-6 xl:h-6 text-[#FF5500]" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                <g>
-                  {/* Left sound bars */}
-                  <rect x="2.2" y="13" width="1.2" height="5" rx="0.6" />
-                  <rect x="4.2" y="11.5" width="1.2" height="6.5" rx="0.6" />
-                  <rect x="6.2" y="10" width="1.2" height="8" rx="0.6" />
-                  <rect x="8.2" y="9" width="1.2" height="9" rx="0.6" />
-                  <rect x="10.2" y="8.2" width="1.2" height="9.8" rx="0.6" />
-                </g>
-                {/* Cloud (simplified) */}
-                <path d="M13.5 8.5a4.5 4.5 0 00-4.5 4.5v.05A2.95 2.95 0 007.5 13c-1.66 0-3 1.34-3 3s1.34 3 3 3H18a3.5 3.5 0 000-7 3.6 3.6 0 00-1 .14A4.5 4.5 0 0013.5 8.5z" />
-              </svg>
-            </a>
           </div>
 
           {/* Separator */}
@@ -164,6 +143,7 @@ export default function Navbar() {
                   bgColor: "from-purple-500 to-pink-500"
                 }
               ].map((item) => (
+                <>
                 <li key={item.label}>
                   <button
                     onClick={() => navigateToSection(item.section as "home" | "services" | "projects" | "contact")}
@@ -186,6 +166,52 @@ export default function Navbar() {
                     </div>
                   </button>
                 </li>
+                {item.section === 'home' && (
+                  <>
+                    {/* LinkedIn below Terminal */}
+                    <li key="social-linkedin">
+                      <a
+                        href="https://www.linkedin.com/"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label="Open LinkedIn"
+                        className="group relative flex items-center justify-center w-10 h-10 xl:w-11 xl:h-11 rounded-xl shadow-lg transition-all duration-300 hover:scale-110 active:scale-95 hover:shadow-xl bg-white/20 text-white/80 hover:bg-white/30 hover:text-white"
+                      >
+                        <svg className="w-5 h-5 xl:w-6 xl:h-6" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                          <path fill="#0A66C2" d="M4.983 3.5a2.5 2.5 0 11-.002 5.002A2.5 2.5 0 014.983 3.5zM3.5 9h2.967v11H3.5V9zm6.318 0H12.7v1.507h.046c.446-.846 1.538-1.739 3.167-1.739 3.388 0 4.013 2.234 4.013 5.142V20H16.96v-5.12c0-1.22-.022-2.79-1.7-2.79-1.703 0-1.963 1.33-1.963 2.702V20H9.818V9z"/>
+                        </svg>
+                        <div className="absolute left-full ml-3 px-2 py-1 bg-black/80 text-white text-xs rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50">
+                          LinkedIn
+                        </div>
+                      </a>
+                    </li>
+                    {/* SoundCloud below LinkedIn */}
+                    <li key="social-soundcloud">
+                      <a
+                        href="https://soundcloud.com/"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label="Open SoundCloud"
+                        className="group relative flex items-center justify-center w-10 h-10 xl:w-11 xl:h-11 rounded-xl shadow-lg transition-all duration-300 hover:scale-110 active:scale-95 hover:shadow-xl bg-white/20 text-white/80 hover:bg-white/30 hover:text-white"
+                      >
+                        <svg className="w-5 h-5 xl:w-6 xl:h-6" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                          <g fill="#FF5500">
+                            <rect x="2.2" y="13" width="1.2" height="5" rx="0.6" />
+                            <rect x="4.2" y="11.5" width="1.2" height="6.5" rx="0.6" />
+                            <rect x="6.2" y="10" width="1.2" height="8" rx="0.6" />
+                            <rect x="8.2" y="9" width="1.2" height="9" rx="0.6" />
+                            <rect x="10.2" y="8.2" width="1.2" height="9.8" rx="0.6" />
+                          </g>
+                          <path fill="#FF5500" d="M13.5 8.5a4.5 4.5 0 00-4.5 4.5v.05A2.95 2.95 0 007.5 13c-1.66 0-3 1.34-3 3s1.34 3 3 3H18a3.5 3.5 0 000-7 3.6 3.6 0 00-1 .14A4.5 4.5 0 0013.5 8.5z" />
+                        </svg>
+                        <div className="absolute left-full ml-3 px-2 py-1 bg-black/80 text-white text-xs rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50">
+                          SoundCloud
+                        </div>
+                      </a>
+                    </li>
+                  </>
+                )}
+                </>
               ))}
             </ul>
             
