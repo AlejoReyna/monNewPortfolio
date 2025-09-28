@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useLanguage } from "@/components/lang-context";
 import { useNavigation } from "@/contexts/navigation-context";
+import Image from "next/image";
 
 export default function Navbar() {
   const { language } = useLanguage();
@@ -82,19 +83,18 @@ export default function Navbar() {
         <div className="flex grow flex-col gap-y-3 overflow-y-auto bg-white/10 backdrop-blur-2xl border border-white/20 rounded-2xl shadow-2xl p-3">
           {/* Brand Section */}
           <div className="flex shrink-0 items-center justify-center">
-            <button 
-              onClick={() => navigateToSection("home")}
-              className="group relative flex items-center justify-center w-10 h-10 xl:w-11 xl:h-11 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 active:scale-95"
+            <a
+              href="https://github.com/AlejoReyna/monNewPortfolio"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Open GitHub repository"
+              className="group relative flex items-center justify-center w-10 h-10 xl:w-11 xl:h-11 rounded-xl bg-black shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 active:scale-95"
             >
-              {/* User/Profile icon */}
-              <svg className="w-5 h-5 xl:w-6 xl:h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+              {/* GitHub icon */}
+              <svg className="w-5 h-5 xl:w-6 xl:h-6 text-white" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 2C6.477 2 2 6.484 2 12.01c0 4.424 2.865 8.18 6.839 9.504.5.092.682-.218.682-.486 0-.24-.009-.876-.014-1.72-2.782.605-3.369-1.343-3.369-1.343-.454-1.157-1.11-1.467-1.11-1.467-.908-.622.069-.609.069-.609 1.003.071 1.53 1.032 1.53 1.032.892 1.542 2.341 1.096 2.91.838.091-.654.35-1.096.636-1.349-2.22-.254-4.555-1.114-4.555-4.957 0-1.095.39-1.991 1.029-2.693-.103-.253-.446-1.274.098-2.656 0 0 .84-.27 2.75 1.028A9.564 9.564 0 0112 6.844c.851.004 1.707.115 2.507.337 1.909-1.298 2.748-1.028 2.748-1.028.546 1.382.203 2.403.1 2.656.64.702 1.028 1.598 1.028 2.693 0 3.854-2.339 4.701-4.566 4.951.359.31.679.924.679 1.862 0 1.344-.012 2.428-.012 2.758 0 .27.18.582.688.483A10.02 10.02 0 0022 12.01C22 6.484 17.523 2 12 2z"/>
               </svg>
-              {/* Active indicator */}
-              {currentSection === "home" && (
-                <div className="absolute -left-1 top-1/2 -translate-y-1/2 w-1 h-6 bg-white rounded-full" />
-              )}
-            </button>
+            </a>
           </div>
 
           {/* Separator */}
@@ -108,9 +108,17 @@ export default function Navbar() {
                   section: "home", 
                   label: isEs ? "Inicio" : "Home",
                   icon: (
-                    <svg className="w-5 h-5 xl:w-6 xl:h-6" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
-                    </svg>
+                    <>
+                      <span className="absolute inset-0 rounded-xl bg-white" />
+                      <Image
+                        src="/terminal_icon.png"
+                        alt="Terminal"
+                        fill
+                        className="relative z-10 object-contain p-0"
+                        sizes="(max-width: 1280px) 2.5rem, 2.75rem"
+                        priority
+                      />
+                    </>
                   ),
                   bgColor: "from-orange-500 to-red-500"
                 },
@@ -138,10 +146,12 @@ export default function Navbar() {
                 <li key={item.label}>
                   <button
                     onClick={() => navigateToSection(item.section as "home" | "services" | "projects" | "contact")}
-                    className={`group relative flex items-center justify-center w-10 h-10 xl:w-11 xl:h-11 rounded-xl shadow-lg transition-all duration-300 hover:scale-110 active:scale-95 hover:shadow-xl ${
-                      currentSection === item.section
-                        ? `bg-gradient-to-br ${item.bgColor} text-white`
-                        : `bg-white/20 text-white/80 hover:bg-white/30 hover:text-white`
+                    className={`group relative flex items-center justify-center w-10 h-10 xl:w-11 xl:h-11 rounded-xl shadow-lg transition-all duration-300 hover:scale-110 active:scale-95 hover:shadow-xl overflow-hidden ${
+                      item.section === "home"
+                        ? "bg-transparent"
+                        : currentSection === item.section
+                          ? `bg-gradient-to-br ${item.bgColor} text-white`
+                          : `bg-white/20 text-white/80 hover:bg-white/30 hover:text-white`
                     }`}
                   >
                     {item.icon}
