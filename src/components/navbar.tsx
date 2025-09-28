@@ -41,7 +41,7 @@ export default function Navbar() {
               <div className="w-3 h-3 rounded-full bg-yellow-500 hover:bg-yellow-400 transition-colors cursor-pointer" />
               <div className="w-3 h-3 rounded-full bg-green-500 hover:bg-green-400 transition-colors cursor-pointer" />
             </div>
-            <span className="text-white/90 text-sm font-medium">Alexis Reyna</span>
+            <span className="text-white/90 text-sm font-medium">Alexis&#39; desktop</span>
           </div>
 
           {/* Center - Current section indicator */}
@@ -212,7 +212,7 @@ export default function Navbar() {
               <div className="flex flex-col items-start">
                 <div className="text-lg tracking-tight text-left">
                   <span className="bg-gradient-to-r from-white via-gray-100 to-gray-200 bg-clip-text text-transparent group-hover:from-white group-hover:via-white group-hover:to-gray-100 transition-all duration-200 font-mono font-light">
-                    Alexis Reyna
+                    Alexis&#39; desktop
                   </span>
                 </div>
                 <div className="text-xs text-gray-400 uppercase tracking-tight font-mono font-light text-left">

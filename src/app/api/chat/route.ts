@@ -4,9 +4,14 @@ import OpenAI from 'openai';
 import { cookies } from 'next/headers';
 
 /**
- * OpenAI client
+ * Lazily create OpenAI client to avoid build-time crashes when the API key
+ * is not present in the environment. We only instantiate at request time.
  */
-const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+function createOpenAIClient(): OpenAI | null {
+  const apiKey = process.env.OPENAI_API_KEY;
+  if (!apiKey) return null;
+  return new OpenAI({ apiKey });
+}
 
 /**
  * Config de cuota:
@@ -60,7 +65,7 @@ function serializeQuota(q: Quota) {
  * Developer persona para Responses API
  * — breve, directo, tuteo, y con tus rutas de portfolio/contacto
  */
-const DEVELOPER_PERSONA = `Eres Alexis, desarrollador full-stack mexicano. Tono breve, directo y amable; tuteo; respuesta primero, luego 1–3 bullets si aportan valor; tecnologías React/Next.js/TS/Node/PostgreSQL/Rails; si piden proyectos -> /portfolio; contacto -> /contacto o alexis.reynasz@hotmail.com; no inventes; idioma del usuario o español por defecto.`;
+const DEVELOPER_PERSONA = `Eres Alexis, desarrollador full-stack mexicano, nacido en Montemorelos, Nuevo León. Tono breve, directo y amable; tuteo; respuesta primero, luego 1–3 bullets si aportan valor; tecnologías React/Next.js/TS/Node/PostgreSQL/Rails; si piden proyectos -> /portfolio; contacto -> /contacto o alexis.reynasz@hotmail.com; no inventes; idioma del usuario o español por defecto.`;
 
 interface ChatMessage {
   role: 'user' | 'assistant' | 'system' | 'developer';
@@ -162,6 +167,13 @@ export async function POST(req: NextRequest) {
   const input = `${developerContent}\n\n${conversationHistory}`;
 
   try {
+    const client = createOpenAIClient();
+    if (!client) {
+      return NextResponse.json(
+        { error: 'OPENAI_API_KEY no configurada' },
+        { status: 503 }
+      );
+    }
     // 5) Llamada a Responses API
     const resp = await client.responses.create({
       model: 'gpt-5-nano',

@@ -27,7 +27,7 @@ export default function Footer() {
             <div className="inline-flex items-center gap-2">
               <div className="flex items-center font-mono text-lg font-bold tracking-tight">
                 <span className="bg-gradient-to-r from-white via-gray-100 to-gray-200 bg-clip-text text-transparent transition-all duration-200">
-                  Alexis Reyna
+                  Alexis&#39; desktop
                 </span>
               </div>
             </div>

@@ -12,7 +12,7 @@ function generateiOSMetaTags() {
     // iOS status bar appearance
     'apple-mobile-web-app-capable': 'yes',
     'apple-mobile-web-app-status-bar-style': 'black-translucent',
-    'apple-mobile-web-app-title': 'Alexis Reyna',
+    'apple-mobile-web-app-title': 'Alexis\' desktop',
     // Theme color for mobile browsers (matches navbar dark theme)
     'theme-color': '#080404',
     // Additional iOS meta tags
@@ -32,7 +32,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Alexis Reyna | Software Engineer",
+  title: "Alexis' desktop",
   description: "Fullstack Developer | Building modern, fast, and accessible web experiences.",
   other: generateiOSMetaTags(),
 };
@@ -48,12 +48,14 @@ export default function RootLayout({
         {/* Additional iOS specific meta tags */}
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-        <meta name="apple-mobile-web-app-title" content="Alexis Reyna" />
+        <meta name="apple-mobile-web-app-title" content="Alexis' desktop" />
         <meta name="theme-color" content="#080404" />
         <meta name="format-detection" content="telephone=no" />
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
         {/* iOS splash screen color */}
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        {/* Favicon */}
+        <link rel="icon" href="/tags.png" type="image/png" />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
         {/* PWA Manifest */}
         <link rel="manifest" href="/manifest.json" />
