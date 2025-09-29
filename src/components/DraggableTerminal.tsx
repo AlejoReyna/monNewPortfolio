@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useRef, useState, PropsWithChildren } from "react";
-import { motion, useDragControls } from "framer-motion";
+import { motion, useDragControls, PanInfo } from "framer-motion";
 
 type DraggableTerminalProps = {
   /** Ancho (px) reservado para la barra lateral; la ventana no puede invadirlo */
@@ -65,7 +65,7 @@ export default function DraggableTerminal({
   };
 
   // Guardar posición al soltar
-  const handleDragEnd = (_: any, info: { point: { x: number; y: number } }) => {
+  const handleDragEnd = (_: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
     if (!rememberPosition) return;
     try {
       localStorage.setItem(
