@@ -143,6 +143,7 @@ export default function Navbar() {
                   bgColor: "from-purple-500 to-pink-500"
                 }
               ].map((item) => (
+                <>
                 <li key={item.label}>
                   <button
                     onClick={() => navigateToSection(item.section as "home" | "services" | "projects" | "contact")}
@@ -165,8 +166,55 @@ export default function Navbar() {
                     </div>
                   </button>
                 </li>
+                {item.section === 'home' && (
+                  <>
+                    {/* LinkedIn below Terminal */}
+                    <li key="social-linkedin">
+                      <a
+                        href="https://www.linkedin.com/"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label="Open LinkedIn"
+                        className="group relative flex items-center justify-center w-10 h-10 xl:w-11 xl:h-11 rounded-xl shadow-lg transition-all duration-300 hover:scale-110 active:scale-95 hover:shadow-xl bg-white/20 text-white/80 hover:bg-white/30 hover:text-white"
+                      >
+                        <svg className="w-5 h-5 xl:w-6 xl:h-6" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                          <path fill="#0A66C2" d="M4.983 3.5a2.5 2.5 0 11-.002 5.002A2.5 2.5 0 014.983 3.5zM3.5 9h2.967v11H3.5V9zm6.318 0H12.7v1.507h.046c.446-.846 1.538-1.739 3.167-1.739 3.388 0 4.013 2.234 4.013 5.142V20H16.96v-5.12c0-1.22-.022-2.79-1.7-2.79-1.703 0-1.963 1.33-1.963 2.702V20H9.818V9z"/>
+                        </svg>
+                        <div className="absolute left-full ml-3 px-2 py-1 bg-black/80 text-white text-xs rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50">
+                          LinkedIn
+                        </div>
+                      </a>
+                    </li>
+                    {/* SoundCloud below LinkedIn */}
+                    <li key="social-soundcloud">
+                      <a
+                        href="https://soundcloud.com/"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label="Open SoundCloud"
+                        className="group relative flex items-center justify-center w-10 h-10 xl:w-11 xl:h-11 rounded-xl shadow-lg transition-all duration-300 hover:scale-110 active:scale-95 hover:shadow-xl bg-white/20 text-white/80 hover:bg-white/30 hover:text-white"
+                      >
+                        <svg className="w-5 h-5 xl:w-6 xl:h-6" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                          <g fill="#FF5500">
+                            <rect x="2.2" y="13" width="1.2" height="5" rx="0.6" />
+                            <rect x="4.2" y="11.5" width="1.2" height="6.5" rx="0.6" />
+                            <rect x="6.2" y="10" width="1.2" height="8" rx="0.6" />
+                            <rect x="8.2" y="9" width="1.2" height="9" rx="0.6" />
+                            <rect x="10.2" y="8.2" width="1.2" height="9.8" rx="0.6" />
+                          </g>
+                          <path fill="#FF5500" d="M13.5 8.5a4.5 4.5 0 00-4.5 4.5v.05A2.95 2.95 0 007.5 13c-1.66 0-3 1.34-3 3s1.34 3 3 3H18a3.5 3.5 0 000-7 3.6 3.6 0 00-1 .14A4.5 4.5 0 0013.5 8.5z" />
+                        </svg>
+                        <div className="absolute left-full ml-3 px-2 py-1 bg-black/80 text-white text-xs rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50">
+                          SoundCloud
+                        </div>
+                      </a>
+                    </li>
+                  </>
+                )}
+                </>
               ))}
             </ul>
+            
 
             {/* Separator */}
             <div className="h-px bg-white/20 mx-1 my-2" />
