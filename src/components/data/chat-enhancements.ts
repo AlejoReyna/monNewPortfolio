@@ -1,6 +1,6 @@
 // chat-enhancements.ts - Enhanced hint system and intent detection
 
-import { alexisData, getRandomMusicArtist, getRandomTech, getRandomDestination } from './user-data';
+// Removed unused imports: alexisData, getRandomMusicArtist, getRandomTech, getRandomDestination
 
 type Intent = "casual" | "work" | "about" | "projects" | "contact" | "music" | "travel" | "tech";
 type Lang = "en" | "es";
@@ -44,7 +44,7 @@ export const detectEnhancedIntent = (text: string, lang: Lang): Intent => {
 };
 
 // ===== ENHANCED PERSONALIZED HINT SYSTEM =====
-export const buildEnhancedHint = (intent: Intent, lang: Lang, userText: string) => {
+export const buildEnhancedHint = (intent: Intent, lang: Lang) => {
   const HINT_START = "[[SYS]]";
   const HINT_END = "[[/SYS]]";
   

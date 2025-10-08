@@ -243,10 +243,10 @@ export default function PongBackground({ active = false }: { active?: boolean })
 
     return () => {
       window.removeEventListener("resize", resize);
-      window.removeEventListener("keydown", onKeyDown as any);
-      window.removeEventListener("keyup", onKeyUp as any);
-      window.removeEventListener("mousemove", onMouseMove as any);
-      window.removeEventListener("touchmove", onTouchMove as any);
+      window.removeEventListener("keydown", onKeyDown);
+      window.removeEventListener("keyup", onKeyUp);
+      window.removeEventListener("mousemove", onMouseMove);
+      window.removeEventListener("touchmove", onTouchMove);
       if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
     };
   }, []);

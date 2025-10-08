@@ -66,10 +66,11 @@ function VisualCard({
               <source src={media} type="video/mp4" />
             </video>
           ) : (
-            <img
+            <Image
               src={media}
               alt={title}
-              className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
+              fill
+              className="object-cover transition-transform duration-700 group-hover:scale-[1.03]"
             />
           )}
           <div className={`absolute inset-0 bg-gradient-to-t ${gradient}`} />
@@ -110,7 +111,6 @@ function ServiceSection({
   subtitle,
   bullets,
   cta,
-  bg,
   reverse,
   visual, // { kind, media, badge, gradient }
 }: {
@@ -119,7 +119,6 @@ function ServiceSection({
   subtitle: string;
   bullets: string[];
   cta: { label: string; href: string }[];
-  bg: string;
   reverse?: boolean;
   visual?: {
     kind?: "image" | "video" | "empty";
@@ -254,7 +253,6 @@ type ServiceDef = {
   subtitle: string;
   bullets: string[];
   cta: { label: string; href: string }[];
-  bg: string;
   reverse?: boolean;
   visual?: {
     kind?: VisualKind;
@@ -280,7 +278,6 @@ export default function ServicesPage() {
           { label: "Ver proyectos web", href: "/projects?type=web" },
           { label: "Cotizar", href: "/contact" },
         ],
-        bg: "bg-[radial-gradient(60%_80%_at_50%_10%,rgba(99,102,241,.35),transparent_70%)] bg-neutral-950 text-white",
         visual: {
           kind: "image",
           media: "/services/web.jpg",
@@ -302,7 +299,6 @@ export default function ServicesPage() {
           { label: "Ver casos de diseño", href: "/projects?type=design" },
           { label: "Hablemos", href: "/contact" },
         ],
-        bg: "bg-[radial-gradient(60%_80%_at_50%_10%,rgba(244,114,182,.28),transparent_70%)] bg-neutral-950 text-white",
         reverse: true,
         visual: {
           kind: "image",
@@ -325,7 +321,6 @@ export default function ServicesPage() {
           { label: "Infra demo", href: "/projects?type=cloud" },
           { label: "Revisar tu arquitectura", href: "/contact" },
         ],
-        bg: "bg-[radial-gradient(60%_80%_at_50%_10%,rgba(45,212,191,.28),transparent_70%)] bg-neutral-950 text-white",
         visual: {
           kind: "image",
           media: "/services/aws.jpg",

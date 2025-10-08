@@ -91,10 +91,11 @@ function Card({
               <source src={media} type="video/mp4" />
             </video>
           ) : (
-            <img
+            <Image
               src={media}
               alt={title}
-              className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
+              fill
+              className="object-cover transition-transform duration-700 group-hover:scale-[1.03]"
             />
           )}
           <div className={`absolute inset-0 bg-gradient-to-t ${gradient}`} />

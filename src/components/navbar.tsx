@@ -9,17 +9,10 @@ export default function Navbar() {
   const { language } = useLanguage();
   const { navigateToSection, currentSection } = useNavigation();
   const isEs = language === 'es';
-  const [isScrolled, setIsScrolled] = useState(false);
+  // Removed unused isScrolled state variable
   const [currentTime, setCurrentTime] = useState(new Date());
 
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 8);
-    };
-    handleScroll();
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  // Removed unused scroll effect that was setting isScrolled
 
   // Update time every second
   useEffect(() => {

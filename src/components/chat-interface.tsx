@@ -4,38 +4,7 @@ import type React from "react";
 import { useLanguage } from "@/components/lang-context";
 import { useChat } from "@/hooks/useChat";
 
-/* ========= TypewriterText Component ========= */
-type TypewriterTextProps = {
-  text: string;
-  className?: string;
-  speed?: number;
-  onComplete?: () => void;
-};
-
-function TypewriterText({ text, className = "", speed = 50, onComplete }: TypewriterTextProps) {
-  const [displayedText, setDisplayedText] = useState("");
-  const [currentIndex, setCurrentIndex] = useState(0);
-
-  useEffect(() => {
-    if (currentIndex < text.length) {
-      const timer = setTimeout(() => {
-        setDisplayedText((prev) => prev + text[currentIndex]);
-        setCurrentIndex((prev) => prev + 1);
-      }, speed);
-      return () => clearTimeout(timer);
-    } else if (currentIndex === text.length && onComplete) {
-      const timer = setTimeout(onComplete, 1000);
-      return () => clearTimeout(timer);
-    }
-  }, [currentIndex, text, speed, onComplete]);
-
-  useEffect(() => {
-    setDisplayedText("");
-    setCurrentIndex(0);
-  }, [text]);
-
-  return <p className={className}>{displayedText}</p>;
-}
+// Removed unused TypewriterText component and its props type
 
 /* ========= Loading Spinner Component ========= */
 function LoadingSpinner() {
@@ -50,7 +19,7 @@ function LoadingSpinner() {
   );
 }
 
-import { alexisData, getRandomMusicArtist, getRandomTech } from "./data/user-data";
+// Removed unused imports: alexisData, getRandomMusicArtist, getRandomTech
 // Debug imports
 import {
   detectEnhancedIntent,
@@ -70,19 +39,14 @@ const getRandomSuggestions = (all: Suggestion[], count = 5) =>
   [...all].sort(() => 0.5 - Math.random()).slice(0, count);
 
 /* ========= Easter Egg (resumido, igual que antes) ========= */
-const EASTER_GIBBERISH_ES = ["weuhruqw wefhuqsbdchja scuwqe hfqusdncu"];
-const EASTER_GIBBERISH_EN = ["weuhruqw wefhuqsbdchja scuwqe hfqusdncu"];
-const buildEasterFull = (seed: string) =>
-  Array.from({ length: 80 })
-    .map((_, i) => (i % 5 === 4 ? `${seed}\n` : `${seed} `))
-    .join("");
+// Removed unused easter egg variables: EASTER_GIBBERISH_ES, EASTER_GIBBERISH_EN, buildEasterFull
 
 /* ========= Intents & Hints ========= */
 const HINT_START = "[[SYS]]";
 const HINT_END = "[[/SYS]]";
 const deriveIntent = detectEnhancedIntent;
-const buildHint = (intent: Intent, lang: Lang, userText: string) =>
-  buildEnhancedHint(intent, lang, userText);
+const buildHint = (intent: Intent, lang: Lang) =>
+  buildEnhancedHint(intent, lang);
 const stripHintFromUserMessage = (raw: unknown) => {
   const text = (raw ?? "").toString();
   if (text.startsWith(HINT_START)) {
@@ -115,18 +79,8 @@ export default function ChatInterface() {
   const [userName, setUserName] = useState("");
   const [showNamePrompt, setShowNamePrompt] = useState(false);
 
-  // Overlays/column-left flow
-  const [showWelcome, setShowWelcome] = useState(false);
-  const [welcomeOpacity, setWelcomeOpacity] = useState(0);
-  const [showNameStep, setShowNameStep] = useState(false);
-  const [nameOpacity, setNameOpacity] = useState(0);
-  const [showLangStep, setShowLangStep] = useState(false);
-  const [langOpacity, setLangOpacity] = useState(0);
-
-  // Nombre (antes de idioma)
-  const [showNameInput, setShowNameInput] = useState(false);
-  const [nameInputOpacity, setNameInputOpacity] = useState(0);
-  const [nameInput, setNameInput] = useState("");
+  // Removed unused overlay state variables: showWelcome, setShowWelcome, welcomeOpacity, setWelcomeOpacity, 
+  // showNameStep, setNameOpacity, showLangStep, langOpacity, showNameInput, nameInputOpacity, setNameInput
 
   // Chat
   const { messages, isLoading, error, sendMessage, isRateLimit } = useChat(userName);
@@ -137,7 +91,7 @@ export default function ChatInterface() {
   console.log("showChat:", showChat);
   const [inputValue, setInputValue] = useState("");
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
-  const [pendingUserText, setPendingUserText] = useState<string | null>(null);
+  // Removed unused pendingUserText state
 
   const rootRef = useRef<HTMLDivElement>(null);
   const [chatHeightPx, setChatHeightPx] = useState<number | undefined>();
@@ -207,62 +161,9 @@ export default function ChatInterface() {
   }, [messages]);
 
   /* ========= Handlers ========= */
-  const handleLanguageSelection = (lang: Lang) => {
-    setPreferredLang(lang);
-    setCtxLanguage?.(lang);
+  // Removed unused handlers: handleLanguageSelection, handleNameStepComplete
 
-    setLangOpacity(0);
-    setTimeout(() => {
-      setShowLangStep(false);
-      setShowNameStep(true);
-      requestAnimationFrame(() => setNameOpacity(1));
-    }, 350);
-  };
-
-  const handleNameStepComplete = () => {
-    setShowNameInput(true);
-    requestAnimationFrame(() => setNameInputOpacity(1));
-  };
-
-  const handleNameSubmit = () => {
-    const trimmed = nameInput.trim();
-    if (!trimmed) return;
-    setUserName(trimmed);
-
-    const langToSave: Lang = preferredLang ?? initialCtxLang;
-    try {
-      localStorage.setItem("userName", trimmed);
-      localStorage.setItem("preferredLanguage", langToSave);
-    } catch {}
-
-    setNameOpacity(0);
-    setNameInputOpacity(0);
-    setTimeout(() => {
-      setShowNameStep(false);
-      setShowNameInput(false);
-      setShowNamePrompt(false);
-      setShowChat(true);
-
-      if (pendingUserText) {
-        const raw = pendingUserText.trim();
-        if (raw) {
-          const intent = deriveIntent(raw, currentLang);
-          const payload = buildHint(intent, currentLang, raw) + "\n" + raw;
-          sendMessage(payload);
-          setInputValue("");
-          setPendingUserText(null);
-          pickPlaceholder();
-        }
-      }
-    }, 350);
-  };
-
-  const handleNameKey = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      handleNameSubmit();
-    }
-  };
+  // Removed unused handlers: handleNameSubmit, handleNameKey (these were for name input functionality that's not being used)
 
   const handleSendMessage = () => {
     const raw = inputValue.trim();
@@ -277,7 +178,7 @@ export default function ChatInterface() {
       setShowChat(true);
     }
     const intent = deriveIntent(raw, currentLang);
-    const payload = buildHint(intent, currentLang, raw) + "\n" + raw;
+    const payload = buildHint(intent, currentLang) + "\n" + raw;
     sendMessage(payload);
     setInputValue("");
     if (!showChat) setShowChat(true);
@@ -295,7 +196,7 @@ export default function ChatInterface() {
       setShowNamePrompt(false);
       setShowChat(true);
     }
-    const payload = buildHint(intent, currentLang, text) + "\n" + text;
+    const payload = buildHint(intent, currentLang) + "\n" + text;
     sendMessage(payload);
     if (!showChat) setShowChat(true);
     pickPlaceholder();
@@ -330,7 +231,7 @@ export default function ChatInterface() {
 
   useEffect(() => {
     setGreetingIndex(Math.floor(Math.random() * greetings.length));
-  }, []);
+  }, [greetings.length]);
 
   const baseGreeting = isEs ? greetings[greetingIndex].es : greetings[greetingIndex].en;
   const text = userName
