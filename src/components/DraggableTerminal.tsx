@@ -79,38 +79,48 @@ export default function DraggableTerminal({
   const mobileClass = disableDragOnMobile ? "hidden md:block" : "";
 
   return (
-    <div className={`pointer-events-none absolute inset-0 ${mobileClass}`} style={{ zIndex }}>
-      {/* Área de restricciones con padding = zonas seguras */}
-      <div
-        ref={constraintsRef}
-        className="absolute inset-0"
-        style={{
-          paddingLeft: sidebarWidth,
-          paddingTop: topSafe,
-          paddingRight: rightSafe,
-          paddingBottom: bottomSafe,
-        }}
-      />
-      {/* Ventana arrastrable */}
-      <motion.div
-        className="pointer-events-auto absolute"
-        drag
-        dragControls={controls}
-        dragListener={false}          // solo desde el header
-        dragConstraints={constraintsRef}
-        dragMomentum={false}
-        onDragEnd={handleDragEnd}
-        initial={isClient ? initial : defaultPos}
-        whileDrag={{ cursor: "grabbing", scale: 1.005 }}
-        style={{
-          width: "min(860px, calc(100vw - 140px))",
-          willChange: "transform",
-        }}
-        onPointerDown={handlePointerDown}
-      >
-        {children}
-      </motion.div>
-    </div>
+    <>
+      {/* Desktop: Ventana draggable (oculta en mobile/tablet) */}
+      <div className={`pointer-events-none absolute inset-0 hidden lg:block ${mobileClass}`} style={{ zIndex }}>
+        {/* Área de restricciones con padding = zonas seguras */}
+        <div
+          ref={constraintsRef}
+          className="absolute inset-0"
+          style={{
+            paddingLeft: sidebarWidth,
+            paddingTop: topSafe,
+            paddingRight: rightSafe,
+            paddingBottom: bottomSafe,
+          }}
+        />
+        {/* Ventana arrastrable */}
+        <motion.div
+          className="pointer-events-auto absolute"
+          drag
+          dragControls={controls}
+          dragListener={false}          // solo desde el header
+          dragConstraints={constraintsRef}
+          dragMomentum={false}
+          onDragEnd={handleDragEnd}
+          initial={isClient ? initial : defaultPos}
+          whileDrag={{ cursor: "grabbing", scale: 1.005 }}
+          style={{
+            width: "min(860px, calc(100vw - 140px))",
+            willChange: "transform",
+          }}
+          onPointerDown={handlePointerDown}
+        >
+          {children}
+        </motion.div>
+      </div>
+
+      {/* Mobile/Tablet: Ventana fija en la parte inferior (visible solo en mobile/tablet) */}
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 pointer-events-auto" style={{ zIndex, margin: '10px', maxHeight: '35vh' }}>
+        <div className="w-full h-full overflow-hidden">
+          {children}
+        </div>
+      </div>
+    </>
   );
 }
 

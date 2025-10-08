@@ -377,9 +377,9 @@ export default function ChatInterface() {
   const sorted = [...messages].sort((a, b) => +a.timestamp - +b.timestamp);
 
   return (
-    <div ref={rootRef} className="relative z-10 flex flex-col px-4 w-full max-w-3xl mx-auto mb-12">
+    <div ref={rootRef} className="relative z-10 flex flex-col px-0 lg:px-4 w-full max-w-3xl mx-auto mb-0 lg:mb-12 h-full">
       {/* Terminal unificada */}
-      <div className="pointer-events-auto w-full rounded-lg border border-orange-500/30 bg-black/30 backdrop-blur-md shadow-2xl shadow-orange-500/10 overflow-hidden">
+      <div className="pointer-events-auto w-full rounded-lg border border-orange-500/30 bg-black/30 backdrop-blur-md shadow-2xl shadow-orange-500/10 overflow-hidden h-full flex flex-col">
         {/* Terminal header */}
         <div
           className="flex items-center justify-between px-4 py-3 bg-black/40 border-b border-orange-500/30 cursor-move"
@@ -397,7 +397,7 @@ export default function ChatInterface() {
         </div>
 
         {/* Contenido de la terminal */}
-        <div className="p-4">
+        <div className="p-2 lg:p-4 flex-1 flex flex-col overflow-hidden">
           {/* Mensaje inicial o última línea de login */}
           <div className="text-xs text-gray-500 font-mono mb-2">
             Last login: {new Date().toDateString()} {new Date().toTimeString().split(" ")[0]} on ttys009
@@ -405,31 +405,25 @@ export default function ChatInterface() {
 
           {/* Portada (misma línea con el $, envuelve debajo si falta ancho) */}
           {!showChat && (
-            <div className="mb-4">
-              <div className="grid grid-cols-[auto_1fr] gap-x-2 font-mono text-[13px] leading-6 mb-2">
-                {/* Prefix fijo */}
-                <div className="flex items-baseline shrink-0 text-nowrap">
-                  <span className="text-green-400">➜</span>
-                  <span className="text-blue-400 ml-2">~</span>
-                  <span className="text-orange-400 ml-2">alexis@portfolio:</span>
-                  <span className="text-blue-400">~</span>
-                  <span className="text-orange-400">$</span>
-                </div>
-                {/* Texto que envuelve */}
-                <div className="min-w-0 text-gray-100 whitespace-pre-wrap break-words">
-                  {displayed || text}
-                  {!showNamePrompt && displayed.length < text.length && (
-                    <span className="ml-1 inline-block h-4 w-0.5 align-[-0.15em] bg-gray-300 animate-pulse" />
-                  )}
-                </div>
-              </div>
+            <div className="mb-4 font-mono text-[13px] leading-6">
+              <span className="text-green-400">➜</span>
+              <span className="text-blue-400 ml-2">~</span>
+              <span className="text-orange-400 ml-2">alexis@portfolio:</span>
+              <span className="text-blue-400">~</span>
+              <span className="text-orange-400">$</span>
+              <span className="text-gray-100 ml-2">
+                {displayed || text}
+                {!showNamePrompt && displayed.length < text.length && (
+                  <span className="ml-1 inline-block h-4 w-0.5 align-[-0.15em] bg-gray-300 animate-pulse" />
+                )}
+              </span>
             </div>
           )}
 
           {/* Chat messages */}
           {(sorted.length > 0 || showChat) && (
             <div
-              className="space-y-4 overflow-y-auto mb-4"
+              className="space-y-4 overflow-y-auto mb-4 flex-1 lg:flex-initial"
               style={{
                 height: chatHeightPx ? `${chatHeightPx - 120}px` : "400px",
                 maxHeight: chatHeightPx ? `${chatHeightPx - 120}px` : "400px",
@@ -444,21 +438,15 @@ export default function ChatInterface() {
                     {isUser ? (
                       // Usuario - estilo comando de terminal con wrap correcto
                       <div className="mb-2">
-                        <div className="grid grid-cols-[auto_1fr] gap-x-2 text-[13px]">
-                          {/* Prefix */}
-                          <div className="flex items-baseline shrink-0 text-nowrap">
-                            <span className="text-green-400">➜</span>
-                            <span className="text-blue-400 ml-2">~</span>
-                            <span className="text-orange-400 ml-2">alexis@portfolio:</span>
-                            <span className="text-blue-400">~</span>
-                            <span className="text-orange-400">$</span>
-                          </div>
-                          {/* Contenido que envuelve */}
-                          <div className="min-w-0 text-gray-100 whitespace-pre-wrap break-words">
-                            {content}
-                          </div>
+                        <div className="text-[13px]">
+                          <span className="text-green-400">➜</span>
+                          <span className="text-blue-400 ml-2">~</span>
+                          <span className="text-orange-400 ml-2">alexis@portfolio:</span>
+                          <span className="text-blue-400">~</span>
+                          <span className="text-orange-400">$</span>
+                          <span className="text-gray-100 ml-2">{content}</span>
                         </div>
-                        <div className="text-[11px] text-gray-500 ml-6 mt-1">
+                        <div className="text-[11px] text-gray-500 mt-1">
                           {m.timestamp.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
                         </div>
                       </div>
@@ -532,7 +520,7 @@ export default function ChatInterface() {
           )}
 
           {/* Input - siempre al final */}
-          <div className="border-t border-orange-500/20 pt-3">
+          <div className="border-t border-orange-500/20 pt-3 shrink-0">
             <div className="flex items-center font-mono text-[13px]">
               <span className="text-green-400">➜</span>
               <span className="text-blue-400 ml-2">~</span>
