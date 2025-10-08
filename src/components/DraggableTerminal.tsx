@@ -115,10 +115,8 @@ export default function DraggableTerminal({
       </div>
 
       {/* Mobile/Tablet: Ventana fija en la parte inferior (visible solo en mobile/tablet) */}
-      <div className="lg:hidden fixed bottom-0 left-0 right-0 pointer-events-auto" style={{ zIndex, margin: '10px', maxHeight: '35vh' }}>
-        <div className="w-full h-full overflow-hidden">
-          {children}
-        </div>
+      <div className="lg:hidden fixed left-0 right-0 pointer-events-auto" style={{ zIndex, margin: '10px', bottom: '80px' }}>
+        {children}
       </div>
     </>
   );

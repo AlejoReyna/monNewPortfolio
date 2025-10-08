@@ -278,9 +278,9 @@ export default function ChatInterface() {
   const sorted = [...messages].sort((a, b) => +a.timestamp - +b.timestamp);
 
   return (
-    <div ref={rootRef} className="relative z-10 flex flex-col px-0 lg:px-4 w-full max-w-3xl mx-auto mb-0 lg:mb-12 h-full">
+    <div ref={rootRef} className="relative z-10 flex flex-col px-0 lg:px-4 w-full max-w-3xl mx-auto mb-0 lg:mb-12 h-full lg:h-auto">
       {/* Terminal unificada */}
-      <div className="pointer-events-auto w-full rounded-lg border border-orange-500/30 bg-black/30 backdrop-blur-md shadow-2xl shadow-orange-500/10 overflow-hidden h-full flex flex-col">
+      <div className="pointer-events-auto w-full rounded-lg border border-orange-500/30 bg-black/30 backdrop-blur-md shadow-2xl shadow-orange-500/10 overflow-hidden max-h-[35vh] lg:h-auto flex flex-col">
         {/* Terminal header */}
         <div
           className="flex items-center justify-between px-4 py-3 bg-black/40 border-b border-orange-500/30 cursor-move"
