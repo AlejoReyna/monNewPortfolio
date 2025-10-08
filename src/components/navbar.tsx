@@ -28,13 +28,8 @@ export default function Navbar() {
       <div className="fixed inset-x-0 top-0 z-[70] flex h-7 bg-black/60 backdrop-blur-xl border-b border-white/10">
         <div className="flex w-full items-center justify-between px-4">
           {/* Left side - App name */}
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-red-500 hover:bg-red-400 transition-colors cursor-pointer" />
-              <div className="w-3 h-3 rounded-full bg-yellow-500 hover:bg-yellow-400 transition-colors cursor-pointer" />
-              <div className="w-3 h-3 rounded-full bg-green-500 hover:bg-green-400 transition-colors cursor-pointer" />
-            </div>
-            <span className="text-white/90 text-sm font-medium">Alexis&#39; desktop</span>
+          <div className="flex items-center">
+            <span className="text-white/90 text-sm font-bold">Alexis&#39; desktop</span>
           </div>
 
           {/* Center - Current section indicator */}
