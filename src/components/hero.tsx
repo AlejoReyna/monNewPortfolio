@@ -30,7 +30,7 @@ export default function Hero({ className }: HeroProps) {
           priority
           unoptimized
           className="mt-[10vh] md:mt-[20vh] lg:mt-[28vh] object-contain object-center lg:object-right
-                     origin-center lg:origin-right scale-[0.9] sm:scale-[0.95] md:scale-[1.05]
+                     origin-center lg:origin-right scale-[1.1] sm:scale-[0.95] md:scale-[1.2]
                      lg:scale-[1.35] xl:scale-[1.45] lg:translate-x-[200px]"
         />
       </div>
