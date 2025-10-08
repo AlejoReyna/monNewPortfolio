@@ -423,7 +423,6 @@ export default function ChatInterface() {
           {/* Input - siempre al final */}
           <div className="border-t border-orange-500/20 pt-3 shrink-0">
             <div className="flex items-center font-mono text-[13px]">
-              <span className="text-green-400">➜</span>
               <span className="text-blue-400 ml-2">~</span>
 
               <input
@@ -459,7 +458,6 @@ export default function ChatInterface() {
 
             {/* Terminal status line */}
             <div className="flex justify-between items-center mt-1 text-xs text-gray-500 font-mono">
-              <span>{isLoading ? "Ejecutando comando..." : "Listo para comandos"}</span>
               <span>{inputValue.length}/500</span>
             </div>
           </div>
