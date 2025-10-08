@@ -36,6 +36,7 @@ export default function PongBackground({ active = false }: { active?: boolean })
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
       const w = window.innerWidth;
       const h = window.innerHeight;
+      if (!canvas || !ctx) return;
       canvas.style.width = `${w}px`;
       canvas.style.height = `${h}px`;
       canvas.width = Math.round(w * dpr);
@@ -203,7 +204,9 @@ export default function PongBackground({ active = false }: { active?: boolean })
       const dt = Math.min((ts - lastTs) / 1000, 0.033);
       lastTs = ts;
       update(dt);
-      render(ctx);
+      if (ctx) {
+        render(ctx);
+      }
       rafRef.current = requestAnimationFrame(loop);
     }
 

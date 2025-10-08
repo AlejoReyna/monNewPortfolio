@@ -84,7 +84,7 @@ function Card({
       }}
     >
       {/* Media */}
-      {kind !== "empty" && (
+      {kind !== "empty" && media && (
         <>
           {kind === "video" ? (
             <video className="absolute inset-0 h-full w-full object-cover" autoPlay muted loop playsInline>
