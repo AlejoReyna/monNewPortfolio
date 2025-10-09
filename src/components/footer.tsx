@@ -80,7 +80,7 @@ export default function Footer() {
 
                 <a
                   aria-label="LinkedIn"
-                  href="#"
+                  href="https://www.linkedin.com/in/alexis-alberto-reyna-sánchez-6953102b4"
                   className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-black/30 text-gray-300 transition-colors hover:text-white"
                 >
                   {/* Real LinkedIn glyph (simple-icons path) */}

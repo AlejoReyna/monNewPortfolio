@@ -300,13 +300,13 @@ export default function ChatInterface() {
         {/* Contenido de la terminal */}
         <div className="p-2 lg:p-4 flex-1 flex flex-col overflow-hidden">
           {/* Mensaje inicial o última línea de login */}
-          <div className="text-xs text-gray-500 font-mono mb-2">
+          <div className="text-xs lg:text-sm xl:text-[13px] text-gray-500 font-mono mb-2">
             Last login: {new Date().toDateString()} {new Date().toTimeString().split(" ")[0]} on ttys009
           </div>
 
           {/* Portada (misma línea con el $, envuelve debajo si falta ancho) */}
           {!showChat && (
-            <div className="mb-4 font-mono text-[13px] leading-6">
+            <div className="mb-4 font-mono text-[13px] lg:text-[14px] xl:text-[15px] leading-6">
               <span className="text-green-400">➜</span>
               <span className="text-blue-400 ml-2">~</span>
               <span className="text-orange-400 ml-2">alexis@portfolio:</span>
@@ -335,11 +335,11 @@ export default function ChatInterface() {
                 const key = (m.id ?? String(+m.timestamp)) as string;
                 const content = isUser ? stripHintFromUserMessage(m.content) : m.content ?? "";
                 return (
-                  <div key={key} className="font-mono text-[13px] leading-6 animate-fadeIn">
+                  <div key={key} className="font-mono text-[13px] lg:text-[14px] xl:text-[15px] leading-6 animate-fadeIn">
                     {isUser ? (
                       // Usuario - estilo comando de terminal con wrap correcto
                       <div className="mb-2">
-                        <div className="text-[13px]">
+                        <div className="text-[13px] lg:text-[14px] xl:text-[15px]">
                           <span className="text-green-400">➜</span>
                           <span className="text-blue-400 ml-2">~</span>
                           <span className="text-orange-400 ml-2">alexis@portfolio:</span>
@@ -354,7 +354,7 @@ export default function ChatInterface() {
                     ) : (
                       // Respuesta del sistema
                       <div className="mb-2">
-                        <div className="text-gray-100 bg-black/10 rounded p-3 border-l-4 border-orange-500 text-[13px] leading-6">
+                        <div className="text-gray-100 bg-black/10 rounded p-3 border-l-4 border-orange-500 text-[13px] lg:text-[14px] xl:text-[15px] leading-6">
                           {content}
                         </div>
                         <div className="text-[11px] text-gray-500 mt-1">
@@ -366,7 +366,7 @@ export default function ChatInterface() {
                 );
               })}
               {isLoading && (
-                <div className="font-mono text-[13px] animate-fadeIn">
+                <div className="font-mono text-[13px] lg:text-[14px] xl:text-[15px] animate-fadeIn">
                   <div className="text-gray-100 bg-black/10 rounded p-3 border-l-4 border-orange-500 flex items-center gap-3">
                     <LoadingSpinner />
                     <span>Procesando respuesta...</span>
@@ -379,7 +379,7 @@ export default function ChatInterface() {
 
           {/* Error */}
           {error && (
-            <div className="bg-black/30 border-l-4 border-red-500 text-red-100 p-4 rounded font-mono text-[13px] animate-fadeIn mb-4">
+            <div className="bg-black/30 border-l-4 border-red-500 text-red-100 p-4 rounded font-mono text-[13px] lg:text-[14px] xl:text-[15px] animate-fadeIn mb-4">
               <div className="flex items-center text-[13px] mb-2">
                 <span className="text-green-400">➜</span>
                 <span className="text-blue-400 ml-2">~</span>
@@ -422,7 +422,7 @@ export default function ChatInterface() {
 
           {/* Input - siempre al final */}
           <div className="border-t border-orange-500/20 pt-3 shrink-0">
-            <div className="flex items-center font-mono text-[13px]">
+            <div className="flex items-center font-mono text-[13px] lg:text-[14px] xl:text-[15px]">
               <span className="text-blue-400 ml-2">~</span>
 
               <input
@@ -444,7 +444,7 @@ export default function ChatInterface() {
                     isDisabled: isLoading,
                   });
                 }}
-                className="flex-1 bg-transparent text-gray-100 placeholder-gray-400 font-mono text-[13px] focus:outline-none disabled:opacity-50 caret-gray-300 ml-2"
+                className="flex-1 bg-transparent text-gray-100 placeholder-gray-400 font-mono text-[13px] lg:text-[14px] xl:text-[15px] focus:outline-none disabled:opacity-50 caret-gray-300 ml-2"
                 disabled={isLoading}
                 maxLength={500}
               />

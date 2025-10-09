@@ -36,23 +36,66 @@ export default function DraggableTerminal({
   const constraintsRef = useRef<HTMLDivElement>(null);
   const controls = useDragControls();
 
-  const [initial, setInitial] = useState<{ x: number; y: number }>(defaultPos);
+  const [initial, setInitial] = useState<{ x: number; y: number } | null>(null);
   const [isClient, setIsClient] = useState(false);
+  const [hasAnimated, setHasAnimated] = useState(false);
 
   // Evita SSR issues y restaura posición si aplica
   useEffect(() => {
     setIsClient(true);
-    if (!rememberPosition) return;
-    try {
-      const raw = localStorage.getItem(storageKey);
-      if (raw) {
-        const p = JSON.parse(raw);
-        if (typeof p?.x === "number" && typeof p?.y === "number") {
-          setInitial(p);
-        }
+
+    // Calcular posición centrada horizontalmente (centro absoluto de la pantalla)
+    const calculateCenteredPosition = () => {
+      if (typeof window === 'undefined') return defaultPos;
+
+      const viewportWidth = window.innerWidth;
+      const terminalWidth = Math.min(860, viewportWidth - 140);
+      // Centrar en toda la pantalla
+      const centeredX = (viewportWidth - terminalWidth) / 2;
+      // Ajustar por el padding del sidebar que tiene el contenedor de restricciones
+      const adjustedX = centeredX - sidebarWidth;
+
+      return { x: adjustedX, y: defaultPos.y };
+    };
+
+    const centerNow = () => {
+      if (!rememberPosition) {
+        setInitial(calculateCenteredPosition());
+        return;
       }
-    } catch {}
-  }, [rememberPosition, storageKey]);
+
+      try {
+        const raw = localStorage.getItem(storageKey);
+        if (raw) {
+          const p = JSON.parse(raw);
+          if (typeof p?.x === "number" && typeof p?.y === "number") {
+            setInitial(p);
+            return;
+          }
+        }
+        setInitial(calculateCenteredPosition());
+      } catch {
+        setInitial(calculateCenteredPosition());
+      }
+    };
+
+    // Ejecutar centrado antes del siguiente paint
+    if (typeof window !== 'undefined') {
+      if ("requestAnimationFrame" in window) {
+        window.requestAnimationFrame(() => {
+          centerNow();
+        });
+      } else {
+        centerNow();
+      }
+    }
+  }, [rememberPosition, storageKey, sidebarWidth, rightSafe, defaultPos]);
+
+  // Marca que la animación ya se ejecutó (para evitar repetirla en cada render)
+  useEffect(() => {
+    const timer = setTimeout(() => setHasAnimated(true), 800);
+    return () => clearTimeout(timer);
+  }, []);
 
   const handlePointerDown = (e: React.PointerEvent) => {
     const el = e.target as HTMLElement;
@@ -94,6 +137,7 @@ export default function DraggableTerminal({
           }}
         />
         {/* Ventana arrastrable */}
+        {initial && (
         <motion.div
           className="pointer-events-auto absolute"
           drag
@@ -102,7 +146,7 @@ export default function DraggableTerminal({
           dragConstraints={constraintsRef}
           dragMomentum={false}
           onDragEnd={handleDragEnd}
-          initial={isClient ? initial : defaultPos}
+          initial={initial}
           whileDrag={{ cursor: "grabbing", scale: 1.005 }}
           style={{
             width: "min(860px, calc(100vw - 140px))",
@@ -110,16 +154,55 @@ export default function DraggableTerminal({
           }}
           onPointerDown={handlePointerDown}
         >
-          {children}
+          {/* Animación de aparición tipo macOS */}
+          <motion.div
+            initial={{ 
+              opacity: 0, 
+              scale: 0.8,
+              y: 20
+            }}
+            animate={{ 
+              opacity: 1, 
+              scale: 1,
+              y: 0
+            }}
+            transition={{
+              duration: 0.5,
+              ease: [0.16, 1, 0.3, 1], // Curva de easing tipo macOS
+              opacity: { duration: 0.3 },
+            }}
+          >
+            {children}
+          </motion.div>
         </motion.div>
+        )}
       </div>
 
       {/* Mobile/Tablet: Ventana fija en la parte inferior (visible solo en mobile/tablet) */}
       <div className="lg:hidden fixed left-0 right-0 pointer-events-auto" style={{ zIndex, margin: '10px', bottom: '80px' }}>
-        {children}
+        <motion.div
+          initial={{ 
+            opacity: 0, 
+            scale: 0.8,
+            y: 20
+          }}
+          animate={{ 
+            opacity: 1, 
+            scale: 1,
+            y: 0
+          }}
+          transition={{
+            duration: 0.5,
+            ease: [0.16, 1, 0.3, 1], // Curva de easing tipo macOS
+            opacity: { duration: 0.3 },
+          }}
+        >
+          {children}
+        </motion.div>
       </div>
     </>
   );
 }
+
 
 

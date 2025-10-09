@@ -46,7 +46,7 @@ export default function Hero({ className }: HeroProps) {
         bottomSafe={16}
         defaultPos={{ x: 0, y: 120 }}
         zIndex={30}
-        rememberPosition
+        rememberPosition={false}
       >
         {/* No cambies ChatInterface por dentro */}
         <div className="px-4 sm:px-0">

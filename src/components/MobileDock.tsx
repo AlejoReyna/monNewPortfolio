@@ -44,7 +44,7 @@ export default function MobileDock() {
     },
     { 
       label: "LinkedIn",
-      href: "https://www.linkedin.com/",
+      href: "https://www.linkedin.com/in/alexis-alberto-reyna-sánchez-6953102b4",
       icon: "linkedin"
     },
     { 

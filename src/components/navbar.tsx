@@ -111,6 +111,21 @@ export default function Navbar() {
                   bgColor: "from-orange-500 to-red-500"
                 },
                 { 
+                  section: "projects", 
+                  label: isEs ? "Proyectos" : "Projects",
+                  icon: (
+                    <Image
+                      src="/linux_folder.png"
+                      alt="Linux Folder"
+                      fill
+                      className="object-contain p-0"
+                      sizes="(max-width: 1280px) 2.5rem, 2.75rem"
+                      priority
+                    />
+                  ),
+                  bgColor: "from-purple-500 to-pink-500"
+                },
+                { 
                   section: "services", 
                   label: isEs ? "Servicios" : "Services",
                   icon: (
@@ -119,16 +134,6 @@ export default function Navbar() {
                     </svg>
                   ),
                   bgColor: "from-yellow-500 to-orange-500"
-                },
-                { 
-                  section: "projects", 
-                  label: isEs ? "Proyectos" : "Projects",
-                  icon: (
-                    <svg className="w-5 h-5 xl:w-6 xl:h-6" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M20 6h-2.18c.11-.31.18-.65.18-1a2.996 2.996 0 0 0-5.5-1.65l-.5.67-.5-.68C10.96 2.54 10.05 2 9 2 7.34 2 6 3.34 6 5c0 .35.07.69.18 1H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-5-2c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zM9 4c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1z"/>
-                    </svg>
-                  ),
-                  bgColor: "from-purple-500 to-pink-500"
                 }
               ].map((item) => (
                 <>
@@ -136,7 +141,7 @@ export default function Navbar() {
                   <button
                     onClick={() => navigateToSection(item.section as "home" | "services" | "projects" | "contact")}
                     className={`group relative flex items-center justify-center w-10 h-10 xl:w-11 xl:h-11 rounded-xl shadow-lg transition-all duration-300 hover:scale-110 active:scale-95 hover:shadow-xl overflow-hidden ${
-                      item.section === "home"
+                      item.section === "home" || item.section === "projects"
                         ? "bg-transparent"
                         : currentSection === item.section
                           ? `bg-gradient-to-br ${item.bgColor} text-white`
@@ -159,22 +164,27 @@ export default function Navbar() {
                     {/* LinkedIn below Terminal */}
                     <li key="social-linkedin">
                       <a
-                        href="https://www.linkedin.com/"
+                        href="https://www.linkedin.com/in/alexis-alberto-reyna-sánchez-6953102b4"
                         target="_blank"
                         rel="noopener noreferrer"
                         aria-label="Open LinkedIn"
                         className="group relative flex items-center justify-center w-10 h-10 xl:w-11 xl:h-11 rounded-xl shadow-lg transition-all duration-300 hover:scale-110 active:scale-95 hover:shadow-xl bg-white/20 text-white/80 hover:bg-white/30 hover:text-white"
                       >
-                        <svg className="w-5 h-5 xl:w-6 xl:h-6" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                          <path fill="#0A66C2" d="M4.983 3.5a2.5 2.5 0 11-.002 5.002A2.5 2.5 0 014.983 3.5zM3.5 9h2.967v11H3.5V9zm6.318 0H12.7v1.507h.046c.446-.846 1.538-1.739 3.167-1.739 3.388 0 4.013 2.234 4.013 5.142V20H16.96v-5.12c0-1.22-.022-2.79-1.7-2.79-1.703 0-1.963 1.33-1.963 2.702V20H9.818V9z"/>
-                        </svg>
+                        <Image
+                          src="/linkedin_icon.png"
+                          alt="LinkedIn"
+                          fill
+                          className="object-contain p-0"
+                          sizes="(max-width: 1280px) 2.5rem, 2.75rem"
+                          priority
+                        />
                         <div className="absolute left-full ml-3 px-2 py-1 bg-black/80 text-white text-xs rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50">
                           LinkedIn
                         </div>
                       </a>
                     </li>
-                    {/* SoundCloud below LinkedIn */}
-                    <li key="social-soundcloud">
+                    {/* SoundCloud below LinkedIn - COMMENTED OUT */}
+                    {/* <li key="social-soundcloud">
                       <a
                         href="https://soundcloud.com/"
                         target="_blank"
@@ -196,7 +206,7 @@ export default function Navbar() {
                           SoundCloud
                         </div>
                       </a>
-                    </li>
+                    </li> */}
                   </>
                 )}
                 </>

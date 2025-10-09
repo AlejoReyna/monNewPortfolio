@@ -120,7 +120,7 @@ export default function LetsTalk() {
             </a>
             <a
               aria-label="LinkedIn"
-              href="#"
+              href="https://www.linkedin.com/in/alexis-alberto-reyna-sánchez-6953102b4"
               className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-black/40 text-gray-200 hover:text-white hover:bg-black/50 backdrop-blur-md transition-colors"
             >
               {/* Real LinkedIn glyph from footer.tsx */}
