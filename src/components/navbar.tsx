@@ -82,6 +82,10 @@ export default function Navbar() {
               <svg className="w-5 h-5 xl:w-6 xl:h-6 text-white" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path d="M12 2C6.477 2 2 6.484 2 12.01c0 4.424 2.865 8.18 6.839 9.504.5.092.682-.218.682-.486 0-.24-.009-.876-.014-1.72-2.782.605-3.369-1.343-3.369-1.343-.454-1.157-1.11-1.467-1.11-1.467-.908-.622.069-.609.069-.609 1.003.071 1.53 1.032 1.53 1.032.892 1.542 2.341 1.096 2.91.838.091-.654.35-1.096.636-1.349-2.22-.254-4.555-1.114-4.555-4.957 0-1.095.39-1.991 1.029-2.693-.103-.253-.446-1.274.098-2.656 0 0 .84-.27 2.75 1.028A9.564 9.564 0 0112 6.844c.851.004 1.707.115 2.507.337 1.909-1.298 2.748-1.028 2.748-1.028.546 1.382.203 2.403.1 2.656.64.702 1.028 1.598 1.028 2.693 0 3.854-2.339 4.701-4.566 4.951.359.31.679.924.679 1.862 0 1.344-.012 2.428-.012 2.758 0 .27.18.582.688.483A10.02 10.02 0 0022 12.01C22 6.484 17.523 2 12 2z"/>
               </svg>
+              {/* Tooltip */}
+              <div className="pointer-events-none absolute -top-7 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded bg-black text-white text-[10px] opacity-0 group-hover:opacity-100 transition-opacity duration-150">
+                GitHub
+              </div>
             </a>
           </div>
 
@@ -125,22 +129,22 @@ export default function Navbar() {
                   ),
                   bgColor: "from-purple-500 to-pink-500"
                 },
-                { 
-                  section: "services", 
-                  label: isEs ? "Servicios" : "Services",
-                  icon: (
-                    <svg className="w-5 h-5 xl:w-6 xl:h-6" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                    </svg>
-                  ),
-                  bgColor: "from-yellow-500 to-orange-500"
-                }
+                // { 
+                //   section: "services", 
+                //   label: isEs ? "Servicios" : "Services",
+                //   icon: (
+                //     <svg className="w-5 h-5 xl:w-6 xl:h-6" fill="currentColor" viewBox="0 0 24 24">
+                //       <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                //     </svg>
+                //   ),
+                //   bgColor: "from-yellow-500 to-orange-500"
+                // }
               ].map((item) => (
                 <>
                 <li key={item.label}>
                   <button
                     onClick={() => navigateToSection(item.section as "home" | "services" | "projects" | "contact")}
-                    className={`group relative flex items-center justify-center w-10 h-10 xl:w-11 xl:h-11 rounded-xl shadow-lg transition-all duration-300 hover:scale-110 active:scale-95 hover:shadow-xl overflow-hidden ${
+                    className={`group relative flex items-center justify-center w-10 h-10 xl:w-11 xl:h-11 rounded-xl shadow-lg transition-all duration-300 hover:scale-110 active:scale-95 hover:shadow-xl ${
                       item.section === "home" || item.section === "projects"
                         ? "bg-transparent"
                         : currentSection === item.section
@@ -149,14 +153,13 @@ export default function Navbar() {
                     }`}
                   >
                     {item.icon}
-                    {/* Active indicator */}
-                    {currentSection === item.section && (
-                      <div className="absolute -left-1 top-1/2 -translate-y-1/2 w-1 h-6 bg-white rounded-full" />
-                    )}
+                    {/* Active indicator removed on desktop; kept only in MobileDock */}
                     {/* Tooltip */}
-                    <div className="absolute left-full ml-3 px-2 py-1 bg-black/80 text-white text-xs rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50">
-                      {item.label}
-                    </div>
+                    {(item.section === 'home' || item.section === 'projects' || item.section === 'services') && (
+                      <div className="pointer-events-none absolute -top-7 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded bg-black text-white text-[10px] opacity-0 group-hover:opacity-100 transition-opacity duration-150 z-50">
+                        {item.section === 'home' ? (isEs ? 'Inicio' : 'Home') : item.section === 'projects' ? (isEs ? 'Proyectos' : 'Projects') : (isEs ? 'Servicios' : 'Services')}
+                      </div>
+                    )}
                   </button>
                 </li>
                 {item.section === 'home' && (
@@ -168,10 +171,10 @@ export default function Navbar() {
                         target="_blank"
                         rel="noopener noreferrer"
                         aria-label="Open LinkedIn"
-                        className="group relative flex items-center justify-center w-10 h-10 xl:w-11 xl:h-11 rounded-xl shadow-lg transition-all duration-300 hover:scale-110 active:scale-95 hover:shadow-xl bg-white/20 text-white/80 hover:bg-white/30 hover:text-white"
+                        className="group relative flex items-center justify-center w-10 h-10 xl:w-11 xl:h-11 rounded-xl shadow-lg transition-all duration-300 hover:scale-110 active:scale-95 hover:shadow-xl bg-transparent text-white/80"
                       >
                         <Image
-                          src="/linkedin_icon.png"
+                          src="/LinkedIn_icon.svg"
                           alt="LinkedIn"
                           fill
                           className="object-contain p-0"

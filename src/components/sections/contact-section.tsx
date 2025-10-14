@@ -123,10 +123,7 @@ export default function LetsTalk() {
               href="https://www.linkedin.com/in/alexis-alberto-reyna-sánchez-6953102b4"
               className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-black/40 text-gray-200 hover:text-white hover:bg-black/50 backdrop-blur-md transition-colors"
             >
-              {/* Real LinkedIn glyph from footer.tsx */}
-              <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor" role="img">
-                <path d="M22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.454C23.205 24 24 23.227 24 22.271V1.729C24 .774 23.205 0 22.225 0zM7.034 20.452H3.89V9h3.144v11.452zM5.462 7.433a2.062 2.062 0 110-4.124 2.062 2.062 0 010 4.124zM20.452 20.452h-3.142v-5.569c0-1.328-.027-3.037-1.854-3.037-1.855 0-2.139 1.445-2.139 2.939v5.667H10.18V9h3.017v1.561h.043c.421-.8 1.451-1.852 3.352-1.852 3.584 0 3.86 2.36 3.86 5.425v6.318z" />
-              </svg>
+              <img src="/LinkedIn_icon.svg" alt="LinkedIn" className="h-5 w-5" />
             </a>
 
             {/* WhatsApp icon */}

@@ -111,8 +111,8 @@ function Card({
       )}
 
       {/* Content (compact en mobile) */}
-      <div className="relative z-10 flex h-full items-end">
-        <div className="w-full text-white bg-black/55 backdrop-blur-sm p-4 md:p-7 rounded-t-xl">
+          <div className="relative z-10 flex h-full items-end">
+        <div className="w-full text-white bg-black/55 backdrop-blur-sm p-4 md:p-7">
           {date && <p className="text-white/70 text-[11px] md:text-sm mb-1.5 md:mb-2">{date}</p>}
           {kicker && <p className="text-white/70 text-[11px] md:text-xs mb-1">{kicker}</p>}
           <h3 className="font-mono font-light leading-tight text-lg md:text-2xl">{title}</h3>
@@ -193,43 +193,40 @@ export default function ProjectsSection() {
           className="relative z-10 w-full max-w-6xl text-center"
         >
           {/* Header */}
-          <motion.div variants={item} className="text-left mb-4">
+          <motion.div variants={item} className="text-left mb-4 mt-4 md:mt-6 lg:mt-12">
             <h4 className="font-mono text-2xl md:text-3xl text-white/90 tracking-wide">
               {copy.featured.title}
             </h4>
             <p className="text-white/70 text-sm md:text-base">{copy.featured.desc}</p>
           </motion.div>
 
-          {/* FILA SUPERIOR (stack en mobile, alturas controladas) */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 auto-rows-auto gap-4 md:gap-6 lg:gap-8 text-left mx-auto">
+          {/* FILA SUPERIOR (stack en mobile) → Dos columnas 50% c/u en lg+ con 90vh de alto */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 auto-rows-auto gap-4 md:gap-6 lg:gap-8 text-left mx-auto">
             <Card
               kind="video"
               media="/plebes_video.mp4"
-              badge={isEs ? "MODA" : "FASHION"}
-              date={isEs ? "Hace 1 día" : "1 day ago"}
+              
               title={isEs ? "Plebes DAO | Diseño UX/UI" : "Plebes DAO | UX/UI Design"}
-              desc={
-                isEs
-                  ? "Breve descripción del post: lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod."
-                  : "Short post description: lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod."
-              }
-              className="lg:col-span-2 lg:row-span-2 md:min-h-[360px]"
+              desc={"Community‑driven DAO on ICP (Internet Computer). Design, branding and UX."}
+              links={[
+                { href: "https://plebes.xyz", label: isEs ? "Demo en vivo" : "Live demo" },
+              ]}
+              className="md:min-h-[360px] lg:min-h-[90vh] lg:h-[90vh]"
               gradient="from-black/85 via-black/50 to-transparent"
               mobileAspect="16/10"
             />
 
             <Card
-              kind="image"
-              media="/wedding_cover.jpg"
-              badge={isEs ? "BODAS" : "WEDDINGS"}
-              date={isEs ? "Hace 2 días" : "2 days ago"}
+              kind="video"
+              media="/wedding_preview.mp4"
+              
               title="Andrea & Aldo | Wedding invitation"
-              desc={
-                isEs
-                  ? "Breve descripción del post: lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod."
-                  : "Short post description: lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod."
-              }
-              className="lg:row-span-2 md:min-h-[360px]"
+              desc={"Interactive wedding invitation site with RSVP flow, schedule and maps."}
+              links={[
+                { href: "https://aldoyandrea.com", label: isEs ? "Demo en vivo" : "Live demo" },
+                { href: "https://github.com/AlejoReyna/wedding_invitation", label: "GitHub" },
+              ]}
+              className="md:min-h-[360px] lg:min-h-[90vh] lg:h-[90vh]"
               gradient="from-black/70 via-black/40 to-transparent"
               mobileAspect="4/3"
             />
@@ -258,7 +255,8 @@ export default function ProjectsSection() {
             />
 
             <Card
-              kind="empty"
+              kind="video"
+              media="/preview_pokefolio.mp4"
               badge={isEs ? "PORTAFOLIO" : "PORTFOLIO"}
               title={`PokeFolio — ${isEs ? "Portfolio estilo Pokémon" : "Pokémon-style portfolio"}`}
               desc={

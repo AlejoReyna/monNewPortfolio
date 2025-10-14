@@ -167,9 +167,7 @@ export default function LetsTalk() {
               href="https://www.linkedin.com/in/alexis-alberto-reyna-sánchez-6953102b4"
               className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-black/40 text-gray-200 hover:text-white hover:bg-black/50 backdrop-blur-md transition-colors"
             >
-              <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M4.98 3.5C4.98 4.88 3.86 6 2.5 6S0 4.88 0 3.5 1.12 1 2.5 1s2.48 1.12 2.48 2.5zM.5 8h4V24h-4zM8.5 8h3.8v2.2h.05c.53-1 1.82-2.2 3.75-2.2 4 0 4.75 2.63 4.75 6v7.99h-4V15.5c0-2 0-4.5-2.75-4.5s-3.17 2.15-3.17 4.36V24h-4z" />
-              </svg>
+              <img src="/LinkedIn_icon.svg" alt="LinkedIn" className="h-5 w-5" />
             </a>
           </div>
         </div>
