@@ -1,9 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import Navbar from "@/components/navbar";
-import MobileDock from "@/components/MobileDock";
-
 import { LanguageProvider, LanguageFade } from "@/components/lang-context";
 import { NavigationProvider } from "@/contexts/navigation-context";
 
@@ -69,9 +66,7 @@ export default function RootLayout({
           <NavigationProvider>
             <LanguageFade>
               <a id="top" />
-              <Navbar />
               {children}
-              <MobileDock />
               {/* <Footer /> */}
             </LanguageFade>
           </NavigationProvider>
