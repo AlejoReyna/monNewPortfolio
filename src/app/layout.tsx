@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import Navbar from "@/components/navbar";
-import MobileDock from "@/components/MobileDock";
+// import Navbar from "@/components/navbar";
+// import MobileDock from "@/components/MobileDock";
 
 import { LanguageProvider, LanguageFade } from "@/components/lang-context";
 import { NavigationProvider } from "@/contexts/navigation-context";
@@ -63,15 +63,26 @@ export default function RootLayout({
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-        style={{ backgroundColor: '#080404' }}
+        // NOTE: "standby" mode — keep body neutral so the page can be fully blank/white.
+        // Previous background used by the desktop UI:
+        // style={{ backgroundColor: "#080404" }}
+        style={{ backgroundColor: "#ffffff" }}
       >
         <LanguageProvider>
           <NavigationProvider>
             <LanguageFade>
               <a id="top" />
-              <Navbar />
+              {/*
+               * Standby page: hide global desktop chrome (macOS top bar / sidebar).
+               * Re-enable when bringing back the original desktop UI.
+               */}
+              {/* <Navbar /> */}
               {children}
-              <MobileDock />
+              {/*
+               * Standby page: hide mobile dock.
+               * Re-enable when bringing back the original desktop UI.
+               */}
+              {/* <MobileDock /> */}
               {/* <Footer /> */}
             </LanguageFade>
           </NavigationProvider>
