@@ -207,6 +207,7 @@ export default function ChatInterface() {
   const [typewriterComplete, setTypewriterComplete] = useState(false);
   const [visibleButtons, setVisibleButtons] = useState(0);
   const [showInput, setShowInput] = useState(false);
+  const [lastLoginLine, setLastLoginLine] = useState("Last login: -- on ttys009");
 
   const greetings = [
     {
@@ -232,6 +233,13 @@ export default function ChatInterface() {
   useEffect(() => {
     setGreetingIndex(Math.floor(Math.random() * greetings.length));
   }, [greetings.length]);
+
+  useEffect(() => {
+    const now = new Date();
+    const date = now.toDateString();
+    const time = now.toTimeString().split(" ")[0];
+    setLastLoginLine(`Last login: ${date} ${time} on ttys009`);
+  }, []);
 
   const baseGreeting = isEs ? greetings[greetingIndex].es : greetings[greetingIndex].en;
   const text = userName
@@ -301,7 +309,7 @@ export default function ChatInterface() {
         <div className="p-2 lg:p-4 flex-1 flex flex-col overflow-hidden">
           {/* Mensaje inicial o última línea de login */}
           <div className="text-xs lg:text-sm xl:text-[13px] text-gray-500 font-mono mb-2">
-            Last login: {new Date().toDateString()} {new Date().toTimeString().split(" ")[0]} on ttys009
+            {lastLoginLine}
           </div>
 
           {/* Portada (misma línea con el $, envuelve debajo si falta ancho) */}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { useLanguage } from "@/components/lang-context";
 import { useNavigation } from "@/contexts/navigation-context";
 import Image from "next/image";
@@ -10,12 +10,13 @@ export default function Navbar() {
   const { navigateToSection, currentSection } = useNavigation();
   const isEs = language === 'es';
   // Removed unused isScrolled state variable
-  const [currentTime, setCurrentTime] = useState(new Date());
+  const [currentTime, setCurrentTime] = useState<Date | null>(null);
 
   // Removed unused scroll effect that was setting isScrolled
 
   // Update time every second
   useEffect(() => {
+    setCurrentTime(new Date());
     const timer = setInterval(() => {
       setCurrentTime(new Date());
     }, 1000);
@@ -56,11 +57,13 @@ export default function Navbar() {
 
             {/* Time */}
             <span className="text-white/70 text-xs font-mono tabular-nums">
-              {currentTime.toLocaleTimeString([], { 
-                hour: '2-digit', 
-                minute: '2-digit',
-                hour12: false 
-              })}
+              {currentTime
+                ? currentTime.toLocaleTimeString([], {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    hour12: false,
+                  })
+                : "--:--"}
             </span>
           </div>
         </div>
@@ -140,8 +143,8 @@ export default function Navbar() {
                 //   bgColor: "from-yellow-500 to-orange-500"
                 // }
               ].map((item) => (
-                <>
-                <li key={item.label}>
+                <Fragment key={item.section}>
+                <li>
                   <button
                     onClick={() => navigateToSection(item.section as "home" | "services" | "projects" | "contact")}
                     className={`group relative flex items-center justify-center w-10 h-10 xl:w-11 xl:h-11 rounded-xl shadow-lg transition-all duration-300 hover:scale-110 active:scale-95 hover:shadow-xl ${
@@ -212,7 +215,7 @@ export default function Navbar() {
                     </li> */}
                   </>
                 )}
-                </>
+                </Fragment>
               ))}
             </ul>
             
