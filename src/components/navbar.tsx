@@ -70,7 +70,7 @@ export default function Navbar() {
       </div>
 
       {/* Desktop macOS-style Sidebar */}
-      <aside className="hidden lg:fixed lg:top-11 lg:bottom-4 lg:left-4 lg:z-[60] lg:flex lg:w-16 xl:w-18 lg:flex-col">
+      <aside className="hero-sidebar hidden lg:fixed lg:top-11 lg:bottom-4 lg:left-4 lg:z-[60] lg:flex lg:w-16 xl:w-18 lg:flex-col">
         <div className="flex grow flex-col gap-y-3 overflow-y-auto bg-white/10 backdrop-blur-2xl border border-white/20 rounded-2xl shadow-2xl p-3">
           {/* Brand Section */}
           <div className="flex shrink-0 items-center justify-center">

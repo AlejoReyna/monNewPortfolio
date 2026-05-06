@@ -1,374 +1,277 @@
 "use client";
 
-import type React from "react";
 import { useMemo } from "react";
-import { motion, useScroll, useSpring } from "framer-motion";
+import { motion, MotionConfig } from "framer-motion";
 import Link from "next/link";
-import Image from "next/image";
+import { useLanguage } from "@/components/lang-context";
 
-/* =========================
-   Util
-========================= */
-const cn = (...cls: (string | false | undefined)[]) => cls.filter(Boolean).join(" ");
-
-/* =========================
-   Tilt / parallax en hover
-========================= */
-function withTilt(e: React.MouseEvent<HTMLDivElement, MouseEvent>) {
-  const el = e.currentTarget as HTMLDivElement;
-  const rect = el.getBoundingClientRect();
-  const px = (e.clientX - rect.left) / rect.width;
-  const py = (e.clientY - rect.top) / rect.height;
-  el.style.setProperty("--px", String(px));
-  el.style.setProperty("--py", String(py));
-}
-
-/* =========================
-   Tarjeta visual estilo "projects"
-========================= */
-function VisualCard({
-  kind = "image",
-  media,
-  title,
-  badge,
-  gradient = "from-black/80 via-black/40 to-transparent",
-}: {
-  kind?: "image" | "video" | "empty";
-  media?: string;
-  title: string;
-  badge?: string;
-  gradient?: string;
-}) {
-  return (
-    <div
-      onMouseMove={withTilt}
-      className={cn(
-        "group relative w-full max-w-lg aspect-[16/10] rounded-3xl overflow-hidden",
-        "border border-white/10 bg-white/5 backdrop-blur-sm shadow-2xl will-change-transform"
-      )}
-      style={{
-        transform:
-          "perspective(900px) rotateX(calc((0.5 - var(--py, .5)) * 3deg)) rotateY(calc((var(--px, .5) - 0.5) * 6deg))",
-        transition: "transform 120ms ease-out",
-      }}
-    >
-      {/* Media */}
-      {kind !== "empty" && media && (
-        <>
-          {kind === "video" ? (
-            <video
-              className="absolute inset-0 h-full w-full object-cover"
-              autoPlay
-              muted
-              loop
-              playsInline
-            >
-              <source src={media} type="video/mp4" />
-            </video>
-          ) : (
-            <Image
-              src={media}
-              alt={title}
-              fill
-              className="object-cover transition-transform duration-700 group-hover:scale-[1.03]"
-            />
-          )}
-          <div className={`absolute inset-0 bg-gradient-to-t ${gradient}`} />
-          <div className="absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100 bg-white/5" />
-        </>
-      )}
-
-      {/* Chrome dots deco */}
-      <div className="absolute left-4 top-4 z-20 flex gap-2">
-        <span className="h-3 w-3 rounded-full bg-rose-400/90" />
-        <span className="h-3 w-3 rounded-full bg-amber-300/90" />
-        <span className="h-3 w-3 rounded-full bg-emerald-400/90" />
-      </div>
-
-      {/* Badge */}
-      {badge && (
-        <span className="absolute top-4 right-4 z-20 rounded-full bg-white/15 border border-white/20 backdrop-blur px-3 py-1 text-[10px] tracking-wide text-white">
-          {badge}
-        </span>
-      )}
-
-      {/* Footer strip */}
-      <div className="absolute inset-x-0 bottom-0 z-20">
-        <div className="m-3 rounded-xl bg-black/55 backdrop-blur-sm border border-white/10 px-4 py-3">
-          <h3 className="font-mono font-light text-white leading-tight">{title}</h3>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-/* =========================
-   Sección reusable
-========================= */
-function ServiceSection({
-  id,
-  title,
-  subtitle,
-  bullets,
-  cta,
-  reverse,
-  visual, // { kind, media, badge, gradient }
-}: {
-  id: string;
-  title: string;
-  subtitle: string;
-  bullets: string[];
-  cta: { label: string; href: string }[];
-  reverse?: boolean;
-  visual?: {
-    kind?: "image" | "video" | "empty";
-    media?: string;
-    badge?: string;
-    gradient?: string;
-  };
-}) {
-  return (
-    <section
-      id={id}
-      className={cn(
-        "snap-start h-screen w-full relative overflow-hidden",
-        "flex items-center",
-        "bg-black text-white"
-      )}
-      aria-label={title}
-    >
-      {/* Vignette suave */}
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/40" />
-
-      <div
-        className={cn(
-          "relative z-10 mx-auto grid w-full max-w-6xl gap-10 px-6 md:px-10",
-          "md:grid-cols-2"
-        )}
-      >
-        {/* Texto */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.4 }}
-          transition={{ duration: 0.6 }}
-          className={cn("flex flex-col justify-center", reverse && "md:order-2")}
-        >
-          <h2 className="text-4xl md:text-5xl font-extrabold text-white tracking-tight">
-            {title}
-          </h2>
-          <p className="mt-3 text-lg text-white/80 max-w-prose">{subtitle}</p>
-
-          <ul className="mt-6 space-y-2 text-white/80">
-            {bullets.map((b, i) => (
-              <li key={i} className="flex items-start gap-3">
-                <span className="mt-1 h-2 w-2 rounded-full bg-white/80" />
-                <span>{b}</span>
-              </li>
-            ))}
-          </ul>
-
-          <div className="mt-8 flex flex-wrap gap-3">
-            {cta.map((c) => (
-              <Link
-                key={c.label}
-                href={c.href}
-                className={cn(
-                  "rounded-2xl px-5 py-3 text-sm font-semibold",
-                  "bg-white text-black hover:bg-white/90 transition",
-                  "shadow-lg shadow-black/20"
-                )}
-              >
-                {c.label}
-              </Link>
-            ))}
-          </div>
-        </motion.div>
-
-        {/* Visual tipo "projects" */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.3 }}
-          transition={{ duration: 0.6, delay: 0.05 }}
-          className={cn(
-            "grid place-items-center",
-            reverse && "md:order-1"
-          )}
-        >
-          <VisualCard
-            kind={visual?.kind}
-            media={visual?.media}
-            badge={visual?.badge}
-            title={title}
-            gradient={visual?.gradient}
-          />
-        </motion.div>
-      </div>
-    </section>
-  );
-}
-
-/* =========================
-   Dots Nav
-========================= */
-function DotNav() {
-  const items = [
-    { id: "web" },
-    { id: "mobile" }, // (UX/UI) mantenemos id para no romper anclas
-    { id: "cloud" },  // (AWS)   mantenemos id para no romper anclas
-  ];
-  return (
-    <nav className="fixed right-5 top-1/2 -translate-y-1/2 hidden md:flex flex-col gap-3 z-50">
-      {items.map((it) => (
-        <a key={it.id} href={`#${it.id}`} className="group" aria-label={`Ir a ${it.id}`}>
-          <span className="block h-3 w-3 rounded-full bg-white/40 group-hover:bg-white transition" />
-        </a>
-      ))}
-    </nav>
-  );
-}
-
-/* =========================
-   Barra de progreso scroll
-========================= */
-function TopProgress() {
-  const { scrollYProgress } = useScroll();
-  const scaleX = useSpring(scrollYProgress, { stiffness: 100, damping: 30, mass: 0.2 });
-  return (
-    <motion.div
-      style={{ scaleX }}
-      className="fixed left-0 right-0 top-0 h-1 origin-left bg-white/80 z-50"
-    />
-  );
-}
-
-/* =========================
-   Página
-========================= */
-type VisualKind = "image" | "video" | "empty";
 type ServiceDef = {
   id: string;
+  eyebrow: string;
   title: string;
   subtitle: string;
   bullets: string[];
   cta: { label: string; href: string }[];
-  reverse?: boolean;
-  visual?: {
-    kind?: VisualKind;
-    media?: string;
-    badge?: string;
-    gradient?: string;
-  };
+  featured?: boolean;
 };
+
+const cardVariant = {
+  hidden: { opacity: 0, y: 24 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] as const } },
+};
+
+function ServiceCard({ service }: { service: ServiceDef }) {
+  const isFeatured = service.featured;
+
+  return (
+    <motion.article
+      id={service.id}
+      variants={cardVariant}
+      className="relative overflow-hidden flex flex-col justify-between"
+      style={{
+        minHeight: isFeatured ? "360px" : "320px",
+        padding: isFeatured ? "clamp(32px, 5vw, 64px)" : "var(--gic-spacing-24)",
+        borderRadius: isFeatured ? "var(--gic-radius-cards-large)" : "var(--gic-radius-cards-small)",
+        background: isFeatured ? "var(--gic-cofounder-blue)" : "var(--gic-off-white)",
+        boxShadow: isFeatured ? "var(--gic-shadow-subtle-3)" : "var(--gic-shadow-subtle-2)",
+      }}
+    >
+      {isFeatured && (
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background:
+              "radial-gradient(circle at 80% 18%, rgba(255,255,255,0.16), transparent 34%), linear-gradient(135deg, rgba(255,255,255,0.08), transparent 46%)",
+          }}
+        />
+      )}
+
+      <div className="relative z-10 flex flex-col gap-4">
+        <span
+          style={{
+            fontFamily: "var(--gic-font-sans)",
+            fontSize: "11px",
+            fontWeight: 600,
+            letterSpacing: "0.06em",
+            textTransform: "uppercase",
+            color: isFeatured ? "rgba(255,255,255,0.62)" : "var(--gic-medium-gray)",
+          }}
+        >
+          {service.eyebrow}
+        </span>
+
+        <h3
+          style={{
+            fontFamily: "var(--gic-font-serif)",
+            fontSize: isFeatured ? "clamp(32px, 4vw, var(--gic-text-heading-lg))" : "var(--gic-text-heading)",
+            fontWeight: 400,
+            lineHeight: "var(--gic-leading-heading)",
+            letterSpacing: "var(--gic-tracking-heading)",
+            color: isFeatured ? "var(--gic-canvas-white)" : "var(--gic-dark-charcoal)",
+            maxWidth: isFeatured ? "620px" : "420px",
+          }}
+        >
+          {service.title}
+        </h3>
+
+        <p
+          style={{
+            fontFamily: "var(--gic-font-sans)",
+            fontSize: "16px",
+            lineHeight: 1.5,
+            letterSpacing: "-0.012em",
+            color: isFeatured ? "rgba(255,255,255,0.78)" : "var(--gic-medium-gray)",
+            maxWidth: "560px",
+          }}
+        >
+          {service.subtitle}
+        </p>
+
+        <ul className="grid gap-2 pt-2">
+          {service.bullets.map((bullet) => (
+            <li key={bullet} className="flex items-start gap-3">
+              <span
+                className="mt-2 h-1.5 w-1.5 rounded-full shrink-0"
+                style={{
+                  backgroundColor: isFeatured ? "rgba(255,255,255,0.72)" : "var(--gic-action-azure)",
+                }}
+              />
+              <span
+                style={{
+                  fontFamily: "var(--gic-font-sans)",
+                  fontSize: "15px",
+                  lineHeight: 1.45,
+                  letterSpacing: "-0.012em",
+                  color: isFeatured ? "rgba(255,255,255,0.72)" : "var(--gic-slate-gray)",
+                }}
+              >
+                {bullet}
+              </span>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <div className="relative z-10 flex flex-wrap gap-4 pt-8">
+        {service.cta.map((action) => (
+          <Link
+            key={action.href + action.label}
+            href={action.href}
+            style={{
+              fontFamily: "var(--gic-font-sans)",
+              fontSize: "var(--gic-text-caption)",
+              fontWeight: 500,
+              letterSpacing: "var(--gic-tracking-caption)",
+              color: isFeatured ? "var(--gic-canvas-white)" : "var(--gic-cofounder-blue)",
+              textDecoration: "underline",
+              textUnderlineOffset: "3px",
+            }}
+          >
+            {action.label} ↗
+          </Link>
+        ))}
+      </div>
+    </motion.article>
+  );
+}
+
 export default function ServicesPage() {
+  const { language } = useLanguage();
+  const isEs = language === "es";
+
   const sections = useMemo<ServiceDef[]>(
     () => [
       {
         id: "web",
-        title: "Web Development",
-        subtitle:
-          "Modern, fast and responsive web apps using React/Next.js, Vue 3 and TypeScript.",
+        eyebrow: isEs ? "Ingeniería web" : "Web engineering",
+        title: isEs ? "Productos web rápidos, claros y escalables." : "Fast, clear, scalable web products.",
+        subtitle: isEs
+          ? "Construyo interfaces y sistemas con Next.js, React, Vue y TypeScript, cuidando rendimiento, accesibilidad y mantenibilidad."
+          : "I build interfaces and systems with Next.js, React, Vue and TypeScript, with attention to performance, accessibility and maintainability.",
         bullets: [
-          "Landing pages, dashboards y sistemas internos",
-          "SSR/SSG con Next.js, accesibilidad y SEO técnico",
-          "Testing (Vitest/Jest) y CI/CD",
+          isEs ? "Landing pages, dashboards y sistemas internos" : "Landing pages, dashboards and internal tools",
+          isEs ? "SSR/SSG, SEO técnico y componentes reutilizables" : "SSR/SSG, technical SEO and reusable components",
+          isEs ? "Testing, CI/CD y despliegues confiables" : "Testing, CI/CD and reliable deployments",
         ],
         cta: [
-          { label: "Ver proyectos web", href: "/projects?type=web" },
-          { label: "Cotizar", href: "/contact" },
+          { label: isEs ? "Ver trabajo" : "View work", href: "#projects" },
+          { label: isEs ? "Hablemos" : "Start a conversation", href: "#contact" },
         ],
-        visual: {
-          kind: "image",
-          media: "/services/web.jpg",
-          badge: "NEXT.JS · VUE",
-          gradient: "from-black/85 via-black/45 to-transparent",
-        },
+        featured: true,
       },
       {
         id: "mobile",
-        title: "UX/UI Design", // <— solicitado
-        subtitle:
-          "Diseño centrado en el usuario con prototipos interactivos, design systems y microinteracciones atractivas.",
+        eyebrow: "UX/UI",
+        title: isEs ? "Diseño que se siente simple." : "Design that feels simple.",
+        subtitle: isEs
+          ? "De wireframes a interfaces finales, convierto flujos complejos en experiencias limpias, usables y consistentes."
+          : "From wireframes to final interfaces, I turn complex flows into clean, usable and consistent experiences.",
         bullets: [
-          "Wireframes → prototipos de alta fidelidad",
-          "Design tokens y componentes reusables",
-          "Motion/UI states, accesibilidad y handoff",
+          isEs ? "Prototipos de alta fidelidad" : "High-fidelity prototypes",
+          isEs ? "Design tokens y sistemas visuales" : "Design tokens and visual systems",
+          isEs ? "Estados, motion y handoff" : "States, motion and handoff",
         ],
         cta: [
-          { label: "Ver casos de diseño", href: "/projects?type=design" },
-          { label: "Hablemos", href: "/contact" },
+          { label: isEs ? "Casos de diseño" : "Design cases", href: "#projects" },
         ],
-        reverse: true,
-        visual: {
-          kind: "image",
-          media: "/services/uxui.jpg",
-          badge: "FIGMA · MOTION",
-          gradient: "from-black/80 via-black/40 to-transparent",
-        },
       },
       {
         id: "cloud",
-        title: "AWS Managment", // <— solicitado (misma ortografía)
-        subtitle:
-          "Infraestructura escalable, automatizada y observable sobre AWS (ECS, Lambda, RDS, S3, CloudFront).",
+        eyebrow: "AWS",
+        title: isEs ? "Infraestructura lista para crecer." : "Infrastructure ready to grow.",
+        subtitle: isEs
+          ? "Automatizo despliegues, datos y observabilidad para que los productos puedan operar con menos fricción."
+          : "I automate deployments, data and observability so products can operate with less friction.",
         bullets: [
-          "Docker + CI/CD (GitHub Actions) con despliegues azules/verdes",
-          "PostgreSQL gestionado, secrets y parámetros",
-          "Observabilidad: logs, alarms y costos bajo control",
+          "Docker + CI/CD",
+          isEs ? "PostgreSQL, secrets y parámetros" : "PostgreSQL, secrets and parameters",
+          isEs ? "Logs, alarmas y costos bajo control" : "Logs, alarms and costs under control",
         ],
         cta: [
-          { label: "Infra demo", href: "/projects?type=cloud" },
-          { label: "Revisar tu arquitectura", href: "/contact" },
+          { label: isEs ? "Revisar arquitectura" : "Review architecture", href: "#contact" },
         ],
-        visual: {
-          kind: "image",
-          media: "/services/aws.jpg",
-          badge: "ECS · LAMBDA · RDS",
-          gradient: "from-black/85 via-black/45 to-transparent",
-        },
       },
     ],
-    []
+    [isEs]
   );
 
   return (
-    <main className="relative min-h-screen bg-neutral-950 text-white lg:pl-24 xl:pl-28 sm:pt-7">
-      {/* Background image: focal.png */}
-      <div className="absolute inset-0 z-0">
-        <Image
-          src="/focal.png"
-          alt="Background"
-          fill
-          priority
-          className="object-cover"
+    <MotionConfig transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] as const }}>
+      <section
+        id="services"
+        className="relative overflow-hidden"
+        style={{ backgroundColor: "var(--gic-off-white)" }}
+      >
+        <div
+          className="pointer-events-none absolute inset-x-0 top-0 h-24"
+          style={{
+            background: "linear-gradient(to bottom, var(--gic-night-sky), var(--gic-off-white))",
+          }}
         />
-      </div>
 
-      <div className="relative z-10">
-        <TopProgress />
-        <DotNav />
+        <div
+          className="relative mx-auto px-6 md:px-10 lg:px-16 pt-32 pb-24"
+          style={{
+            maxWidth: "var(--gic-max-width)",
+            paddingLeft: "clamp(24px, 5vw, 64px)",
+            paddingRight: "clamp(24px, 5vw, 64px)",
+          }}
+        >
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.35 }}
+            className="mb-12 grid grid-cols-1 lg:grid-cols-[0.9fr_1.1fr] gap-8 items-end"
+          >
+            <div className="flex items-center gap-4">
+              <div style={{ height: "1px", width: "32px", backgroundColor: "var(--gic-steel-gray)" }} />
+              <span
+                style={{
+                  fontFamily: "var(--gic-font-sans)",
+                  fontSize: "var(--gic-text-caption)",
+                  fontWeight: 600,
+                  letterSpacing: "0.06em",
+                  textTransform: "uppercase",
+                  color: "var(--gic-light-gray)",
+                }}
+              >
+                {isEs ? "Servicios" : "Services"}
+              </span>
+            </div>
 
-        {/* Contenedor scroll con snap */}
-        <div className="snap-y snap-mandatory h-screen overflow-y-scroll no-scrollbar">
-          {sections.map((s) => (
-            <ServiceSection key={s.id} {...s} />
-          ))}
-        </div>
-
-        {/* Footer CTA */}
-        <footer className="sticky bottom-0 z-40">
-          <div className="mx-auto max-w-6xl px-6 md:px-10 py-4 flex items-center justify-between text-sm text-white/70">
-            <span>¿Listo para construir algo? </span>
-            <Link
-              href="/contact"
-              className="rounded-xl bg-white px-4 py-2 font-semibold text-black shadow-md hover:bg-white/90"
+            <h2
+              style={{
+                fontFamily: "var(--gic-font-serif)",
+                fontSize: "clamp(34px, 4.8vw, var(--gic-text-display))",
+                fontWeight: 400,
+                lineHeight: "var(--gic-leading-display)",
+                letterSpacing: "var(--gic-tracking-display)",
+                color: "var(--gic-dark-charcoal)",
+                maxWidth: "660px",
+              }}
             >
-              Contáctame
-            </Link>
-          </div>
-        </footer>
-      </div>
-    </main>
+              {isEs
+                ? "Un stack completo para llevar ideas a producción."
+                : "A full stack for bringing ideas into production."}
+            </h2>
+          </motion.div>
+
+          <motion.div
+            variants={{ show: { transition: { staggerChildren: 0.1 } } }}
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: true, amount: 0.12 }}
+            className="grid grid-cols-1 lg:grid-cols-2 gap-6"
+          >
+            <div className="lg:col-span-2">
+              <ServiceCard service={sections[0]} />
+            </div>
+            {sections.slice(1).map((service) => (
+              <ServiceCard key={service.id} service={service} />
+            ))}
+          </motion.div>
+        </div>
+      </section>
+    </MotionConfig>
   );
 }

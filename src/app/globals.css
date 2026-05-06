@@ -16,6 +16,87 @@
   --font-mono: var(--font-geist-mono);
 }
 
+/* ============================================
+   GIC — General Intelligence Company Tokens
+   From: src/contexts/DESIGN.md
+   ============================================ */
+:root {
+  /* Colors */
+  --gic-night-sky: #1f1f29;
+  --gic-cofounder-blue: #0081c0;
+  --gic-action-azure: #41a1cf;
+  --gic-pitch-black: #000000;
+  --gic-canvas-white: #ffffff;
+  --gic-off-white: #fefffc;
+  --gic-ash-gray: #f9faf7;
+  --gic-cool-gray: #eef1ed;
+  --gic-steel-gray: #dee2de;
+  --gic-dark-charcoal: #171717;
+  --gic-charcoal: #2c2c2c;
+  --gic-rich-black: #282834;
+  --gic-slate-gray: #444141;
+  --gic-medium-gray: #646464;
+  --gic-light-gray: #b4b8b4;
+
+  /* Typography — Font Families (fallback system fonts) */
+  --gic-font-serif: Georgia, 'Times New Roman', 'Palatino Linotype', serif;
+  --gic-font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+  /* Typography — Scale */
+  --gic-text-caption: 13px;
+  --gic-leading-caption: 1.5;
+  --gic-tracking-caption: -0.13px;
+  --gic-text-button-label: 16px;
+  --gic-leading-button-label: 1;
+  --gic-tracking-button-label: -0.19px;
+  --gic-text-subheading: 18px;
+  --gic-leading-subheading: 1.2;
+  --gic-tracking-subheading: -0.18px;
+  --gic-text-heading: 40px;
+  --gic-leading-heading: 1.1;
+  --gic-tracking-heading: -0.8px;
+  --gic-text-heading-lg: 48px;
+  --gic-leading-heading-lg: 1.1;
+  --gic-tracking-heading-lg: -0.96px;
+  --gic-text-display: 54px;
+  --gic-leading-display: 1.1;
+  --gic-tracking-display: -1.08px;
+
+  /* Spacing */
+  --gic-spacing-4: 4px;
+  --gic-spacing-8: 8px;
+  --gic-spacing-12: 12px;
+  --gic-spacing-16: 16px;
+  --gic-spacing-20: 20px;
+  --gic-spacing-24: 24px;
+  --gic-spacing-32: 32px;
+  --gic-spacing-40: 40px;
+  --gic-spacing-48: 48px;
+  --gic-spacing-64: 64px;
+  --gic-spacing-80: 80px;
+
+  /* Border Radius */
+  --gic-radius-buttons: 4px;
+  --gic-radius-nav-items-small: 8px;
+  --gic-radius-cards-small: 12px;
+  --gic-radius-cards-medium: 16px;
+  --gic-radius-cards-large: 24px;
+  --gic-radius-nav: 50.496px;
+
+  /* Shadows */
+  --gic-shadow-sm: rgba(0, 0, 0, 0.15) 0px 2px 6px 0px;
+  --gic-shadow-subtle: rgb(222, 226, 222) 0px 0px 0px 1px;
+  --gic-shadow-subtle-2: rgba(0, 0, 0, 0.08) 0px 1px 1px 0px, rgba(0, 0, 0, 0.08) 0px 4px 5px 0px;
+  --gic-shadow-subtle-3: rgba(0, 0, 0, 0.06) 0px 2px 2px 0px, rgba(0, 0, 0, 0) 0px 6px 6px 0px, rgba(0, 0, 0, 0.04) 0px 0px 0px 5px;
+  --gic-shadow-sm-2: rgba(0, 0, 0, 0.05) 0px 1px 8px 0px;
+
+  /* Layout */
+  --gic-section-gap: 32px;
+  --gic-card-padding: 16px;
+  --gic-element-gap: 8px;
+  --gic-max-width: 1200px;
+}
+
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
@@ -24,9 +105,13 @@
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--gic-off-white);
+  color: var(--gic-dark-charcoal);
+  font-family: var(--gic-font-sans);
+}
+
+body.hide-hero-sidebar .hero-sidebar {
+  display: none;
 }
 
 /* Hero gradient text fade-in */

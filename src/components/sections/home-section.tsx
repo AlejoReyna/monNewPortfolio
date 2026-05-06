@@ -1,14 +1,14 @@
 "use client";
 
 
-import Hero from "@/components/hero";
+import HeroV2 from "@/components/v2/hero-v2";
 
 export default function HomeSection() {
 
 
   return (
     <div className="min-h-screen">
-      <Hero />
+      <HeroV2 />
     </div>
   );
 }
