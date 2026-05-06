@@ -1,13 +1,15 @@
 "use client";
 
-import React, { useState } from "react";
-import { motion } from "framer-motion";
+import React, { useState, useRef } from "react";
+import { motion, useScroll, useTransform, useSpring } from "framer-motion";
 import {
   Terminal,
   LayoutDashboard,
   CalendarDays,
   LineChart,
   Send,
+  Image as ImageIcon,
+  CheckCircle2,
 } from "lucide-react";
 import Link from "next/link";
 import { useLanguage } from "@/components/lang-context";
@@ -18,6 +20,7 @@ interface TimelineEvent {
   title: string;
   description: string;
   icon: React.ElementType;
+  extraFeatures: string[];
 }
 
 function timelineEs(): TimelineEvent[] {
@@ -29,14 +32,26 @@ function timelineEs(): TimelineEvent[] {
       description:
         "El primer paso fue romper el cascarón de los frames heredados. Se diseñó un dashboard moderno, inyectado directamente en el portal existente. Organizamos la información académica, habilitamos temas personalizados y creamos una navegación lateral limpia que respeta los colores institucionales.",
       icon: LayoutDashboard,
+      extraFeatures: [
+        "Reskin moderno para los frames 'top', 'left' y 'center'.",
+        "Barra lateral categorizada con búsqueda y anclaje.",
+        "Landing experience para eselcarrera.htm.",
+        "Navegación persistente en todo el ecosistema.",
+      ],
     },
     {
       id: "step-2",
       date: "5 de mayo, 2026",
       title: "Sincronizando el tiempo: Nexus",
       description:
-        "Conectamos los hilos invisibles entre SIASE y Nexus. Resolviendo bloqueos de sesión y expiración de tokens, construimos un widget nativo para las actividades próximas. Ahora, con un clic, las fechas límite se exportan a Google Calendar, Outlook o .ics.",
+        "Conectamos los hilos invisibles entre SIASE y Nexus. Resolviendo bloqueos de sesión y expiración de tokens, construimos un widget nativo para las actividades próximas. Ahora, con un clic, las fechas límite se exportan a Google Calendar o Outlook.",
       icon: CalendarDays,
+      extraFeatures: [
+        "Widget de 'Próximas a vencer' integrado.",
+        "Deep links para Outlook y Microsoft 365.",
+        "Exportación nativa de archivos .ics.",
+        "Gestión de tokens en segundo plano.",
+      ],
     },
     {
       id: "step-3",
@@ -45,51 +60,24 @@ function timelineEs(): TimelineEvent[] {
       description:
         "La extensión comenzó a leer el kardex en segundo plano. Analizando créditos, calculando porcentajes de progreso y determinando el promedio aritmético sin la intervención del estudiante. Todo resumido en una sola tira de métricas visuales.",
       icon: LineChart,
-    },
-  ];
-}
-
-function timelineEn(): TimelineEvent[] {
-  return [
-    {
-      id: "step-1",
-      date: "April 27, 2026",
-      title: "Evolving the dashboard",
-      description:
-        "First we broke out of inherited frames. A modern dashboard was designed and injected into the existing portal. We organized academic data, enabled custom themes, and built a clean side navigation that respects institutional colors.",
-      icon: LayoutDashboard,
-    },
-    {
-      id: "step-2",
-      date: "May 5, 2026",
-      title: "Syncing time: Nexus",
-      description:
-        "We connected SIASE and Nexus behind the scenes—session locks and token expiry included—and shipped a native widget for upcoming tasks. Deadlines export to Google Calendar, Outlook, or .ics in one click.",
-      icon: CalendarDays,
-    },
-    {
-      id: "step-3",
-      date: "May 6, 2026",
-      title: "Knowledge is power: automatic transcript",
-      description:
-        "The extension reads the transcript in the background—credits, progress percentage, and GPA without manual input—summarized in a single strip of visual metrics.",
-      icon: LineChart,
+      extraFeatures: [
+        "Scraping asíncrono sin alertas intrusivas.",
+        "Cálculo de promedio y progreso de créditos.",
+        "Notificaciones de cambios en notas vía Worker.",
+        "Popup de acceso rápido con caché inteligente.",
+      ],
     },
   ];
 }
 
 export default function HistoriaPage() {
-  const { language } = useLanguage();
-  const isEs = language === "es";
   const [inputValue, setInputValue] = useState("");
   const [ack, setAck] = useState(false);
-
-  const timelineData = isEs ? timelineEs() : timelineEn();
+  const timelineData = timelineEs();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (inputValue.trim()) {
-      console.log("Feature requested:", inputValue);
       setInputValue("");
       setAck(true);
       window.setTimeout(() => setAck(false), 3200);
@@ -97,289 +85,151 @@ export default function HistoriaPage() {
   };
 
   return (
-    <main
-      className="min-h-screen selection:bg-[var(--gic-action-azure)] selection:text-[var(--gic-canvas-white)]"
-      style={{
-        backgroundColor: "var(--gic-canvas-white)",
-        color: "var(--gic-pitch-black)",
-        fontFamily: "var(--gic-font-sans)",
-      }}
-    >
+    <main className="w-full bg-[var(--gic-canvas-white)] selection:bg-[var(--gic-pitch-black)] selection:text-[var(--gic-canvas-white)]">
       <Link
         href="/"
-        className="fixed left-4 top-4 z-40 px-3 py-2 transition-opacity hover:opacity-80 sm:left-6 sm:top-6"
-        style={{
-          fontFamily: "var(--gic-font-sans)",
-          fontSize: "var(--gic-text-caption)",
-          letterSpacing: "var(--gic-tracking-caption)",
-          color: "var(--gic-slate-gray)",
-        }}
+        className="fixed left-6 top-6 z-50 mix-blend-difference font-[var(--gic-font-serif)] text-[var(--gic-text-caption)] text-[var(--gic-slate-gray)] uppercase tracking-widest"
       >
-        {isEs ? "← Inicio" : "← Home"}
+        ← Inicio
       </Link>
 
-      {/* 1. Hero */}
-      <section className="relative flex min-h-screen flex-col items-center justify-center px-6 text-center sm:px-8">
+      {/* 1. Hero: Mind-breaking Reveal */}
+      <section className="relative flex min-h-screen flex-col items-center justify-center px-6 overflow-hidden">
         <motion.div
-          initial={{ opacity: 0, filter: "blur(12px)", scale: 0.95, y: 20 }}
-          animate={{ opacity: 1, filter: "blur(0px)", scale: 1, y: 0 }}
-          transition={{ duration: 1.5, ease: [0.22, 1, 0.36, 1] }}
-          className="max-w-3xl"
+          initial={{ clipPath: "inset(100% 0% 0% 0%)", filter: "blur(20px)", y: 100 }}
+          animate={{ clipPath: "inset(0% 0% 0% 0%)", filter: "blur(0px)", y: 0 }}
+          transition={{ duration: 2, ease: [0.16, 1, 0.3, 1] }}
+          className="max-w-4xl text-center"
         >
-          <Terminal
-            className="mx-auto mb-10 md:mb-12"
-            size={48}
-            strokeWidth={1.5}
-            style={{ color: "var(--gic-slate-gray)" }}
-            aria-hidden
-          />
-          <h1
-            className="mb-8 md:mb-10 leading-tight"
-            style={{
-              fontFamily: "var(--gic-font-serif)",
-              fontSize: "var(--gic-text-display)",
-              lineHeight: "var(--gic-leading-display)",
-              letterSpacing: "var(--gic-tracking-display)",
-              color: "var(--gic-pitch-black)",
-            }}
-          >
-            {isEs ? (
-              <>
-                El sistema heredado.
-                <br />
-                La nueva realidad.
-              </>
-            ) : (
-              <>
-                The legacy system.
-                <br />A new reality.
-              </>
-            )}
+          <Terminal className="mx-auto mb-8 text-[var(--gic-pitch-black)] opacity-20" size={40} />
+          <h1 className="font-[var(--gic-font-serif)] text-[clamp(3rem,8vw,5rem)] leading-[0.9] text-[var(--gic-pitch-black)] tracking-tighter mb-12">
+            EL SISTEMA HEREDADO.<br />
+            UNA NUEVA REALIDAD.
           </h1>
-          <p
-            className="mx-auto max-w-2xl"
-            style={{
-              fontSize: "max(1.125rem, 1.15vw)",
-              lineHeight: 1.55,
-              letterSpacing: "-0.012em",
-              color: "var(--gic-charcoal)",
-            }}
+          <motion.p 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1.2, duration: 1 }}
+            className="font-[var(--gic-font-serif)] text-[var(--gic-text-heading)] text-[var(--gic-pitch-black)] max-w-2xl mx-auto leading-relaxed opacity-80"
           >
-            {isEs
-              ? "SIASE es un laberinto de frames y CGI de otra época. Pero debajo de ese código hay una experiencia esperando ser liberada. Esto no es solo un reskin: es una reconstrucción de la experiencia académica en la UANL."
-              : "SIASE is a maze of frames and another-era CGI—but underneath, an experience waiting to be freed. This isn’t just a reskin: it’s a rebuild of the academic experience at UANL."}
-          </p>
-          <p
-            className="mt-6"
-            style={{
-              fontSize: "var(--gic-text-subheading)",
-              lineHeight: "var(--gic-leading-subheading)",
-              letterSpacing: "var(--gic-tracking-subheading)",
-              color: "var(--gic-slate-gray)",
-            }}
-          >
-            {isEs
-              ? "Sigue haciendo scroll para ver el proceso."
-              : "Keep scrolling to see how it came together."}
-          </p>
+            SIASE es un laberinto de frames y CGI de otra época. Pero debajo de ese código hay una experiencia esperando ser liberada.
+          </motion.p>
         </motion.div>
+        
+        {/* Línea de progreso infinita lateral */}
+        <motion.div 
+          className="absolute right-10 top-0 w-px h-full bg-gradient-to-b from-transparent via-[var(--gic-steel-gray)] to-transparent"
+          initial={{ scaleY: 0 }}
+          animate={{ scaleY: 1 }}
+          transition={{ duration: 2 }}
+        />
       </section>
 
-      {/* 2. Timeline */}
-      <div
-        className="mx-auto max-w-4xl py-16 md:py-24"
-        style={{
-          paddingLeft: "var(--gic-spacing-24)",
-          paddingRight: "var(--gic-spacing-24)",
-        }}
-      >
-        {timelineData.map((step, index) => {
-          const Icon = step.icon;
-          return (
-            <motion.section
-              key={step.id}
-              initial={{ opacity: 0, y: 40 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-20%" }}
-              transition={{ duration: 0.8, ease: "easeOut" }}
-              className="mb-16 flex flex-col items-start gap-8 last:mb-0 md:mb-24 md:flex-row md:gap-10"
-            >
-              <div className="hidden flex-col items-center md:flex" style={{ marginTop: "var(--gic-spacing-8)" }}>
-                <div
-                  className="flex h-12 w-12 items-center justify-center rounded-full"
-                  style={{
-                    backgroundColor: "var(--gic-off-white)",
-                    boxShadow: "var(--gic-shadow-subtle-2)",
-                  }}
-                >
-                  <Icon
-                    size={24}
-                    strokeWidth={1.5}
-                    style={{ color: "var(--gic-dark-charcoal)" }}
-                    aria-hidden
-                  />
-                </div>
-                {index !== timelineData.length - 1 && (
-                  <div
-                    className="mt-4 w-px opacity-30"
-                    style={{
-                      height: "160px",
-                      backgroundColor: "var(--gic-steel-gray)",
-                    }}
-                  />
-                )}
-              </div>
+      {/* 2. Timeline Sections: Parallax & Masking */}
+      {timelineData.map((step, index) => (
+        <TimelineSection key={step.id} step={step} index={index} />
+      ))}
 
-              <div
-                className="flex-1 p-6 md:p-10"
-                style={{
-                  borderRadius: "var(--gic-radius-cards-large)",
-                  backgroundColor: "var(--gic-canvas-white)",
-                  boxShadow: "var(--gic-shadow-sm)",
-                  border: "1px solid var(--gic-cool-gray)",
-                }}
-              >
-                <div className="mb-4 flex items-center gap-3 md:hidden">
-                  <div
-                    className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full"
-                    style={{ backgroundColor: "var(--gic-ash-gray)" }}
-                  >
-                    <Icon
-                      size={20}
-                      strokeWidth={1.5}
-                      style={{ color: "var(--gic-dark-charcoal)" }}
-                      aria-hidden
-                    />
-                  </div>
-                </div>
-                <span
-                  className="uppercase tracking-wider"
-                  style={{
-                    fontFamily: "var(--gic-font-serif)",
-                    fontSize: "var(--gic-text-button-label)",
-                    color: "var(--gic-slate-gray)",
-                  }}
-                >
-                  {step.date}
-                </span>
-                <h2
-                  className="mt-2"
-                  style={{
-                    fontFamily: "var(--gic-font-serif)",
-                    fontSize: "var(--gic-text-heading-lg)",
-                    lineHeight: "var(--gic-leading-heading-lg)",
-                    letterSpacing: "var(--gic-tracking-heading-lg)",
-                    color: "var(--gic-cofounder-blue)",
-                  }}
-                >
-                  {step.title}
-                </h2>
-                <p
-                  className="mt-4 leading-relaxed"
-                  style={{
-                    fontSize: "var(--gic-text-subheading)",
-                    lineHeight: "var(--gic-leading-subheading)",
-                    letterSpacing: "var(--gic-tracking-subheading)",
-                    color: "var(--gic-charcoal)",
-                  }}
-                >
-                  {step.description}
-                </p>
-              </div>
-            </motion.section>
-          );
-        })}
-      </div>
-
-      {/* 3. CTA */}
-      <motion.section
-        initial={{ opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        viewport={{ once: true, margin: "0%" }}
-        transition={{ duration: 1 }}
-        className="flex min-h-[60vh] flex-col items-center justify-center px-6 py-20 text-center sm:px-8 sm:py-24"
-        style={{
-          backgroundColor: "var(--gic-canvas-white)",
-          borderTop: "1px solid var(--gic-cool-gray)",
-        }}
-      >
-        <h2
-          className="mb-10 max-w-4xl leading-tight md:mb-12"
-          style={{
-            fontFamily: "var(--gic-font-serif)",
-            fontSize: "var(--gic-text-display)",
-            lineHeight: "var(--gic-leading-display)",
-            letterSpacing: "var(--gic-tracking-display)",
-            color: "var(--gic-pitch-black)",
-          }}
+      {/* 3. Footer: Minimalist CTA */}
+      <section className="flex min-h-screen flex-col items-center justify-center px-6 border-t border-[var(--gic-off-white)]">
+        <motion.h2 
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          className="font-[var(--gic-font-serif)] text-[clamp(2rem,5vw,3.5rem)] text-[var(--gic-pitch-black)] text-center mb-16 leading-tight max-w-4xl"
         >
-          {isEs
-            ? "Este proyecto sigue en desarrollo. ¿Hay alguna feature que te gustaría ver?"
-            : "This project is still in motion. Is there a feature you’d like to see?"}
-        </h2>
+          ¿Hay alguna feature que te gustaría ver?
+        </motion.h2>
 
-        <form
-          onSubmit={handleSubmit}
-          className="relative flex w-full max-w-2xl items-center"
-        >
+        <form onSubmit={handleSubmit} className="relative w-full max-w-2xl">
           <input
             type="text"
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
-            placeholder={isEs ? "# SIASE Plus" : "# SIASE Plus"}
-            aria-label={
-              isEs
-                ? "Sugiere una funcionalidad para SIASE Plus"
-                : "Suggest a SIASE Plus feature"
-            }
-            className="w-full bg-transparent py-4 pl-0 pr-14 transition-colors focus:outline-none placeholder:opacity-50"
-            style={{
-              fontSize: "var(--gic-text-subheading)",
-              lineHeight: "var(--gic-leading-subheading)",
-              letterSpacing: "var(--gic-tracking-subheading)",
-              color: "var(--gic-pitch-black)",
-              borderBottomWidth: "2px",
-              borderBottomStyle: "solid",
-              borderBottomColor: "var(--gic-steel-gray)",
-            }}
-            onFocus={(e) => {
-              e.target.style.borderBottomColor = "var(--gic-action-azure)";
-            }}
-            onBlur={(e) => {
-              e.target.style.borderBottomColor = "var(--gic-steel-gray)";
-            }}
+            placeholder="# SIASE Plus"
+            className="w-full bg-transparent py-8 font-[var(--gic-font-serif)] text-[var(--gic-text-heading)] text-[var(--gic-pitch-black)] border-b-2 border-[var(--gic-pitch-black)] focus:outline-none placeholder:opacity-20"
           />
-          <button
-            type="submit"
-            disabled={!inputValue.trim()}
-            aria-label={isEs ? "Enviar sugerencia" : "Send suggestion"}
-            className="absolute right-0 top-1/2 -translate-y-1/2 p-2 transition-colors disabled:opacity-50"
-            style={{ color: "var(--gic-medium-gray)" }}
-            onMouseEnter={(e) => {
-              if (!inputValue.trim()) return;
-              (e.currentTarget as HTMLButtonElement).style.color =
-                "var(--gic-action-azure)";
-            }}
-            onMouseLeave={(e) => {
-              (e.currentTarget as HTMLButtonElement).style.color =
-                "var(--gic-medium-gray)";
-            }}
-          >
-            <Send size={24} strokeWidth={1.5} />
+          <button type="submit" className="absolute right-0 top-1/2 -translate-y-1/2 hover:scale-110 transition-transform">
+            <Send size={32} className="text-[var(--gic-pitch-black)]" />
           </button>
         </form>
-        {ack && (
-          <p
-            className="mt-6"
-            style={{
-              fontSize: "var(--gic-text-caption)",
-              color: "var(--gic-cofounder-blue)",
-            }}
-          >
-            {isEs ? "Gracias — lo anoté." : "Thanks — noted."}
-          </p>
-        )}
-      </motion.section>
+        {ack && <p className="mt-8 font-[var(--gic-font-serif)] text-[var(--gic-action-azure)]">Registrado en la bitácora.</p>}
+      </section>
     </main>
+  );
+}
+
+function TimelineSection({ step, index }: { step: TimelineEvent; index: number }) {
+  const container = useRef(null);
+  const { scrollYProgress } = useScroll({
+    target: container,
+    offset: ["start end", "end start"]
+  });
+
+  const y = useTransform(scrollYProgress, [0, 1], [100, -100]);
+  const opacity = useTransform(scrollYProgress, [0, 0.2, 0.8, 1], [0, 1, 1, 0]);
+  const scale = useTransform(scrollYProgress, [0, 0.2], [0.8, 1]);
+  const isEven = index % 2 === 0;
+
+  return (
+    <motion.section
+      ref={container}
+      style={{ opacity }}
+      className="relative flex min-h-screen flex-col items-center justify-center px-6 py-32 lg:px-24"
+    >
+      <div className={`flex w-full max-w-7xl flex-col items-center gap-20 lg:flex-row ${isEven ? "" : "lg:flex-row-reverse"}`}>
+        
+        {/* Contenido Narrativo */}
+        <div className="flex-1 space-y-8">
+          <motion.div
+            initial={{ x: isEven ? -100 : 100, opacity: 0 }}
+            whileInView={{ x: 0, opacity: 1 }}
+            transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+          >
+            <span className="font-[var(--gic-font-serif)] text-[var(--gic-text-caption)] text-[var(--gic-slate-gray)] uppercase tracking-[0.4em] mb-4 block">
+              {step.date}
+            </span>
+            <h2 className="font-[var(--gic-font-serif)] text-[var(--gic-text-display)] text-[var(--gic-pitch-black)] leading-[1.1] mb-8">
+              {step.title.toUpperCase()}
+            </h2>
+            <p className="font-[var(--gic-font-serif)] text-[var(--gic-text-heading)] text-[var(--gic-pitch-black)] leading-relaxed opacity-80">
+              {step.description}
+            </p>
+          </motion.div>
+
+          <motion.div 
+            className="pt-8 space-y-4 border-t border-[var(--gic-off-white)]"
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            transition={{ delay: 0.5 }}
+          >
+            {step.extraFeatures.map((f, i) => (
+              <div key={i} className="flex items-center gap-4 group">
+                <div className="h-px w-8 bg-[var(--gic-pitch-black)] transition-all group-hover:w-12" />
+                <span className="font-[var(--gic-font-serif)] text-[var(--gic-text-subheading)] text-[var(--gic-pitch-black)]">
+                  {f}
+                </span>
+              </div>
+            ))}
+          </motion.div>
+        </div>
+
+        {/* Visual Parallax Wrapper */}
+        <motion.div 
+          style={{ y, scale }}
+          className="flex-1 w-full"
+        >
+          <div className="relative aspect-[4/5] bg-[var(--gic-off-white)] rounded-[var(--gic-radius-cards-large)] border border-[var(--gic-cool-gray)] overflow-hidden shadow-2xl">
+            <div className="absolute inset-0 flex flex-col items-center justify-center opacity-20">
+              <step.icon size={80} strokeWidth={0.5} className="text-[var(--gic-pitch-black)] mb-4" />
+              <p className="font-[var(--gic-font-serif)] text-[var(--gic-text-caption)] uppercase tracking-widest">
+                Visual Assets / Phase {index + 1}
+              </p>
+            </div>
+            {/* Efecto de ruido/textura sutil */}
+            <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
+          </div>
+        </motion.div>
+      </div>
+    </motion.section>
   );
 }
