@@ -1,17 +1,66 @@
 "use client";
 
 import React, { useState, useRef } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
 import {
   Terminal,
   LayoutDashboard,
   CalendarDays,
   LineChart,
   Send,
-  Image as ImageIcon,
-  CheckCircle2,
 } from "lucide-react";
 import Link from "next/link";
+
+type PageLocale = "es" | "en";
+
+function FlagSpainCircle({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 3 2"
+      className={className}
+      xmlns="http://www.w3.org/2000/svg"
+      preserveAspectRatio="xMidYMid slice"
+      aria-hidden
+    >
+      <rect width="3" height="0.67" fill="#c60b1e" />
+      <rect y="0.67" width="3" height="0.67" fill="#ffc400" />
+      <rect y="1.34" width="3" height="0.66" fill="#c60b1e" />
+    </svg>
+  );
+}
+
+function FlagUkCircle({ className }: { className?: string }) {
+  const clipId = React.useId().replace(/:/g, "");
+  return (
+    <svg
+      viewBox="0 0 60 30"
+      className={className}
+      xmlns="http://www.w3.org/2000/svg"
+      preserveAspectRatio="xMidYMid slice"
+      aria-hidden
+    >
+      <defs>
+        <clipPath id={clipId}>
+          <path d="M30,15 h30 v15 z v15 h-30 z h-30 z h30 z" />
+        </clipPath>
+      </defs>
+      <path fill="#012169" d="M0,0 h60 v30 H0 z" />
+      <path
+        stroke="#ffffff"
+        strokeWidth="6"
+        d="M0,0 L60,30 M60,0 L0,30"
+      />
+      <path
+        clipPath={`url(#${clipId})`}
+        stroke="#C8102E"
+        strokeWidth="4"
+        d="M0,0 L60,30 M60,0 L0,30"
+      />
+      <path stroke="#ffffff" strokeWidth="10" d="M30,0 v30 M0,15 h60" />
+      <path stroke="#C8102E" strokeWidth="6" d="M30,0 v30 M0,15 h60" />
+    </svg>
+  );
+}
 
 interface TimelineEvent {
   id: string;
@@ -69,10 +118,104 @@ function timelineEs(): TimelineEvent[] {
   ];
 }
 
+function timelineEn(): TimelineEvent[] {
+  return [
+    {
+      id: "step-1",
+      date: "April 27, 2026",
+      title: "The dashboard evolution",
+      description:
+        "The first step was breaking out of inherited frames. We designed a modern dashboard injected directly into the existing portal. We structured academic information, enabled custom themes, and built a clean side navigation that respects institutional colors.",
+      icon: LayoutDashboard,
+      extraFeatures: [
+        "Modern reskin for the top, left, and center frames.",
+        "Categorized sidebar with search and anchor links.",
+        "Landing experience for eselcarrera.htm.",
+        "Persistent navigation across the ecosystem.",
+      ],
+    },
+    {
+      id: "step-2",
+      date: "May 5, 2026",
+      title: "Syncing time: Nexus",
+      description:
+        "We connected the invisible threads between SIASE and Nexus. By fixing session blocks and token expiry, we built a native widget for upcoming activities. Now, with one click, deadlines export to Google Calendar or Outlook.",
+      icon: CalendarDays,
+      extraFeatures: [
+        "Integrated “due soon” widget.",
+        "Deep links for Outlook and Microsoft 365.",
+        "Native .ics file export.",
+        "Background token handling.",
+      ],
+    },
+    {
+      id: "step-3",
+      date: "May 6, 2026",
+      title: "Knowledge is power: automatic kardex",
+      description:
+        "The extension began reading the kardex in the background. It analyzes credits, calculates progress percentages, and derives the arithmetic average without student intervention. Everything summarized in a single strip of visual metrics.",
+      icon: LineChart,
+      extraFeatures: [
+        "Async scraping without intrusive alerts.",
+        "Average and credit-progress calculation.",
+        "Grade-change notifications via Worker.",
+        "Quick-access popup with smart cache.",
+      ],
+    },
+  ];
+}
+
+function getTimeline(locale: PageLocale): TimelineEvent[] {
+  return locale === "es" ? timelineEs() : timelineEn();
+}
+
+const copy = {
+  es: {
+    home: "← Inicio",
+    heroTitleLine1: "El sistema heredado.",
+    heroTitleLine2: "Una nueva realidad.",
+    heroQuote:
+      "\u201cSIASE es un laberinto de frames y CGI de otra época. Pero debajo de ese código hay una experiencia esperando ser liberada. Esto no es solo un reskin: es una reconstrucción total.\u201d",
+    ctaTitleLine1: "Este proyecto sigue en desarrollo,",
+    ctaTitleLine2: "¿hay alguna feature que te gustaría ver?",
+    ack: "Sugerencia recibida. Gracias por construir el futuro de la UANL.",
+    processView: "Vista de proceso",
+    langLabel: "Idioma",
+    langAriaEs: "Español",
+    langAriaEn: "Inglés (Reino Unido)",
+  },
+  en: {
+    home: "← Home",
+    heroTitleLine1: "The legacy system.",
+    heroTitleLine2: "A new reality.",
+    heroQuote:
+      "\u201cSIASE is a maze of frames and CGI from another era. But beneath that code is an experience waiting to be freed. This is not just a reskin: it is a full rebuild.\u201d",
+    ctaTitleLine1: "This project is still in development.",
+    ctaTitleLine2: "Is there a feature you would like to see?",
+    ack: "Suggestion received. Thanks for helping shape the future at UANL.",
+    processView: "Process view",
+    langLabel: "Language",
+    langAriaEs: "Español",
+    langAriaEn: "English (United Kingdom)",
+  },
+} as const;
+
 export default function HistoriaPage() {
+  const [locale, setLocale] = useState<PageLocale>("es");
+  const [localeSwitchCount, setLocaleSwitchCount] = useState(0);
   const [inputValue, setInputValue] = useState("");
   const [ack, setAck] = useState(false);
-  const timelineData = timelineEs();
+  const timelineData = getTimeline(locale);
+  const t = copy[locale];
+
+  const setLocaleWithTracking = (code: PageLocale) => {
+    if (code !== locale) {
+      setLocale(code);
+      setLocaleSwitchCount((n) => n + 1);
+    }
+  };
+
+  const suppressHeroIntro = localeSwitchCount > 0;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -89,146 +232,199 @@ export default function HistoriaPage() {
       style={{
         backgroundColor: "var(--gic-canvas-white)",
         color: "var(--gic-pitch-black)",
-        fontFamily: "var(--gic-font-sans)",
+        fontFamily: "var(--gic-font-serif)",
       }}
     >
-      <Link
-        href="/"
-        className="fixed left-4 top-4 z-50 transition-opacity hover:opacity-80 sm:left-6 sm:top-6"
-        style={{
-          fontFamily: "var(--gic-font-sans)",
-          fontSize: "var(--gic-text-caption)",
-          letterSpacing: "var(--gic-tracking-caption)",
-          color: "var(--gic-slate-gray)",
-        }}
+      <div
+        className="fixed right-4 top-4 z-[60] flex items-center gap-1 rounded-full border border-[var(--gic-cool-gray)] bg-[var(--gic-canvas-white)]/90 p-1 shadow-sm backdrop-blur-sm sm:right-6 sm:top-6"
+        role="group"
+        aria-label={t.langLabel}
       >
-        ← Inicio
-      </Link>
+        {(
+          [
+            { code: "es" as const, Flag: FlagSpainCircle, label: t.langAriaEs },
+            { code: "en" as const, Flag: FlagUkCircle, label: t.langAriaEn },
+          ] as const
+        ).map(({ code, Flag, label }) => (
+          <button
+            key={code}
+            type="button"
+            onClick={() => setLocaleWithTracking(code)}
+            className="relative flex size-10 items-center justify-center rounded-full transition-opacity duration-200"
+            style={{ opacity: locale === code ? 1 : 0.55 }}
+            aria-pressed={locale === code}
+            aria-label={label}
+          >
+            {locale === code && (
+              <motion.span
+                layoutId="historia-lang-pill"
+                className="absolute inset-0 -z-10 rounded-full bg-[var(--gic-action-azure)]/15 ring-2 ring-[var(--gic-action-azure)] ring-offset-2 ring-offset-[var(--gic-canvas-white)]"
+                transition={{ type: "spring", stiffness: 420, damping: 32 }}
+              />
+            )}
+            <span className="relative size-7 overflow-hidden rounded-full shadow-sm ring-1 ring-black/10">
+              <Flag className="size-full" />
+            </span>
+          </button>
+        ))}
+      </div>
 
-      {/* 1. Hero: Mind-breaking Reveal */}
-      <section className="relative flex min-h-screen flex-col items-center justify-center px-6 overflow-hidden">
+      <AnimatePresence mode="wait" initial={false}>
         <motion.div
-          initial={{ clipPath: "inset(100% 0% 0% 0%)", filter: "blur(20px)", y: 100 }}
-          animate={{ clipPath: "inset(0% 0% 0% 0%)", filter: "blur(0px)", y: 0 }}
-          transition={{ duration: 2, ease: [0.16, 1, 0.3, 1] }}
-          className="max-w-4xl text-center"
+          key={locale}
+          initial={{ opacity: 0, y: 10, filter: "blur(6px)" }}
+          animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+          exit={{ opacity: 0, y: -8, filter: "blur(6px)" }}
+          transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
         >
-          <Terminal
-            className="mx-auto mb-8 text-[var(--gic-slate-gray)]"
-            size={48}
-            strokeWidth={1}
-          />
-          <h1
-            className="mb-12 leading-tight"
+          <Link
+            href="/"
+            className="fixed left-4 top-4 z-50 transition-opacity hover:opacity-80 sm:left-6 sm:top-6"
             style={{
               fontFamily: "var(--gic-font-serif)",
-              fontSize: "clamp(2.25rem, 7vw, var(--gic-text-display))",
-              lineHeight: "var(--gic-leading-display)",
-              letterSpacing: "var(--gic-tracking-display)",
-              color: "var(--gic-pitch-black)",
-            }}
-          >
-            El sistema heredado.
-            <br />
-            Una nueva realidad.
-          </h1>
-          <motion.p 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 1.2, duration: 1 }}
-            className="mx-auto max-w-2xl italic"
-            style={{
-              fontFamily: "var(--gic-font-sans)",
-              fontSize: "1.125rem",
-              lineHeight: 1.6,
-              color: "var(--gic-charcoal)",
-            }}
-          >
-            {
-              "\u201cSIASE es un laberinto de frames y CGI de otra época. Pero debajo de ese código hay una experiencia esperando ser liberada. Esto no es solo un reskin: es una reconstrucción total.\u201d"
-            }
-          </motion.p>
-        </motion.div>
-        
-        {/* Línea de progreso infinita lateral */}
-        <motion.div 
-          className="absolute right-10 top-0 w-px h-full bg-gradient-to-b from-transparent via-[var(--gic-steel-gray)] to-transparent"
-          initial={{ scaleY: 0 }}
-          animate={{ scaleY: 1 }}
-          transition={{ duration: 2 }}
-        />
-      </section>
-
-      {/* 2. Timeline Sections: Parallax & Masking */}
-      {timelineData.map((step, index) => (
-        <TimelineSection key={step.id} step={step} index={index} />
-      ))}
-
-      {/* 3. Footer: Minimalist CTA */}
-      <section className="flex min-h-screen flex-col items-center justify-center px-6 border-t border-[var(--gic-off-white)]">
-        <motion.h2 
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          className="mb-16 max-w-4xl text-center leading-tight"
-          style={{
-            fontFamily: "var(--gic-font-serif)",
-            fontSize: "clamp(2rem, 5vw, var(--gic-text-display))",
-            lineHeight: "var(--gic-leading-display)",
-            color: "var(--gic-pitch-black)",
-          }}
-        >
-          Este proyecto sigue en desarrollo,
-          <br />
-          ¿hay alguna feature que te gustaría ver?
-        </motion.h2>
-
-        <form onSubmit={handleSubmit} className="relative w-full max-w-2xl">
-          <input
-            type="text"
-            value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-            placeholder="# SIASE Plus"
-            className="w-full bg-transparent py-6 text-left transition-all focus:outline-none"
-            style={{
-              fontFamily: "var(--gic-font-sans)",
-              fontSize: "var(--gic-text-heading)",
-              color: "var(--gic-pitch-black)",
-              borderBottom: "2px solid var(--gic-steel-gray)",
-            }}
-            onFocus={(e) => {
-              e.currentTarget.style.borderBottomColor = "var(--gic-action-azure)";
-            }}
-            onBlur={(e) => {
-              e.currentTarget.style.borderBottomColor = "var(--gic-steel-gray)";
-            }}
-          />
-          <button
-            type="submit"
-            disabled={!inputValue.trim()}
-            className="absolute right-0 top-1/2 -translate-y-1/2 p-2 text-[var(--gic-medium-gray)] transition-colors hover:text-[var(--gic-action-azure)] disabled:opacity-30"
-          >
-            <Send size={28} />
-          </button>
-        </form>
-        {ack && (
-          <p
-            className="mt-8 font-bold text-[var(--gic-action-azure)]"
-            style={{
-              fontFamily: "var(--gic-font-sans)",
               fontSize: "var(--gic-text-caption)",
+              letterSpacing: "var(--gic-tracking-caption)",
+              color: "var(--gic-slate-gray)",
             }}
           >
-            Sugerencia recibida. Gracias por construir el futuro de la UANL.
-          </p>
-        )}
-      </section>
+            {t.home}
+          </Link>
+
+          {/* 1. Hero: Mind-breaking Reveal */}
+          <section className="relative flex min-h-screen flex-col items-center justify-center px-6 overflow-hidden">
+            <motion.div
+              initial={
+                suppressHeroIntro
+                  ? { clipPath: "inset(0% 0% 0% 0%)", filter: "blur(0px)", y: 0 }
+                  : { clipPath: "inset(100% 0% 0% 0%)", filter: "blur(20px)", y: 100 }
+              }
+              animate={{ clipPath: "inset(0% 0% 0% 0%)", filter: "blur(0px)", y: 0 }}
+              transition={{ duration: suppressHeroIntro ? 0.35 : 2, ease: [0.16, 1, 0.3, 1] }}
+              className="max-w-4xl text-center"
+            >
+              <Terminal
+                className="mx-auto mb-8 text-[var(--gic-slate-gray)]"
+                size={48}
+                strokeWidth={1}
+              />
+              <h1
+                className="mb-12 leading-tight"
+                style={{
+                  fontFamily: "var(--gic-font-serif)",
+                  fontSize: "clamp(2.25rem, 7vw, var(--gic-text-display))",
+                  lineHeight: "var(--gic-leading-display)",
+                  letterSpacing: "var(--gic-tracking-display)",
+                  color: "var(--gic-pitch-black)",
+                }}
+              >
+                {t.heroTitleLine1}
+                <br />
+                {t.heroTitleLine2}
+              </h1>
+              <motion.p
+                initial={{ opacity: suppressHeroIntro ? 1 : 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: suppressHeroIntro ? 0 : 1.2, duration: 1 }}
+                className="mx-auto max-w-2xl italic"
+                style={{
+                  fontFamily: "var(--gic-font-serif)",
+                  fontSize: "var(--gic-text-button-label)",
+                  lineHeight: 1.65,
+                  color: "var(--gic-charcoal)",
+                }}
+              >
+                {t.heroQuote}
+              </motion.p>
+            </motion.div>
+
+            <motion.div
+              className="absolute right-10 top-0 w-px h-full bg-gradient-to-b from-transparent via-[var(--gic-steel-gray)] to-transparent"
+              initial={{ scaleY: suppressHeroIntro ? 1 : 0 }}
+              animate={{ scaleY: 1 }}
+              transition={{ duration: suppressHeroIntro ? 0.35 : 2 }}
+            />
+          </section>
+
+          {timelineData.map((step, index) => (
+            <TimelineSection key={step.id} step={step} index={index} locale={locale} />
+          ))}
+
+          {/* 3. Footer: Minimalist CTA */}
+          <section className="flex min-h-screen flex-col items-center justify-center px-6 border-t border-[var(--gic-off-white)]">
+            <motion.h2
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              className="mb-16 max-w-4xl text-center leading-tight"
+              style={{
+                fontFamily: "var(--gic-font-serif)",
+                fontSize: "clamp(2rem, 5vw, var(--gic-text-display))",
+                lineHeight: "var(--gic-leading-display)",
+                color: "var(--gic-pitch-black)",
+              }}
+            >
+              {t.ctaTitleLine1}
+              <br />
+              {t.ctaTitleLine2}
+            </motion.h2>
+
+            <form onSubmit={handleSubmit} className="relative w-full max-w-2xl">
+              <input
+                type="text"
+                value={inputValue}
+                onChange={(e) => setInputValue(e.target.value)}
+                placeholder="# SIASE Plus"
+                className="w-full bg-transparent py-6 text-left transition-all focus:outline-none"
+                style={{
+                  fontFamily: "var(--gic-font-serif)",
+                  fontSize: "var(--gic-text-button-label)",
+                  color: "var(--gic-pitch-black)",
+                  borderBottom: "2px solid var(--gic-steel-gray)",
+                }}
+                onFocus={(e) => {
+                  e.currentTarget.style.borderBottomColor = "var(--gic-action-azure)";
+                }}
+                onBlur={(e) => {
+                  e.currentTarget.style.borderBottomColor = "var(--gic-steel-gray)";
+                }}
+              />
+              <button
+                type="submit"
+                disabled={!inputValue.trim()}
+                className="absolute right-0 top-1/2 -translate-y-1/2 p-2 text-[var(--gic-medium-gray)] transition-colors hover:text-[var(--gic-action-azure)] disabled:opacity-30"
+              >
+                <Send size={28} />
+              </button>
+            </form>
+            {ack && (
+              <p
+                className="mt-8 font-bold text-[var(--gic-action-azure)]"
+                style={{
+                  fontFamily: "var(--gic-font-serif)",
+                  fontSize: "var(--gic-text-caption)",
+                }}
+              >
+                {t.ack}
+              </p>
+            )}
+          </section>
+        </motion.div>
+      </AnimatePresence>
     </main>
   );
 }
 
-function TimelineSection({ step, index }: { step: TimelineEvent; index: number }) {
+function TimelineSection({
+  step,
+  index,
+  locale,
+}: {
+  step: TimelineEvent;
+  index: number;
+  locale: PageLocale;
+}) {
   const container = useRef(null);
   const Icon = step.icon;
+  const processLabel = copy[locale].processView;
   const { scrollYProgress } = useScroll({
     target: container,
     offset: ["start end", "end start"]
@@ -270,7 +466,7 @@ function TimelineSection({ step, index }: { step: TimelineEvent; index: number }
                 fontFamily: "var(--gic-font-serif)",
                 fontSize: "var(--gic-text-display)",
                 lineHeight: "var(--gic-leading-display)",
-                color: "var(--gic-cofounder-blue)",
+                color: "var(--gic-pitch-black)",
               }}
             >
               {step.title}
@@ -278,9 +474,9 @@ function TimelineSection({ step, index }: { step: TimelineEvent; index: number }
             <p
               className="text-balance"
               style={{
-                fontFamily: "var(--gic-font-sans)",
-                fontSize: "var(--gic-text-heading)",
-                lineHeight: 1.6,
+                fontFamily: "var(--gic-font-serif)",
+                fontSize: "var(--gic-text-button-label)",
+                lineHeight: 1.65,
                 color: "var(--gic-charcoal)",
               }}
             >
@@ -299,8 +495,9 @@ function TimelineSection({ step, index }: { step: TimelineEvent; index: number }
                 <div className="h-px w-8 bg-[var(--gic-pitch-black)] transition-all group-hover:w-12" />
                 <span
                   style={{
-                    fontFamily: "var(--gic-font-sans)",
-                    fontSize: "var(--gic-text-subheading)",
+                    fontFamily: "var(--gic-font-serif)",
+                    fontSize: "var(--gic-text-caption)",
+                    lineHeight: 1.5,
                     color: "var(--gic-dark-charcoal)",
                   }}
                 >
@@ -321,9 +518,12 @@ function TimelineSection({ step, index }: { step: TimelineEvent; index: number }
               <Icon size={64} strokeWidth={0.5} />
               <p
                 className="italic"
-                style={{ fontFamily: "var(--gic-font-serif)" }}
+                style={{
+                  fontFamily: "var(--gic-font-serif)",
+                  fontSize: "var(--gic-text-caption)",
+                }}
               >
-                Vista de proceso: {step.title}
+                {processLabel}: {step.title}
               </p>
             </div>
             {/* Efecto de ruido/textura sutil */}
