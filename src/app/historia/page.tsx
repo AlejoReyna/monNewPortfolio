@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useRef } from "react";
-import { motion, useScroll, useTransform, useSpring } from "framer-motion";
+import { motion, useScroll, useTransform } from "framer-motion";
 import {
   Terminal,
   LayoutDashboard,
@@ -12,7 +12,6 @@ import {
   CheckCircle2,
 } from "lucide-react";
 import Link from "next/link";
-import { useLanguage } from "@/components/lang-context";
 
 interface TimelineEvent {
   id: string;
@@ -85,10 +84,23 @@ export default function HistoriaPage() {
   };
 
   return (
-    <main className="w-full bg-[var(--gic-canvas-white)] selection:bg-[var(--gic-pitch-black)] selection:text-[var(--gic-canvas-white)]">
+    <main
+      className="w-full selection:bg-[var(--gic-action-azure)] selection:text-[var(--gic-canvas-white)]"
+      style={{
+        backgroundColor: "var(--gic-canvas-white)",
+        color: "var(--gic-pitch-black)",
+        fontFamily: "var(--gic-font-sans)",
+      }}
+    >
       <Link
         href="/"
-        className="fixed left-6 top-6 z-50 mix-blend-difference font-[var(--gic-font-serif)] text-[var(--gic-text-caption)] text-[var(--gic-slate-gray)] uppercase tracking-widest"
+        className="fixed left-4 top-4 z-50 transition-opacity hover:opacity-80 sm:left-6 sm:top-6"
+        style={{
+          fontFamily: "var(--gic-font-sans)",
+          fontSize: "var(--gic-text-caption)",
+          letterSpacing: "var(--gic-tracking-caption)",
+          color: "var(--gic-slate-gray)",
+        }}
       >
         ← Inicio
       </Link>
@@ -101,18 +113,40 @@ export default function HistoriaPage() {
           transition={{ duration: 2, ease: [0.16, 1, 0.3, 1] }}
           className="max-w-4xl text-center"
         >
-          <Terminal className="mx-auto mb-8 text-[var(--gic-pitch-black)] opacity-20" size={40} />
-          <h1 className="font-[var(--gic-font-serif)] text-[clamp(3rem,8vw,5rem)] leading-[0.9] text-[var(--gic-pitch-black)] tracking-tighter mb-12">
-            EL SISTEMA HEREDADO.<br />
-            UNA NUEVA REALIDAD.
+          <Terminal
+            className="mx-auto mb-8 text-[var(--gic-slate-gray)]"
+            size={48}
+            strokeWidth={1}
+          />
+          <h1
+            className="mb-12 leading-tight"
+            style={{
+              fontFamily: "var(--gic-font-serif)",
+              fontSize: "clamp(2.25rem, 7vw, var(--gic-text-display))",
+              lineHeight: "var(--gic-leading-display)",
+              letterSpacing: "var(--gic-tracking-display)",
+              color: "var(--gic-pitch-black)",
+            }}
+          >
+            El sistema heredado.
+            <br />
+            Una nueva realidad.
           </h1>
           <motion.p 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 1.2, duration: 1 }}
-            className="font-[var(--gic-font-serif)] text-[var(--gic-text-heading)] text-[var(--gic-pitch-black)] max-w-2xl mx-auto leading-relaxed opacity-80"
+            className="mx-auto max-w-2xl italic"
+            style={{
+              fontFamily: "var(--gic-font-sans)",
+              fontSize: "1.125rem",
+              lineHeight: 1.6,
+              color: "var(--gic-charcoal)",
+            }}
           >
-            SIASE es un laberinto de frames y CGI de otra época. Pero debajo de ese código hay una experiencia esperando ser liberada.
+            {
+              "\u201cSIASE es un laberinto de frames y CGI de otra época. Pero debajo de ese código hay una experiencia esperando ser liberada. Esto no es solo un reskin: es una reconstrucción total.\u201d"
+            }
           </motion.p>
         </motion.div>
         
@@ -135,9 +169,17 @@ export default function HistoriaPage() {
         <motion.h2 
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
-          className="font-[var(--gic-font-serif)] text-[clamp(2rem,5vw,3.5rem)] text-[var(--gic-pitch-black)] text-center mb-16 leading-tight max-w-4xl"
+          className="mb-16 max-w-4xl text-center leading-tight"
+          style={{
+            fontFamily: "var(--gic-font-serif)",
+            fontSize: "clamp(2rem, 5vw, var(--gic-text-display))",
+            lineHeight: "var(--gic-leading-display)",
+            color: "var(--gic-pitch-black)",
+          }}
         >
-          ¿Hay alguna feature que te gustaría ver?
+          Este proyecto sigue en desarrollo,
+          <br />
+          ¿hay alguna feature que te gustaría ver?
         </motion.h2>
 
         <form onSubmit={handleSubmit} className="relative w-full max-w-2xl">
@@ -146,13 +188,39 @@ export default function HistoriaPage() {
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             placeholder="# SIASE Plus"
-            className="w-full bg-transparent py-8 font-[var(--gic-font-serif)] text-[var(--gic-text-heading)] text-[var(--gic-pitch-black)] border-b-2 border-[var(--gic-pitch-black)] focus:outline-none placeholder:opacity-20"
+            className="w-full bg-transparent py-6 text-left transition-all focus:outline-none"
+            style={{
+              fontFamily: "var(--gic-font-sans)",
+              fontSize: "var(--gic-text-heading)",
+              color: "var(--gic-pitch-black)",
+              borderBottom: "2px solid var(--gic-steel-gray)",
+            }}
+            onFocus={(e) => {
+              e.currentTarget.style.borderBottomColor = "var(--gic-action-azure)";
+            }}
+            onBlur={(e) => {
+              e.currentTarget.style.borderBottomColor = "var(--gic-steel-gray)";
+            }}
           />
-          <button type="submit" className="absolute right-0 top-1/2 -translate-y-1/2 hover:scale-110 transition-transform">
-            <Send size={32} className="text-[var(--gic-pitch-black)]" />
+          <button
+            type="submit"
+            disabled={!inputValue.trim()}
+            className="absolute right-0 top-1/2 -translate-y-1/2 p-2 text-[var(--gic-medium-gray)] transition-colors hover:text-[var(--gic-action-azure)] disabled:opacity-30"
+          >
+            <Send size={28} />
           </button>
         </form>
-        {ack && <p className="mt-8 font-[var(--gic-font-serif)] text-[var(--gic-action-azure)]">Registrado en la bitácora.</p>}
+        {ack && (
+          <p
+            className="mt-8 font-bold text-[var(--gic-action-azure)]"
+            style={{
+              fontFamily: "var(--gic-font-sans)",
+              fontSize: "var(--gic-text-caption)",
+            }}
+          >
+            Sugerencia recibida. Gracias por construir el futuro de la UANL.
+          </p>
+        )}
       </section>
     </main>
   );
@@ -160,6 +228,7 @@ export default function HistoriaPage() {
 
 function TimelineSection({ step, index }: { step: TimelineEvent; index: number }) {
   const container = useRef(null);
+  const Icon = step.icon;
   const { scrollYProgress } = useScroll({
     target: container,
     offset: ["start end", "end start"]
@@ -185,13 +254,36 @@ function TimelineSection({ step, index }: { step: TimelineEvent; index: number }
             whileInView={{ x: 0, opacity: 1 }}
             transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
           >
-            <span className="font-[var(--gic-font-serif)] text-[var(--gic-text-caption)] text-[var(--gic-slate-gray)] uppercase tracking-[0.4em] mb-4 block">
+            <span
+              className="mb-4 block uppercase tracking-widest opacity-70"
+              style={{
+                fontFamily: "var(--gic-font-serif)",
+                fontSize: "var(--gic-text-button-label)",
+                color: "var(--gic-slate-gray)",
+              }}
+            >
               {step.date}
             </span>
-            <h2 className="font-[var(--gic-font-serif)] text-[var(--gic-text-display)] text-[var(--gic-pitch-black)] leading-[1.1] mb-8">
-              {step.title.toUpperCase()}
+            <h2
+              className="mb-8"
+              style={{
+                fontFamily: "var(--gic-font-serif)",
+                fontSize: "var(--gic-text-display)",
+                lineHeight: "var(--gic-leading-display)",
+                color: "var(--gic-cofounder-blue)",
+              }}
+            >
+              {step.title}
             </h2>
-            <p className="font-[var(--gic-font-serif)] text-[var(--gic-text-heading)] text-[var(--gic-pitch-black)] leading-relaxed opacity-80">
+            <p
+              className="text-balance"
+              style={{
+                fontFamily: "var(--gic-font-sans)",
+                fontSize: "var(--gic-text-heading)",
+                lineHeight: 1.6,
+                color: "var(--gic-charcoal)",
+              }}
+            >
               {step.description}
             </p>
           </motion.div>
@@ -205,7 +297,13 @@ function TimelineSection({ step, index }: { step: TimelineEvent; index: number }
             {step.extraFeatures.map((f, i) => (
               <div key={i} className="flex items-center gap-4 group">
                 <div className="h-px w-8 bg-[var(--gic-pitch-black)] transition-all group-hover:w-12" />
-                <span className="font-[var(--gic-font-serif)] text-[var(--gic-text-subheading)] text-[var(--gic-pitch-black)]">
+                <span
+                  style={{
+                    fontFamily: "var(--gic-font-sans)",
+                    fontSize: "var(--gic-text-subheading)",
+                    color: "var(--gic-dark-charcoal)",
+                  }}
+                >
                   {f}
                 </span>
               </div>
@@ -219,10 +317,13 @@ function TimelineSection({ step, index }: { step: TimelineEvent; index: number }
           className="flex-1 w-full"
         >
           <div className="relative aspect-[4/5] bg-[var(--gic-off-white)] rounded-[var(--gic-radius-cards-large)] border border-[var(--gic-cool-gray)] overflow-hidden shadow-2xl">
-            <div className="absolute inset-0 flex flex-col items-center justify-center opacity-20">
-              <step.icon size={80} strokeWidth={0.5} className="text-[var(--gic-pitch-black)] mb-4" />
-              <p className="font-[var(--gic-font-serif)] text-[var(--gic-text-caption)] uppercase tracking-widest">
-                Visual Assets / Phase {index + 1}
+            <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 text-[var(--gic-slate-gray)] opacity-30">
+              <Icon size={64} strokeWidth={0.5} />
+              <p
+                className="italic"
+                style={{ fontFamily: "var(--gic-font-serif)" }}
+              >
+                Vista de proceso: {step.title}
               </p>
             </div>
             {/* Efecto de ruido/textura sutil */}
