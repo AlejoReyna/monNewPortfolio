@@ -144,9 +144,20 @@ function ProjectCard({ project, idx, isActive, videoRef, isEs }: CardProps) {
 /* ═══════════════════════════════════════════
    SECTION HEADER
    ═══════════════════════════════════════════ */
-function CarouselSectionHeader({ isEs }: { isEs: boolean }) {
+function CarouselSectionHeader({
+  isEs,
+  transparentBackdrop,
+}: {
+  isEs: boolean;
+  transparentBackdrop?: boolean;
+}) {
   return (
-    <div className="v3-section-header">
+    <div
+      className="v3-section-header"
+      style={
+        transparentBackdrop ? { background: "transparent", borderBottomColor: "var(--v3-line)" } : undefined
+      }
+    >
       <span className="v3-sh-tag v3-mono">
         {isEs ? "[ SECCIÓN 04 / PROYECTOS ]" : "[ SECTION 04 / PROJECTS ]"}
       </span>
@@ -161,7 +172,12 @@ function CarouselSectionHeader({ isEs }: { isEs: boolean }) {
 /* ═══════════════════════════════════════════
    MAIN COMPONENT
    ═══════════════════════════════════════════ */
-export default function ProjectsCarousel() {
+type ProjectsCarouselProps = {
+  /** Hero scroll sequence: keep solid v3 panels off so the hero night-sky reads through. */
+  transparentBackdrop?: boolean;
+};
+
+export default function ProjectsCarousel({ transparentBackdrop }: ProjectsCarouselProps = {}) {
   const { language } = useLanguage();
   const isEs = language === "es";
 
@@ -233,10 +249,13 @@ export default function ProjectsCarousel() {
 
   return (
     <section
-      style={{ background: "var(--v3-bg)", position: "relative" }}
+      style={{
+        background: transparentBackdrop ? "transparent" : "var(--v3-bg)",
+        position: "relative",
+      }}
       aria-label={isEs ? "Proyectos" : "Projects"}
     >
-      <CarouselSectionHeader isEs={isEs} />
+      <CarouselSectionHeader isEs={isEs} transparentBackdrop={transparentBackdrop} />
 
       {/* ── Embla viewport ── */}
       <div

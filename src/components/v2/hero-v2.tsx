@@ -2,7 +2,7 @@
 
 import { useRef } from "react";
 import Image from "next/image";
-import { motion, useScroll, useTransform, useSpring } from "framer-motion";
+import { motion, useScroll, useTransform, useSpring, type MotionValue } from "framer-motion";
 import ChatInterface from "@/components/chat-interface";
 
 /* ═══════════════════════════════════
@@ -15,9 +15,14 @@ type HeroV2Props = {
    * Omit scroll-driven motion here — the parent sequence handles the reveal.
    */
   embedInScrollSequence?: boolean;
+  /** When embedded, fades hero chrome (not the BG) during the carousel wipe. */
+  embedContentOpacity?: MotionValue<number>;
 };
 
-export default function HeroV2({ embedInScrollSequence }: HeroV2Props) {
+export default function HeroV2({
+  embedInScrollSequence,
+  embedContentOpacity,
+}: HeroV2Props) {
   const heroRef = useRef<HTMLElement>(null);
 
   /* parallax / fade */
@@ -29,8 +34,23 @@ export default function HeroV2({ embedInScrollSequence }: HeroV2Props) {
   const embed = !!embedInScrollSequence;
   const bgY = useTransform(smooth, [0, 1], embed ? ["0%", "0%"] : ["0%", "22%"]);
   const contentY = useTransform(smooth, [0, 1], embed ? ["0px", "0px"] : ["0px", "55px"]);
-  const contentOpacity = useTransform(smooth, [0, 0.65], embed ? [1, 1] : [1, 0]);
-  const gifOpacity = useTransform(smooth, [0, 0.55], embed ? [1, 1] : [1, 0]);
+  const baseContentOpacity = useTransform(smooth, [0, 0.65], embed ? [1, 1] : [1, 0]);
+  const baseGifOpacity = useTransform(smooth, [0, 0.55], embed ? [1, 1] : [1, 0]);
+
+  const contentOpacity =
+    embed && embedContentOpacity
+      ? useTransform(
+          [baseContentOpacity, embedContentOpacity],
+          ([a, b]) => (Number(a) || 1) * (Number(b) || 1)
+        )
+      : baseContentOpacity;
+  const gifOpacity =
+    embed && embedContentOpacity
+      ? useTransform(
+          [baseGifOpacity, embedContentOpacity],
+          ([a, b]) => (Number(a) || 1) * (Number(b) || 1)
+        )
+      : baseGifOpacity;
   const gifScale = useTransform(smooth, [0, 1], embed ? [1, 1] : [1, 0.93]);
   const arrowOpacity = useTransform(scrollYProgress, embed ? [0, 1] : [0, 0.08], embed ? [0, 0] : [1, 0]);
 
@@ -169,14 +189,25 @@ export default function HeroV2({ embedInScrollSequence }: HeroV2Props) {
         </motion.div>
       </motion.div>
 
-      {/* ── Bottom fade to white ── */}
-      <div
-        className="absolute bottom-0 inset-x-0 h-24 pointer-events-none z-10"
-        style={{
-          background:
-            "linear-gradient(to bottom, transparent, var(--gic-night-sky))",
-        }}
-      />
+      {/* ── Bottom fade to hero base tone ── */}
+      {embedContentOpacity ? (
+        <motion.div
+          className="absolute bottom-0 inset-x-0 h-24 pointer-events-none z-10"
+          style={{
+            opacity: embedContentOpacity,
+            background:
+              "linear-gradient(to bottom, transparent, var(--gic-night-sky))",
+          }}
+        />
+      ) : (
+        <div
+          className="absolute bottom-0 inset-x-0 h-24 pointer-events-none z-10"
+          style={{
+            background:
+              "linear-gradient(to bottom, transparent, var(--gic-night-sky))",
+          }}
+        />
+      )}
     </section>
   );
 }

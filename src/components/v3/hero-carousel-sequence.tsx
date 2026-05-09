@@ -119,12 +119,12 @@ export default function HeroCarouselSequence() {
   useMotionValueEvent(scrollYProgress, "change", syncCarouselPointerEvents);
 
   /* ── Transforms ── */
-  
-  // Hero stays static until the carousel begins to overlap, then subtly scales down
-  const heroScale = useTransform(
+
+  /** Hero foreground fades out while carousel reveals; shared night-sky BG stays underneath. */
+  const heroForegroundOpacity = useTransform(
     scrollYProgress,
-    [PHASE.heroOnlyUntil, PHASE.revealCompleteBy],
-    [1, 0.97]
+    [PHASE.heroOnlyUntil, PHASE.heroOnlyUntil + (PHASE.revealCompleteBy - PHASE.heroOnlyUntil) * 0.85],
+    [1, 0]
   );
 
   // The "Curtain" effect
@@ -144,7 +144,7 @@ export default function HeroCarouselSequence() {
     <div 
       ref={containerRef} 
       style={{ height: `${SCROLL_RUNWAY_VH}vh`, position: "relative" }}
-      className="bg-black" // Ensures no light leaks from behind during the sticky phase
+      className="bg-[var(--gic-night-sky)]"
     >
       <div
         style={{
@@ -154,19 +154,16 @@ export default function HeroCarouselSequence() {
           overflow: "hidden",
         }}
       >
-        {/* Layer 1: Hero — Underlying content */}
-        <motion.div
+        {/* Layer 1: Hero — backdrop + fades; carousel sits on same BG */}
+        <div
           style={{
             position: "absolute",
             inset: 0,
             zIndex: 1,
-            scale: heroScale,
-            transformOrigin: "center center",
-            willChange: "transform",
           }}
         >
-          <HeroV2 embedInScrollSequence />
-        </motion.div>
+          <HeroV2 embedInScrollSequence embedContentOpacity={heroForegroundOpacity} />
+        </div>
 
         {/* Layer 2: Carousel — The Overlaying Curtain */}
         <motion.div
@@ -178,13 +175,11 @@ export default function HeroCarouselSequence() {
             clipPath: carouselClip,
             pointerEvents: carouselPointerEvents,
             willChange: "clip-path",
-            // CRITICAL: Solid background prevents Services section from showing 
-            // through the carousel during the sticky handoff.
-            backgroundColor: "var(--v3-bg, #09090b)", 
+            background: "transparent",
           }}
         >
           <div className="flex flex-col justify-center h-full w-full overflow-hidden">
-            <ProjectsCarousel />
+            <ProjectsCarousel transparentBackdrop />
           </div>
         </motion.div>
 
