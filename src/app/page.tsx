@@ -1,9 +1,8 @@
 "use client";
 
 import { useScrollSection } from "@/hooks/useScrollSection";
-import HomeSection from "@/components/sections/home-section";
+import HeroCarouselSequence from "@/components/v3/hero-carousel-sequence";
 import ServicesSection from "@/components/sections/services-section";
-import ProjectsSection from "@/components/sections/projects-section";
 import ContactSection from "@/components/sections/contact-section";
 
 export default function Home() {
@@ -12,9 +11,9 @@ export default function Home() {
 
   return (
     <main className="relative">
-      <HomeSection />
+      {/* Hero + Projects carousel — scroll-driven reveal */}
+      <HeroCarouselSequence />
       <ServicesSection />
-      <ProjectsSection />
       <ContactSection />
     </main>
   );

@@ -8,7 +8,16 @@ import ChatInterface from "@/components/chat-interface";
 /* ═══════════════════════════════════
    Hero V2 — Night Sky / GIC style
    ═══════════════════════════════════ */
-export default function HeroV2() {
+type HeroV2Props = {
+  /**
+   * Inside `HeroCarouselSequence` the hero stays in a sticky frame; window-based
+   * `useScroll` on this section mis-tracks, so inner fades/parallax hide content early.
+   * Omit scroll-driven motion here — the parent sequence handles the reveal.
+   */
+  embedInScrollSequence?: boolean;
+};
+
+export default function HeroV2({ embedInScrollSequence }: HeroV2Props) {
   const heroRef = useRef<HTMLElement>(null);
 
   /* parallax / fade */
@@ -17,12 +26,13 @@ export default function HeroV2() {
     offset: ["start start", "end start"],
   });
   const smooth = useSpring(scrollYProgress, { stiffness: 80, damping: 22, mass: 0.5 });
-  const bgY = useTransform(smooth, [0, 1], ["0%", "22%"]);
-  const contentY = useTransform(smooth, [0, 1], ["0px", "55px"]);
-  const contentOpacity = useTransform(smooth, [0, 0.65], [1, 0]);
-  const gifOpacity = useTransform(smooth, [0, 0.55], [1, 0]);
-  const gifScale = useTransform(smooth, [0, 1], [1, 0.93]);
-  const arrowOpacity = useTransform(scrollYProgress, [0, 0.08], [1, 0]);
+  const embed = !!embedInScrollSequence;
+  const bgY = useTransform(smooth, [0, 1], embed ? ["0%", "0%"] : ["0%", "22%"]);
+  const contentY = useTransform(smooth, [0, 1], embed ? ["0px", "0px"] : ["0px", "55px"]);
+  const contentOpacity = useTransform(smooth, [0, 0.65], embed ? [1, 1] : [1, 0]);
+  const gifOpacity = useTransform(smooth, [0, 0.55], embed ? [1, 1] : [1, 0]);
+  const gifScale = useTransform(smooth, [0, 1], embed ? [1, 1] : [1, 0.93]);
+  const arrowOpacity = useTransform(scrollYProgress, embed ? [0, 1] : [0, 0.08], embed ? [0, 0] : [1, 0]);
 
   return (
     <section
@@ -70,7 +80,7 @@ export default function HeroV2() {
 
       {/* ── Main content ── */}
       <motion.div
-        className="relative z-10 w-full px-6 md:px-10 lg:px-16 pt-24 pb-28 flex flex-col"
+        className="relative z-10 w-full px-6 md:px-10 lg:px-16 pt-24 pb-36 flex flex-col"
         style={{
           y: contentY,
           opacity: contentOpacity,

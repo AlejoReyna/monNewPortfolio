@@ -95,7 +95,6 @@ export default function ChatInterface({
   // Chat
   const { messages, isLoading, error, sendMessage, isRateLimit } = useChat(userName);
   const [showChat, setShowChat] = useState(false);
-  console.log("showChat:", showChat);
   const [inputValue, setInputValue] = useState("");
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   // Removed unused pendingUserText state
@@ -317,32 +316,33 @@ export default function ChatInterface({
             </div>
           </div>
 
-        {/* Contenido de la terminal */}
-        <div className="p-2 lg:p-4 flex-1 flex flex-col overflow-hidden">
-          {/* Portada */}
-          {!showChat && (
-            <div className="mb-4 font-mono text-[17px] lg:text-[18px] xl:text-[19px] leading-6">
-              <span className="text-gray-200">&gt;</span>
-              <span className="text-gray-400 ml-2">GPT-5</span>
-              <span className="text-gray-100 ml-2">
-                {displayed || text}
-                {!showNamePrompt && displayed.length < text.length && (
-                  <span className="ml-1 inline-block h-4 w-0.5 align-[-0.15em] bg-gray-300 animate-pulse" />
-                )}
-              </span>
-            </div>
-          )}
+        {/* Contenido — min-h-0 + scroll interno para que el texto de portada/comandos no quede cortado */}
+        <div className="p-2 lg:p-4 flex-1 flex flex-col min-h-0 overflow-hidden">
+          <div className="flex-1 min-h-0 flex flex-col gap-4 mb-4 overflow-y-auto">
+            {/* Portada */}
+            {!showChat && (
+              <div className="shrink-0 font-mono text-[17px] lg:text-[18px] xl:text-[19px] leading-6">
+                <span className="text-gray-200">&gt;</span>
+                <span className="text-gray-400 ml-2">GPT-5</span>
+                <span className="text-gray-100 ml-2">
+                  {displayed || text}
+                  {!showNamePrompt && displayed.length < text.length && (
+                    <span className="ml-1 inline-block h-4 w-0.5 align-[-0.15em] bg-gray-300 animate-pulse" />
+                  )}
+                </span>
+              </div>
+            )}
 
-          {/* Chat messages */}
-          {(sorted.length > 0 || showChat) && (
-            <div
-              className="space-y-4 overflow-y-auto mb-4 flex-1 lg:flex-initial"
-              style={{
-                height: chatHeightPx ? `${chatHeightPx - 120}px` : "400px",
-                maxHeight: chatHeightPx ? `${chatHeightPx - 120}px` : "400px",
-              }}
-            >
-              {sorted.map((m) => {
+            {/* Chat messages */}
+            {(sorted.length > 0 || showChat) && (
+              <div
+                className="space-y-4 overflow-y-auto shrink-0"
+                style={{
+                  height: chatHeightPx ? `${chatHeightPx - 120}px` : "400px",
+                  maxHeight: chatHeightPx ? `${chatHeightPx - 120}px` : "400px",
+                }}
+              >
+                {sorted.map((m) => {
                 const isUser = m.role === "user";
                 const key = (m.id ?? String(+m.timestamp)) as string;
                 const content = isUser ? stripHintFromUserMessage(m.content) : m.content ?? "";
@@ -382,32 +382,32 @@ export default function ChatInterface({
                   </div>
                 </div>
               )}
-              <div ref={messagesEndRef} />
-            </div>
-          )}
-
-          {/* Error */}
-          {error && (
-            <div className="bg-black/30 border-l-4 border-red-500 text-red-100 p-4 rounded font-mono text-[17px] lg:text-[18px] xl:text-[19px] animate-fadeIn mb-4">
-              <div className="flex items-center text-[17px] mb-2">
-                <span className="text-gray-200">&gt;</span>
-                <span className="text-gray-400 ml-2">GPT-5</span>
-                <span className="text-red-300 ml-2">error</span>
+                <div ref={messagesEndRef} />
               </div>
-              <div className="ml-6">
-                <p className="text-red-200">bash: {error}</p>
-                {isRateLimit && (
-                  <p className="text-xs mt-2 opacity-80 text-red-300">
-                    {isEs ? "Límite de velocidad alcanzado. Intenta en unos segundos..." : "Rate limit reached. Try in a few seconds..."}
-                  </p>
-                )}
-              </div>
-            </div>
-          )}
+            )}
 
-          {/* Sugerencias antes de iniciar chat */}
-          {!showNamePrompt && !showChat && sorted.length === 0 && (
-            <div className="space-y-2 mb-4">
+            {/* Error */}
+            {error && (
+              <div className="bg-black/30 border-l-4 border-red-500 text-red-100 p-4 rounded font-mono text-[17px] lg:text-[18px] xl:text-[19px] animate-fadeIn shrink-0">
+                <div className="flex items-center text-[17px] mb-2">
+                  <span className="text-gray-200">&gt;</span>
+                  <span className="text-gray-400 ml-2">GPT-5</span>
+                  <span className="text-red-300 ml-2">error</span>
+                </div>
+                <div className="ml-6">
+                  <p className="text-red-200">bash: {error}</p>
+                  {isRateLimit && (
+                    <p className="text-xs mt-2 opacity-80 text-red-300">
+                      {isEs ? "Límite de velocidad alcanzado. Intenta en unos segundos..." : "Rate limit reached. Try in a few seconds..."}
+                    </p>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Sugerencias antes de iniciar chat */}
+            {!showNamePrompt && !showChat && sorted.length === 0 && (
+              <div className="space-y-2 shrink-0">
               <div className="text-xs text-gray-400 font-mono mb-3">Comandos disponibles:</div>
               <div className="flex flex-wrap gap-2">
                 {suggestions.map((s, index) => (
@@ -422,12 +422,13 @@ export default function ChatInterface({
                     ./{isEs ? s.es.replace(/\s+/g, "_").toLowerCase() : s.en.replace(/\s+/g, "_").toLowerCase()}
                   </button>
                 ))}
+                </div>
               </div>
-            </div>
-          )}
+            )}
+          </div>
 
           {/* Input - siempre al final */}
-          <div className="border-t border-gray-500/30 pt-3 shrink-0 mt-auto">
+          <div className="border-t border-gray-500/30 pt-3 shrink-0">
             <div className="flex items-center font-mono text-[17px] lg:text-[18px] xl:text-[19px]">
               <span className="text-gray-200 ml-2">&gt;</span>
 
@@ -442,13 +443,6 @@ export default function ChatInterface({
                   }
                 }}
                 placeholder={isEs ? "Pregúntame algo..." : "Ask me something..."}
-                onFocus={() => {
-                  console.log("Input focus - States:", {
-                    showChat,
-                    isLoading,
-                    isDisabled: isLoading,
-                  });
-                }}
                 className="flex-1 bg-transparent text-gray-100 placeholder-gray-400 font-mono text-[17px] lg:text-[18px] xl:text-[19px] focus:outline-none disabled:opacity-50 caret-gray-300 ml-2"
                 disabled={isLoading}
                 maxLength={500}
