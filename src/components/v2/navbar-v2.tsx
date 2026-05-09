@@ -26,7 +26,7 @@ export default function NavbarV2() {
     { id: "projects" as const, label: isEs ? "Proyectos" : "Work" },
     { id: "contact" as const, label: isEs ? "Contacto" : "Contact" },
   ];
-  const navBeforeContact = navItems.filter((item) => item.id !== "contact");
+  const navBeforeContact = navItems.filter((item) => item.id !== "contact" && item.id !== "home");
   const contactNav = navItems.find((item) => item.id === "contact")!;
 
   const handleNav = (id: "home" | "services" | "projects" | "contact") => {
@@ -35,20 +35,16 @@ export default function NavbarV2() {
   };
 
   return (
-    <header className="fixed top-0 inset-x-0 z-50 flex justify-center pt-4 pointer-events-none">
+    <header className="fixed top-0 inset-x-0 z-50 pointer-events-none">
       {/* ── Desktop pill nav ── */}
       <nav
-        className="pointer-events-auto hidden sm:flex items-center gap-1 px-2 py-2 transition-all duration-300"
+        className="pointer-events-auto hidden sm:flex items-center justify-between px-4 py-2 w-full transition-all duration-300 relative"
         style={{
-          background: scrolled
-            ? "rgba(249, 250, 247, 0.95)"
-            : "rgba(249, 250, 247, 0.78)",
-          backdropFilter: "blur(16px)",
-          WebkitBackdropFilter: "blur(16px)",
-          borderRadius: "var(--gic-radius-nav)",
-          boxShadow: scrolled
-            ? "rgba(0, 0, 0, 0.15) 0px 2px 6px 0px, rgb(222, 226, 222) 0px 0px 0px 1px"
-            : "rgba(0, 0, 0, 0.08) 0px 2px 6px 0px, rgb(222, 226, 222) 0px 0px 0px 1px",
+          background: "transparent",
+          backdropFilter: "none",
+          WebkitBackdropFilter: "none",
+          borderRadius: "0px",
+          boxShadow: "none",
         }}
       >
         {/* Brand */}
@@ -57,131 +53,119 @@ export default function NavbarV2() {
           className="flex items-center px-4 py-1.5 transition-colors duration-150"
           style={{
             fontFamily: "var(--gic-font-sans)",
-            fontSize: "15px",
+            fontSize: "18px",
             fontWeight: 600,
             letterSpacing: "-0.012em",
-            color: "var(--gic-dark-charcoal)",
+            color: "var(--gic-canvas-white)",
           }}
         >
           Alexis Reyna
         </Link>
 
-        {/* Divider */}
-        <div
-          className="h-4 w-px mx-1 shrink-0"
-          style={{ backgroundColor: "var(--gic-steel-gray)" }}
-        />
-
-        {/* Links */}
-        {navBeforeContact.map((item) => {
-          const isActive = pathname === "/" && currentSection === item.id;
-          return (
-            <button
-              key={item.id}
-              onClick={() => handleNav(item.id)}
-              className="relative px-4 py-1.5 transition-all duration-150"
-              style={{
-                fontFamily: "var(--gic-font-sans)",
-                fontSize: "15px",
-                fontWeight: isActive ? 500 : 400,
-                letterSpacing: "-0.010em",
-                color: isActive
-                  ? "var(--gic-dark-charcoal)"
-                  : "var(--gic-medium-gray)",
-                backgroundColor: isActive
-                  ? "rgba(255, 255, 255, 0.9)"
+        {/* Centered nav items */}
+        <div className="absolute left-1/2 -translate-x-1/2 flex items-center gap-1">
+          {navBeforeContact.map((item) => {
+            const isActive = pathname === "/" && currentSection === item.id;
+            return (
+              <button
+                key={item.id}
+                onClick={() => handleNav(item.id)}
+                className="relative px-4 py-1.5 transition-all duration-150"
+                style={{
+                  fontFamily: "var(--gic-font-sans)",
+                  fontSize: "18px",
+                  fontWeight: isActive ? 500 : 400,
+                  letterSpacing: "-0.010em",
+                  color: isActive
+                    ? "var(--gic-canvas-white)"
+                    : "rgba(255,255,255,0.82)",
+                  backgroundColor: isActive
+                    ? "rgba(255, 255, 255, 0.14)"
+                    : "transparent",
+                  borderRadius: "var(--gic-radius-nav)",
+                  boxShadow: isActive
+                    ? "rgba(0, 0, 0, 0.06) 0px 1px 2px 0px"
+                    : "none",
+                }}
+              >
+                {item.label}
+              </button>
+            );
+          })}
+          <Link
+            href="/historia"
+            className="relative px-4 py-1.5 transition-all duration-150"
+            style={{
+              fontFamily: "var(--gic-font-sans)",
+              fontSize: "18px",
+              fontWeight: pathname === "/historia" ? 500 : 400,
+              letterSpacing: "-0.010em",
+              color:
+                pathname === "/historia"
+                  ? "var(--gic-canvas-white)"
+                  : "rgba(255,255,255,0.82)",
+              backgroundColor:
+                pathname === "/historia"
+                  ? "rgba(255, 255, 255, 0.14)"
                   : "transparent",
-                borderRadius: "var(--gic-radius-nav)",
-                boxShadow: isActive
+              borderRadius: "var(--gic-radius-nav)",
+              boxShadow:
+                pathname === "/historia"
                   ? "rgba(0, 0, 0, 0.06) 0px 1px 2px 0px"
                   : "none",
-              }}
-            >
-              {item.label}
-            </button>
-          );
-        })}
-        <Link
-          href="/historia"
-          className="relative px-4 py-1.5 transition-all duration-150"
-          style={{
-            fontFamily: "var(--gic-font-sans)",
-            fontSize: "15px",
-            fontWeight: pathname === "/historia" ? 500 : 400,
-            letterSpacing: "-0.010em",
-            color:
-              pathname === "/historia"
-                ? "var(--gic-dark-charcoal)"
-                : "var(--gic-medium-gray)",
-            backgroundColor:
-              pathname === "/historia"
-                ? "rgba(255, 255, 255, 0.9)"
-                : "transparent",
-            borderRadius: "var(--gic-radius-nav)",
-            boxShadow:
-              pathname === "/historia"
-                ? "rgba(0, 0, 0, 0.06) 0px 1px 2px 0px"
-                : "none",
-          }}
-        >
-          {isEs ? "Historia" : "Story"}
-        </Link>
-        {(() => {
-          const item = contactNav;
-          const isActive = pathname === "/" && currentSection === item.id;
-          return (
-            <button
-              key={item.id}
-              onClick={() => handleNav(item.id)}
-              className="relative px-4 py-1.5 transition-all duration-150"
-              style={{
-                fontFamily: "var(--gic-font-sans)",
-                fontSize: "15px",
-                fontWeight: isActive ? 500 : 400,
-                letterSpacing: "-0.010em",
-                color: isActive
-                  ? "var(--gic-dark-charcoal)"
-                  : "var(--gic-medium-gray)",
-                backgroundColor: isActive
-                  ? "rgba(255, 255, 255, 0.9)"
-                  : "transparent",
-                borderRadius: "var(--gic-radius-nav)",
-                boxShadow: isActive
-                  ? "rgba(0, 0, 0, 0.06) 0px 1px 2px 0px"
-                  : "none",
-              }}
-            >
-              {item.label}
-            </button>
-          );
-        })()}
-
-        {/* Divider */}
-        <div
-          className="h-4 w-px mx-1 shrink-0"
-          style={{ backgroundColor: "var(--gic-steel-gray)" }}
-        />
-
-        {/* Lang toggle */}
-        <button
-          onClick={() => toggleWithFade()}
-          className="px-3 py-1.5 transition-colors duration-150"
-          style={{
-            fontFamily: "var(--gic-font-sans)",
-            fontSize: "13px",
-            fontWeight: 400,
-            letterSpacing: "-0.013px",
-            color: "var(--gic-slate-gray)",
-          }}
-          title={isEs ? "Switch to English" : "Cambiar a Español"}
-        >
-          {isEs ? "EN" : "ES"}
-        </button>
+            }}
+          >
+            {isEs ? "Historia" : "Story"}
+          </Link>
+          {(() => {
+            const item = contactNav;
+            const isActive = pathname === "/" && currentSection === item.id;
+            return (
+              <button
+                key={item.id}
+                onClick={() => handleNav(item.id)}
+                className="relative px-4 py-1.5 transition-all duration-150"
+                style={{
+                  fontFamily: "var(--gic-font-sans)",
+                  fontSize: "18px",
+                  fontWeight: isActive ? 500 : 400,
+                  letterSpacing: "-0.010em",
+                  color: isActive
+                    ? "var(--gic-canvas-white)"
+                    : "rgba(255,255,255,0.82)",
+                  backgroundColor: isActive
+                    ? "rgba(255, 255, 255, 0.14)"
+                    : "transparent",
+                  borderRadius: "var(--gic-radius-nav)",
+                  boxShadow: isActive
+                    ? "rgba(0, 0, 0, 0.06) 0px 1px 2px 0px"
+                    : "none",
+                }}
+              >
+                {item.label}
+              </button>
+            );
+          })()}
+          <button
+            onClick={() => toggleWithFade()}
+            className="px-3 py-1.5 transition-colors duration-150"
+            style={{
+              fontFamily: "var(--gic-font-sans)",
+              fontSize: "16px",
+              fontWeight: 400,
+              letterSpacing: "-0.013px",
+              color: "rgba(255,255,255,0.82)",
+            }}
+            title={isEs ? "Switch to English" : "Cambiar a Español"}
+          >
+            {isEs ? "EN" : "ES"}
+          </button>
+        </div>
 
         {/* CTA */}
         <button
           onClick={() => handleNav("contact")}
-          className="ml-1 transition-all duration-150 hover:opacity-90 active:scale-[0.97]"
+          className="transition-all duration-150 hover:opacity-90 active:scale-[0.97]"
           style={{
             background: "var(--gic-night-sky)",
             color: "var(--gic-canvas-white)",
@@ -201,13 +185,13 @@ export default function NavbarV2() {
 
       {/* ── Mobile compact bar ── */}
       <div
-        className="pointer-events-auto flex sm:hidden items-center justify-between w-[calc(100%-32px)] px-4 py-2.5 mx-4"
+        className="pointer-events-auto flex sm:hidden items-center justify-between w-full px-4 py-2.5"
         style={{
-          background: "rgba(249, 250, 247, 0.92)",
-          backdropFilter: "blur(16px)",
-          WebkitBackdropFilter: "blur(16px)",
-          borderRadius: "var(--gic-radius-nav)",
-          boxShadow: "rgba(0, 0, 0, 0.12) 0px 2px 6px 0px, rgb(222, 226, 222) 0px 0px 0px 1px",
+          background: "transparent",
+          backdropFilter: "none",
+          WebkitBackdropFilter: "none",
+          borderRadius: "0px",
+          boxShadow: "none",
         }}
       >
         <Link

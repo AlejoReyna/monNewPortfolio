@@ -3,6 +3,7 @@
 import { useRef } from "react";
 import Image from "next/image";
 import { motion, useScroll, useTransform, useSpring } from "framer-motion";
+import ChatInterface from "@/components/chat-interface";
 
 /* ═══════════════════════════════════
    Hero V2 — Night Sky / GIC style
@@ -79,12 +80,13 @@ export default function HeroV2() {
       >
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_minmax(320px,min(540px,46vw))] gap-10 lg:gap-12 items-start lg:items-stretch w-full lg:min-h-[min(88vh,780px)]">
 
-          {/* ── Left column ── */}
-          <div
-            className="w-full rounded-lg border-2 border-white/40 lg:min-h-[min(88vh,780px)] min-h-[240px]"
-            style={{ backgroundColor: "rgba(0, 0, 0, 0.45)" }}
-            aria-hidden
-          />
+          {/* ── Left column: terminal uses 50% of column height ── */}
+          <div className="w-full h-full min-h-[min(70vh,520px)] lg:min-h-[min(88vh,780px)] flex flex-col items-stretch justify-start">
+            <ChatInterface
+              variant="panel"
+              className="lg:!w-[140%] lg:-ml-[10%] lg:translate-y-[30%] max-w-none h-[57.5%] min-h-0 shrink-0"
+            />
+          </div>
 
           {/* ── Right column: GIF full height ── */}
           <motion.div

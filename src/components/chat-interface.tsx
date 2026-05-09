@@ -61,7 +61,20 @@ const stripHintFromUserMessage = (raw: unknown) => {
   return text;
 };
 
-export default function ChatInterface() {
+type ChatInterfaceProps = {
+  /** Extra classes on outer wrapper (e.g. embed in hero panel). */
+  className?: string;
+  /** Extra classes on terminal chrome when variant is `card` (inner shell). */
+  terminalClassName?: string;
+  /** `panel`: root element is the terminal (fills hero column). `card`: centered layout with inner terminal frame. */
+  variant?: "card" | "panel";
+};
+
+export default function ChatInterface({
+  className,
+  terminalClassName,
+  variant = "card",
+}: ChatInterfaceProps) {
   const langCtx = useLanguage();
   const initialCtxLang: Lang = langCtx?.language === "es" ? "es" : "en";
   const setCtxLanguage = useCallback(
@@ -285,41 +298,56 @@ export default function ChatInterface() {
   /* ========= UI normal del chat ========= */
   const sorted = [...messages].sort((a, b) => +a.timestamp - +b.timestamp);
 
+  const isPanel = variant === "panel";
+
+  const rootClassName = isPanel
+    ? [
+        "pointer-events-auto relative z-10 flex flex-col w-full rounded-lg border border-gray-500/35 bg-black/30 backdrop-blur-md shadow-2xl shadow-black/35 overflow-hidden min-h-0",
+        terminalClassName,
+        className,
+      ]
+        .filter(Boolean)
+        .join(" ")
+    : [
+        "relative z-10 flex flex-col px-0 lg:px-4 w-full max-w-3xl mx-auto mb-0 lg:mb-12 h-full lg:h-auto",
+        className,
+      ]
+        .filter(Boolean)
+        .join(" ");
+
+  const innerShellClassName = [
+    "pointer-events-auto w-full rounded-lg border border-gray-500/35 bg-black/30 backdrop-blur-md shadow-2xl shadow-black/35 overflow-hidden max-h-[35vh] lg:h-auto flex flex-col",
+    terminalClassName,
+  ]
+    .filter(Boolean)
+    .join(" ");
+
+  const terminalFrame = (body: React.ReactNode) =>
+    isPanel ? body : <div className={innerShellClassName}>{body}</div>;
+
   return (
-    <div ref={rootRef} className="relative z-10 flex flex-col px-0 lg:px-4 w-full max-w-3xl mx-auto mb-0 lg:mb-12 h-full lg:h-auto">
-      {/* Terminal unificada */}
-      <div className="pointer-events-auto w-full rounded-lg border border-orange-500/30 bg-black/30 backdrop-blur-md shadow-2xl shadow-orange-500/10 overflow-hidden max-h-[35vh] lg:h-auto flex flex-col">
-        {/* Terminal header */}
-        <div
-          className="flex items-center justify-between px-4 py-3 bg-black/40 border-b border-orange-500/30 cursor-move"
-          data-drag-handle
-        >
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full bg-red-500 border border-red-600" />
-            <div className="w-3 h-3 rounded-full bg-yellow-500 border border-yellow-600" />
-            <div className="w-3 h-3 rounded-full bg-green-500 border border-green-600" />
+    <div ref={rootRef} className={rootClassName}>
+      {terminalFrame(
+        <>
+          {/* Terminal header */}
+          <div
+            className={`flex items-center px-4 py-3 bg-black/40 border-b border-gray-500/35 shrink-0 ${isPanel ? "cursor-default" : "cursor-move"}`}
+            {...(!isPanel ? { "data-drag-handle": "" } : {})}
+          >
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full bg-red-500 border border-red-600" />
+              <div className="w-3 h-3 rounded-full bg-yellow-500 border border-yellow-600" />
+              <div className="w-3 h-3 rounded-full bg-green-500 border border-green-600" />
+            </div>
           </div>
-          <div className="text-xs text-gray-300 font-mono">admin — alexis@portfolio — ~ — zsh — 80x24</div>
-          <div className="flex items-center gap-2">
-            <div className="text-xs text-orange-400 font-mono">●</div>
-          </div>
-        </div>
 
         {/* Contenido de la terminal */}
         <div className="p-2 lg:p-4 flex-1 flex flex-col overflow-hidden">
-          {/* Mensaje inicial o última línea de login */}
-          <div className="text-xs lg:text-sm xl:text-[13px] text-gray-500 font-mono mb-2">
-            {lastLoginLine}
-          </div>
-
-          {/* Portada (misma línea con el $, envuelve debajo si falta ancho) */}
+          {/* Portada */}
           {!showChat && (
-            <div className="mb-4 font-mono text-[13px] lg:text-[14px] xl:text-[15px] leading-6">
-              <span className="text-green-400">➜</span>
-              <span className="text-blue-400 ml-2">~</span>
-              <span className="text-orange-400 ml-2">alexis@portfolio:</span>
-              <span className="text-blue-400">~</span>
-              <span className="text-orange-400">$</span>
+            <div className="mb-4 font-mono text-[17px] lg:text-[18px] xl:text-[19px] leading-6">
+              <span className="text-gray-200">&gt;</span>
+              <span className="text-gray-400 ml-2">GPT-5</span>
               <span className="text-gray-100 ml-2">
                 {displayed || text}
                 {!showNamePrompt && displayed.length < text.length && (
@@ -343,29 +371,26 @@ export default function ChatInterface() {
                 const key = (m.id ?? String(+m.timestamp)) as string;
                 const content = isUser ? stripHintFromUserMessage(m.content) : m.content ?? "";
                 return (
-                  <div key={key} className="font-mono text-[13px] lg:text-[14px] xl:text-[15px] leading-6 animate-fadeIn">
+                  <div key={key} className="font-mono text-[17px] lg:text-[18px] xl:text-[19px] leading-6 animate-fadeIn">
                     {isUser ? (
                       // Usuario - estilo comando de terminal con wrap correcto
                       <div className="mb-2">
-                        <div className="text-[13px] lg:text-[14px] xl:text-[15px]">
-                          <span className="text-green-400">➜</span>
-                          <span className="text-blue-400 ml-2">~</span>
-                          <span className="text-orange-400 ml-2">alexis@portfolio:</span>
-                          <span className="text-blue-400">~</span>
-                          <span className="text-orange-400">$</span>
+                        <div className="text-[17px] lg:text-[18px] xl:text-[19px]">
+                          <span className="text-gray-200">&gt;</span>
+                          <span className="text-gray-400 ml-2">GPT-5</span>
                           <span className="text-gray-100 ml-2">{content}</span>
                         </div>
-                        <div className="text-[11px] text-gray-500 mt-1">
+                        <div className="text-[14px] text-gray-500 mt-1">
                           {m.timestamp.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
                         </div>
                       </div>
                     ) : (
                       // Respuesta del sistema
                       <div className="mb-2">
-                        <div className="text-gray-100 bg-black/10 rounded p-3 border-l-4 border-orange-500 text-[13px] lg:text-[14px] xl:text-[15px] leading-6">
+                        <div className="text-gray-100 bg-black/10 rounded p-3 border-l-4 border-orange-500 text-[17px] lg:text-[18px] xl:text-[19px] leading-6">
                           {content}
                         </div>
-                        <div className="text-[11px] text-gray-500 mt-1">
+                        <div className="text-[14px] text-gray-500 mt-1">
                           {m.timestamp.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
                         </div>
                       </div>
@@ -374,7 +399,7 @@ export default function ChatInterface() {
                 );
               })}
               {isLoading && (
-                <div className="font-mono text-[13px] lg:text-[14px] xl:text-[15px] animate-fadeIn">
+                <div className="font-mono text-[17px] lg:text-[18px] xl:text-[19px] animate-fadeIn">
                   <div className="text-gray-100 bg-black/10 rounded p-3 border-l-4 border-orange-500 flex items-center gap-3">
                     <LoadingSpinner />
                     <span>Procesando respuesta...</span>
@@ -387,13 +412,10 @@ export default function ChatInterface() {
 
           {/* Error */}
           {error && (
-            <div className="bg-black/30 border-l-4 border-red-500 text-red-100 p-4 rounded font-mono text-[13px] lg:text-[14px] xl:text-[15px] animate-fadeIn mb-4">
-              <div className="flex items-center text-[13px] mb-2">
-                <span className="text-green-400">➜</span>
-                <span className="text-blue-400 ml-2">~</span>
-                <span className="text-red-400 ml-2">alexis@portfolio:</span>
-                <span className="text-blue-400">~</span>
-                <span className="text-red-400">$</span>
+            <div className="bg-black/30 border-l-4 border-red-500 text-red-100 p-4 rounded font-mono text-[17px] lg:text-[18px] xl:text-[19px] animate-fadeIn mb-4">
+              <div className="flex items-center text-[17px] mb-2">
+                <span className="text-gray-200">&gt;</span>
+                <span className="text-gray-400 ml-2">GPT-5</span>
                 <span className="text-red-300 ml-2">error</span>
               </div>
               <div className="ml-6">
@@ -429,9 +451,9 @@ export default function ChatInterface() {
           )}
 
           {/* Input - siempre al final */}
-          <div className="border-t border-orange-500/20 pt-3 shrink-0">
-            <div className="flex items-center font-mono text-[13px] lg:text-[14px] xl:text-[15px]">
-              <span className="text-blue-400 ml-2">~</span>
+          <div className="border-t border-gray-500/30 pt-3 shrink-0 mt-auto">
+            <div className="flex items-center font-mono text-[17px] lg:text-[18px] xl:text-[19px]">
+              <span className="text-gray-200 ml-2">&gt;</span>
 
               <input
                 type="text"
@@ -452,7 +474,7 @@ export default function ChatInterface() {
                     isDisabled: isLoading,
                   });
                 }}
-                className="flex-1 bg-transparent text-gray-100 placeholder-gray-400 font-mono text-[13px] lg:text-[14px] xl:text-[15px] focus:outline-none disabled:opacity-50 caret-gray-300 ml-2"
+                className="flex-1 bg-transparent text-gray-100 placeholder-gray-400 font-mono text-[17px] lg:text-[18px] xl:text-[19px] focus:outline-none disabled:opacity-50 caret-gray-300 ml-2"
                 disabled={isLoading}
                 maxLength={500}
               />
@@ -470,7 +492,8 @@ export default function ChatInterface() {
             </div>
           </div>
         </div>
-      </div>
+        </>
+      )}
     </div>
   );
 }
