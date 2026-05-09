@@ -6,44 +6,6 @@ import { motion, useScroll, useTransform, useSpring } from "framer-motion";
 import { useNavigation } from "@/contexts/navigation-context";
 import { useLanguage } from "@/components/lang-context";
 
-/* ─── small reusable stat cell ─── */
-function StatCell({
-  value,
-  label,
-  accent = false,
-}: {
-  value: string;
-  label: string;
-  accent?: boolean;
-}) {
-  return (
-    <div className="flex flex-col gap-0.5">
-      <span
-        style={{
-          fontFamily: "var(--gic-font-serif)",
-          fontSize: "22px",
-          fontWeight: 400,
-          lineHeight: 1.1,
-          letterSpacing: "-0.5px",
-          color: accent ? "var(--gic-action-azure)" : "var(--gic-canvas-white)",
-        }}
-      >
-        {value}
-      </span>
-      <span
-        style={{
-          fontFamily: "var(--gic-font-sans)",
-          fontSize: "11px",
-          color: "rgba(255,255,255,0.4)",
-          letterSpacing: "-0.013px",
-        }}
-      >
-        {label}
-      </span>
-    </div>
-  );
-}
-
 /* ─── tech pill ─── */
 function TechPill({ label }: { label: string }) {
   return (
@@ -83,6 +45,8 @@ export default function HeroV2() {
   const bgY = useTransform(smooth, [0, 1], ["0%", "22%"]);
   const contentY = useTransform(smooth, [0, 1], ["0px", "55px"]);
   const contentOpacity = useTransform(smooth, [0, 0.65], [1, 0]);
+  const gifOpacity = useTransform(smooth, [0, 0.55], [1, 0]);
+  const gifScale = useTransform(smooth, [0, 1], [1, 0.93]);
   const arrowOpacity = useTransform(scrollYProgress, [0, 0.08], [1, 0]);
 
   /* entrance variants */
@@ -148,10 +112,10 @@ export default function HeroV2() {
           margin: "0 auto",
         }}
       >
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-10 lg:gap-16 items-start w-full">
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_minmax(320px,min(540px,46vw))] gap-10 lg:gap-12 items-start lg:items-stretch w-full lg:min-h-[min(88vh,780px)]">
 
           {/* ── Left column ── */}
-          <div className="flex flex-col gap-8">
+          <div className="flex flex-col gap-8 lg:self-center">
 
             {/* Availability badge */}
             <motion.div {...fadeUp(0.1)}>
@@ -280,115 +244,25 @@ export default function HeroV2() {
             </motion.div>
           </div>
 
-          {/* ── Right column: Hero Overlay Card ── */}
-          <motion.aside
-            initial={{ opacity: 0, y: 24 }}
+          {/* ── Right column: GIF full height ── */}
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.6, ease: [0.22, 1, 0.36, 1] as const }}
-            className="hidden lg:flex flex-col gap-5 mt-2"
-            style={{
-              background: "rgba(222, 226, 222, 0.1)",
-              backdropFilter: "blur(20px)",
-              WebkitBackdropFilter: "blur(20px)",
-              border: "1px solid rgba(255,255,255,0.09)",
-              borderRadius: "var(--gic-radius-cards-large)",
-              padding: "var(--gic-card-padding)",
-            }}
+            transition={{ duration: 0.75, delay: 0.45, ease: [0.22, 1, 0.36, 1] as const }}
+            className="hidden lg:block relative w-full h-full min-h-[min(88vh,780px)] overflow-hidden pointer-events-none origin-top"
+            style={{ opacity: gifOpacity, scale: gifScale }}
+            aria-hidden
           >
-            {/* Current role */}
-            <div className="flex flex-col gap-1">
-              <p
-                style={{
-                  fontFamily: "var(--gic-font-sans)",
-                  fontSize: "var(--gic-text-caption)",
-                  color: "rgba(255,255,255,0.4)",
-                  letterSpacing: "var(--gic-tracking-caption)",
-                }}
-              >
-                {isEs ? "Actualmente en" : "Currently at"}
-              </p>
-              <p
-                style={{
-                  fontFamily: "var(--gic-font-sans)",
-                  fontSize: "15px",
-                  fontWeight: 500,
-                  color: "var(--gic-canvas-white)",
-                  letterSpacing: "-0.012em",
-                }}
-              >
-                Inverater
-              </p>
-              <p
-                style={{
-                  fontFamily: "var(--gic-font-sans)",
-                  fontSize: "var(--gic-text-caption)",
-                  color: "rgba(255,255,255,0.45)",
-                  lineHeight: 1.45,
-                }}
-              >
-                {isEs
-                  ? "Full Stack + UX/UI · Plataforma de inversiones inmobiliarias"
-                  : "Full Stack + UX/UI · Real estate investment platform"}
-              </p>
-            </div>
-
-            {/* Divider */}
-            <div style={{ height: "1px", backgroundColor: "rgba(255,255,255,0.08)" }} />
-
-            {/* Stats */}
-            <div className="flex items-start justify-between">
-              <StatCell value="4+" label={isEs ? "años exp." : "yrs exp."} />
-              <StatCell value="8+" label={isEs ? "proyectos" : "projects"} />
-              <StatCell value="MX" label="Monterrey" accent />
-            </div>
-
-            {/* Divider */}
-            <div style={{ height: "1px", backgroundColor: "rgba(255,255,255,0.08)" }} />
-
-            {/* Links */}
-            <div className="flex flex-col gap-2">
-              <p
-                style={{
-                  fontFamily: "var(--gic-font-sans)",
-                  fontSize: "var(--gic-text-caption)",
-                  color: "rgba(255,255,255,0.35)",
-                  letterSpacing: "var(--gic-tracking-caption)",
-                  textTransform: "uppercase",
-                }}
-              >
-                Links
-              </p>
-              <div className="flex flex-wrap gap-3">
-                {[
-                  {
-                    label: "GitHub",
-                    href: "https://github.com/AlejoReyna",
-                  },
-                  {
-                    label: "LinkedIn",
-                    href: "https://www.linkedin.com/in/alexis-alberto-reyna-sánchez-6953102b4",
-                  },
-                ].map((l) => (
-                  <a
-                    key={l.label}
-                    href={l.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style={{
-                      fontFamily: "var(--gic-font-sans)",
-                      fontSize: "var(--gic-text-caption)",
-                      color: "var(--gic-action-azure)",
-                      letterSpacing: "var(--gic-tracking-caption)",
-                      textDecoration: "underline",
-                      textUnderlineOffset: "3px",
-                    }}
-                  >
-                    {l.label}
-                  </a>
-                ))}
-              </div>
-            </div>
-          </motion.aside>
+            <Image
+              src="/16.gif"
+              alt=""
+              fill
+              priority
+              unoptimized
+              sizes="(min-width: 1024px) min(540px, 46vw), 0px"
+              className="object-cover object-[right_top] scale-[1.2] origin-top-right translate-x-[clamp(12px,5vw,88px)]"
+            />
+          </motion.div>
         </div>
       </motion.div>
 
