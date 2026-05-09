@@ -1,7 +1,11 @@
 "use client";
 
-import ProjectsV2 from "@/components/v2/projects-v2";
+import ProjectsCarousel from "@/components/v3/projects-carousel";
 
 export default function ProjectsSection() {
-  return <ProjectsV2 />;
+  return (
+    <div className="v3-root">
+      <ProjectsCarousel />
+    </div>
+  );
 }

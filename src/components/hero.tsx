@@ -1,6 +1,7 @@
 "use client";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
+import SlowGif from "./SlowGif";
 import { motion, useScroll, useTransform, useSpring } from "framer-motion";
 import ChatInterface from "./minecraft-chat-interface";
 import {
@@ -81,37 +82,42 @@ export default function Hero({ className }: HeroProps) {
         />
       </motion.div>
 
-      {/* GIF con fade + scale al scrollear */}
+      {/* GIF con fade + scale al scrollear — div ocupa h-full, asset empujado 30% hacia abajo */}
       <motion.div
         className="pointer-events-none absolute inset-0 h-full z-10"
         style={{ opacity: gifOpacity, scale: gifScale }}
       >
-        <Image
+        <SlowGif
           src="/16.gif"
           alt="Animated overlay"
-          fill
-          priority
-          unoptimized
-          className="mt-[10vh] md:mt-[20vh] lg:mt-[28vh] object-contain object-center lg:object-right
-                     origin-center lg:origin-right scale-[1.1] sm:scale-[0.95] md:scale-[1.2]
-                     lg:scale-[1.35] xl:scale-[1.45] lg:translate-x-[200px]"
+          speedFactor={5}
+          objectPosition="right"
+          objectPositionY="bottom"
+          topOffsetPx={72}
+          className="absolute inset-0 w-full h-full"
         />
       </motion.div>
 
       {/* Grid para otros contenidos */}
       <div className="grid min-h-screen grid-cols-1 lg:grid-cols-[60%_40%] items-stretch lg:pl-24 xl:pl-28 pt-7" />
 
-      {/* === Minecraft chat con parallax sutil === */}
+      {/* === Minecraft chat con parallax sutil — empujado 20% desde arriba === */}
       <motion.div
-        className="pointer-events-auto absolute bottom-6 z-30"
+        className="pointer-events-auto absolute z-30"
         style={{
           left: isShadersmineWallpaper ? 12 : 108,
-          marginTop: 8,
+          top: "20%",
           y: chatY,
           opacity: chatOpacity,
         }}
       >
-        <ChatInterface />
+        {/* Wrapper con ancho fijo = mismo que ChatInterface (504px max) */}
+        <div style={{ width: 504 }}>
+          {/* Div decorativo bordeado arriba de la terminal */}
+          <div className="h-12 w-full rounded-t-lg"
+               style={{ border: "2px solid rgba(255,255,255,0.55)", background: "rgba(0,0,0,0.45)" }} />
+          <ChatInterface />
+        </div>
       </motion.div>
 
       {/* Separador inferior */}

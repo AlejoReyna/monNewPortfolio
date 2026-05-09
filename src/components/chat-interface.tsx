@@ -25,10 +25,7 @@ import {
   detectEnhancedIntent,
   buildEnhancedHint,
   ENHANCED_SUGGESTIONS,
-  ENHANCED_PLACEHOLDERS,
 } from "./data/chat-enhancements";
-
-console.log("Imported ENHANCED_PLACEHOLDERS:", ENHANCED_PLACEHOLDERS);
 
 type Lang = "en" | "es";
 type Intent = "casual" | "work" | "about" | "projects" | "contact" | "music" | "travel" | "tech";
@@ -98,9 +95,6 @@ export default function ChatInterface({
   // Chat
   const { messages, isLoading, error, sendMessage, isRateLimit } = useChat(userName);
   const [showChat, setShowChat] = useState(false);
-  const [currentPlaceholder, setCurrentPlaceholder] = useState(
-    isEs ? "Pregúntame algo..." : "Ask me something..."
-  );
   console.log("showChat:", showChat);
   const [inputValue, setInputValue] = useState("");
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
@@ -146,22 +140,6 @@ export default function ChatInterface({
     }
   }, [setCtxLanguage]);
 
-  // Placeholders dinámicos
-  const pickPlaceholder = useCallback(() => {
-    const pool = ENHANCED_PLACEHOLDERS[isEs ? "es" : "en"];
-    const randomIndex = Math.floor(Math.random() * pool.length);
-    const newPlaceholder = pool[randomIndex];
-    console.log("New placeholder:", newPlaceholder);
-    setCurrentPlaceholder(newPlaceholder);
-  }, [isEs]);
-
-  useEffect(() => {
-    console.log("Setting up placeholder effect");
-    pickPlaceholder();
-    const interval = setInterval(pickPlaceholder, 5000);
-    return () => clearInterval(interval);
-  }, [pickPlaceholder]);
-
   // Initialize suggestions on client side to prevent hydration mismatch
   useEffect(() => {
     setSuggestions(getRandomSuggestions(ENHANCED_SUGGESTIONS, 5));
@@ -195,7 +173,6 @@ export default function ChatInterface({
     sendMessage(payload);
     setInputValue("");
     if (!showChat) setShowChat(true);
-    pickPlaceholder();
   };
 
   const handleSuggestionClick = (text: string, intent: Intent) => {
@@ -212,7 +189,6 @@ export default function ChatInterface({
     const payload = buildHint(intent, currentLang) + "\n" + text;
     sendMessage(payload);
     if (!showChat) setShowChat(true);
-    pickPlaceholder();
   };
 
   /* ========= Intro text (portada) ========= */
@@ -465,12 +441,11 @@ export default function ChatInterface({
                     handleSendMessage();
                   }
                 }}
-                placeholder={currentPlaceholder || (isEs ? "Pregúntame algo..." : "Ask me something...")}
+                placeholder={isEs ? "Pregúntame algo..." : "Ask me something..."}
                 onFocus={() => {
                   console.log("Input focus - States:", {
                     showChat,
                     isLoading,
-                    currentPlaceholder,
                     isDisabled: isLoading,
                   });
                 }}

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Bebas_Neue, Cormorant_Garamond, Space_Mono } from "next/font/google";
 import "./globals.css";
 import AppChrome from "@/components/app-chrome";
 
@@ -29,6 +29,29 @@ const geistSans = Geist({
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+});
+
+/* ── V3 editorial fonts — available app-wide ── */
+const bebas = Bebas_Neue({
+  weight: "400",
+  subsets: ["latin"],
+  variable: "--font-bebas",
+  display: "swap",
+});
+
+const cormorant = Cormorant_Garamond({
+  weight: ["300", "400", "600"],
+  style: ["normal", "italic"],
+  subsets: ["latin"],
+  variable: "--font-cormorant",
+  display: "swap",
+});
+
+const spaceMono = Space_Mono({
+  weight: ["400", "700"],
+  subsets: ["latin"],
+  variable: "--font-space-mono",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -61,7 +84,7 @@ export default function RootLayout({
         <link rel="manifest" href="/manifest.json" />
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} ${bebas.variable} ${cormorant.variable} ${spaceMono.variable} antialiased`}
         style={{ backgroundColor: "var(--gic-off-white)", color: "var(--gic-dark-charcoal)" }}
       >
         <LanguageProvider>
