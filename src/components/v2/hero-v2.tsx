@@ -58,7 +58,7 @@ export default function HeroV2({
     <section
       id="home"
       ref={heroRef}
-      className="relative min-h-screen overflow-hidden flex items-center"
+      className="relative min-h-screen overflow-hidden flex"
       style={{ backgroundColor: "var(--gic-night-sky)" }}
     >
       {/* ── Background image + parallax ── */}
@@ -100,7 +100,7 @@ export default function HeroV2({
 
       {/* ── Main content ── */}
       <motion.div
-        className="relative z-10 w-full px-6 md:px-10 lg:px-16 pt-24 pb-36 flex flex-col"
+        className="relative z-10 w-full h-screen px-6 md:px-10 lg:px-16 flex flex-col"
         style={{
           y: contentY,
           opacity: contentOpacity,
@@ -108,7 +108,7 @@ export default function HeroV2({
           margin: "0 auto",
         }}
       >
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_minmax(320px,min(540px,46vw))] gap-10 lg:gap-12 items-start lg:items-stretch w-full lg:min-h-[min(88vh,780px)]">
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_minmax(380px,min(640px,52vw))] gap-10 lg:gap-12 items-start lg:items-stretch w-full flex-1">
 
           {/* ── Left column: terminal uses 50% of column height ── */}
           <div className="w-full h-full min-h-[min(70vh,520px)] lg:min-h-[min(88vh,780px)] flex flex-col items-stretch justify-start">
@@ -123,7 +123,7 @@ export default function HeroV2({
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.75, delay: 0.45, ease: [0.22, 1, 0.36, 1] as const }}
-            className="hidden lg:block relative lg:ml-[15%] w-full h-full min-h-[min(88vh,780px)] overflow-hidden pointer-events-none origin-top rounded-lg border-2 border-white/40"
+            className="hidden lg:block relative lg:ml-[15%] w-full h-full min-h-[min(88vh,700px)] pt-16 overflow-hidden pointer-events-none origin-top rounded-lg border-2 border-rose-400"
             style={{ opacity: gifOpacity, scale: gifScale }}
             aria-hidden
           >
@@ -133,81 +133,14 @@ export default function HeroV2({
               fill
               priority
               unoptimized
-              sizes="(min-width: 1024px) min(540px, 46vw), 0px"
-              className="object-cover object-[right_top] scale-[1.2] origin-top-right translate-x-[clamp(12px,5vw,88px)]"
+              sizes="(min-width: 1400px) min(540px, 46vw), 0px"
+              className="object-contain object-center"
             />
           </motion.div>
         </div>
       </motion.div>
 
-      {/* ── Scroll indicator ── */}
-      <motion.div
-        className="absolute bottom-7 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center"
-        style={{ opacity: arrowOpacity }}
-        aria-hidden="true"
-      >
-        <motion.div
-          animate={{ y: [0, 5, 0] }}
-          transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
-        >
-          <svg
-            width="20"
-            height="20"
-            viewBox="0 0 24 24"
-            fill="none"
-            style={{ color: "rgba(255,255,255,0.25)" }}
-          >
-            <path
-              d="M6 9l6 6 6-6"
-              stroke="currentColor"
-              strokeWidth="1.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-        </motion.div>
-        <motion.div
-          animate={{ y: [0, 5, 0] }}
-          transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut", delay: 0.2 }}
-          className="-mt-2"
-        >
-          <svg
-            width="20"
-            height="20"
-            viewBox="0 0 24 24"
-            fill="none"
-            style={{ color: "rgba(255,255,255,0.12)" }}
-          >
-            <path
-              d="M6 9l6 6 6-6"
-              stroke="currentColor"
-              strokeWidth="1.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-        </motion.div>
-      </motion.div>
 
-      {/* ── Bottom fade to hero base tone ── */}
-      {embedContentOpacity ? (
-        <motion.div
-          className="absolute bottom-0 inset-x-0 h-24 pointer-events-none z-10"
-          style={{
-            opacity: embedContentOpacity,
-            background:
-              "linear-gradient(to bottom, transparent, var(--gic-night-sky))",
-          }}
-        />
-      ) : (
-        <div
-          className="absolute bottom-0 inset-x-0 h-24 pointer-events-none z-10"
-          style={{
-            background:
-              "linear-gradient(to bottom, transparent, var(--gic-night-sky))",
-          }}
-        />
-      )}
     </section>
   );
 }

@@ -22,49 +22,6 @@ const PHASE = {
   /** 0.90% - 1.0%: Exit. The sticky container prepares to un-stick. */
 } as const;
 
-function ScrollHint({ opacity }: { opacity: MotionValue<number> }) {
-  return (
-    <motion.div
-      style={{
-        opacity,
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        gap: "0.5rem",
-        userSelect: "none",
-        pointerEvents: "none",
-      }}
-    >
-      <span
-        style={{
-          fontFamily: "var(--font-space-mono, ui-monospace, monospace)",
-          fontSize: "0.55rem",
-          letterSpacing: "0.35em",
-          textTransform: "uppercase",
-          color: "rgba(237, 234, 224, 0.45)",
-        }}
-      >
-        proyectos
-      </span>
-      <motion.svg
-        width="20"
-        height="12"
-        viewBox="0 0 20 12"
-        fill="none"
-        animate={{ y: [0, 5, 0] }}
-        transition={{ repeat: Infinity, duration: 1.6, ease: "easeInOut" }}
-      >
-        <path
-          d="M1 1L10 10L19 1"
-          stroke="rgba(200,168,74,0.6)"
-          strokeWidth="1.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </motion.svg>
-    </motion.div>
-  );
-}
 
 function RevealEdge({ scrollYProgress }: { scrollYProgress: MotionValue<number> }) {
   const opacity = useTransform(
@@ -134,11 +91,6 @@ export default function HeroCarouselSequence() {
     ["inset(100% 0% 0% 0%)", "inset(0% 0% 0% 0%)"]
   );
 
-  const hintOpacity = useTransform(
-    scrollYProgress,
-    [0, PHASE.heroOnlyUntil * 0.5],
-    [1, 0]
-  );
 
   return (
     <div 
@@ -195,7 +147,6 @@ export default function HeroCarouselSequence() {
             zIndex: 2,
           }}
         >
-          <ScrollHint opacity={hintOpacity} />
         </div>
       </div>
     </div>
