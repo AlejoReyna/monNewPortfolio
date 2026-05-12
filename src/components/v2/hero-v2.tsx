@@ -19,6 +19,20 @@ const COMIC_MESSAGES = [
   "todo: fix later",
   "console.log everything",
 ];
+
+/** Full-line rotating greetings above the draggable terminal */
+const DRAG_GREETINGS = [
+  "hey, you made it — drag me anywhere",
+  "welcome in, grab the window",
+  "good to see you — pull me around",
+  "pull up a chair, then drag the chat",
+  "make yourself at home, move me if you like",
+  "you're in the right place — try dragging",
+  "glad you're here, terminal's draggable",
+  "take a look around, i'm not glued down",
+  "vibes: online — toss me anywhere",
+  "ready when you are — drag me anywhere",
+];
 type HeroV2Props = {
   /**
    * Inside `HeroCarouselSequence` the hero stays in a sticky frame; window-based
@@ -38,6 +52,8 @@ export default function HeroV2({
   const [devBorder, setDevBorder] = useState(false);
   const [msgIndex, setMsgIndex] = useState(0);
   const [msgVisible, setMsgVisible] = useState(true);
+  const [dragGreetIndex, setDragGreetIndex] = useState(0);
+  const [dragGreetVisible, setDragGreetVisible] = useState(true);
   useEffect(() => {
     const t = setInterval(() => {
       setMsgVisible(v => {
@@ -46,6 +62,16 @@ export default function HeroV2({
         return true;
       });
     }, 2000);
+    return () => clearInterval(t);
+  }, []);
+  useEffect(() => {
+    const t = setInterval(() => {
+      setDragGreetVisible(v => {
+        if (v) return false;
+        setDragGreetIndex(i => (i + 1) % DRAG_GREETINGS.length);
+        return true;
+      });
+    }, 2800);
     return () => clearInterval(t);
   }, []);
 
@@ -135,12 +161,45 @@ export default function HeroV2({
       >
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_minmax(380px,min(640px,52vw))] gap-10 lg:gap-12 items-start lg:items-stretch w-full flex-1">
 
-          {/* ── Left column: terminal uses 50% of column height ── */}
-          <div className="w-full h-full min-h-[min(70vh,520px)] lg:min-h-[min(88vh,780px)] flex flex-col items-stretch justify-start">
-            <ChatInterface
-              variant="panel"
-              className="lg:!w-[140%] lg:-ml-[10%] lg:translate-y-[30%] max-w-none h-[57.5%] min-h-0 shrink-0"
-            />
+          {/* ── Left column: layout placeholder ── */}
+          <div className={`relative w-full h-full min-h-[min(70vh,520px)] lg:min-h-[min(88vh,780px)] ${devBorder ? "border-2 border-rose-400" : ""}`}>
+
+            {/* ── Pixelated phrase above the line ── */}
+            <div
+              className="absolute pointer-events-none select-none max-w-[min(92vw,520px)]"
+              style={{ top: "30%", left: "8%", zIndex: 5 }}
+            >
+              <style>{`@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');`}</style>
+              <AnimatePresence mode="wait">
+                {dragGreetVisible && (
+                  <motion.span
+                    key={`drag-greet-${dragGreetIndex}`}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.35 }}
+                    style={{
+                      fontFamily: "'Press Start 2P', monospace",
+                      fontSize: "clamp(0.7rem, 1.1vw, 1rem)",
+                      color: "#ffffff",
+                      letterSpacing: "0.05em",
+                      lineHeight: 1.85,
+                      display: "block",
+                    }}
+                  >
+                    &gt; {DRAG_GREETINGS[dragGreetIndex]}_
+                  </motion.span>
+                )}
+              </AnimatePresence>
+            </div>
+
+            {/* ── Dev: horizontal line at 45% ── */}
+            {devBorder && (
+              <div
+                className="absolute inset-x-0 pointer-events-none"
+                style={{ top: "38%", height: "1px", background: "rgba(255,0,0,0.6)" }}
+              />
+            )}
           </div>
 
           {/* ── Right column: GIF full height ── */}
@@ -215,6 +274,24 @@ export default function HeroV2({
         </div>
       </motion.div>
 
+
+      {/* ── Draggable terminal ── */}
+      {/* ── Draggable terminal ── */}
+      <motion.div
+        drag
+        dragMomentum={false}
+        dragConstraints={heroRef}
+        dragElastic={0}
+        className="absolute z-30 cursor-grab active:cursor-grabbing"
+        style={{
+          top: "39%",
+          left: "8%",
+          width: "min(520px, 42vw)",
+          height: "min(450px, 50vh)",
+        }}
+      >
+        <ChatInterface variant="panel" className="!w-full !h-full max-w-none" />
+      </motion.div>
 
       {/* ── DEV: border toggle ── */}
       <button
