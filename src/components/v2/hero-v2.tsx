@@ -51,7 +51,8 @@ export default function HeroV2({
           ([a, b]) => (Number(a) || 1) * (Number(b) || 1)
         )
       : baseGifOpacity;
-  const gifScale = useTransform(smooth, [0, 1], embed ? [1, 1] : [1, 0.93]);
+  const assetZoom = 1.4;
+  const gifScale = useTransform(smooth, [0, 1], embed ? [assetZoom, assetZoom] : [assetZoom, 0.93 * assetZoom]);
   const arrowOpacity = useTransform(scrollYProgress, embed ? [0, 1] : [0, 0.08], embed ? [0, 0] : [1, 0]);
 
   return (
