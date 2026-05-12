@@ -1,13 +1,24 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useState, useEffect } from "react";
 import Image from "next/image";
-import { motion, useScroll, useTransform, useSpring, type MotionValue } from "framer-motion";
+import { motion, AnimatePresence, useScroll, useTransform, useSpring, type MotionValue } from "framer-motion";
 import ChatInterface from "@/components/chat-interface";
 
 /* ═══════════════════════════════════
    Hero V2 — Night Sky / GIC style
    ═══════════════════════════════════ */
+
+const COMIC_MESSAGES = [
+  "i build ai slop 24/7",
+  "slurp",
+  "ships at 2am",
+  "powered by caffeine",
+  "git push --force",
+  "it works on my machine",
+  "todo: fix later",
+  "console.log everything",
+];
 type HeroV2Props = {
   /**
    * Inside `HeroCarouselSequence` the hero stays in a sticky frame; window-based
@@ -24,6 +35,19 @@ export default function HeroV2({
   embedContentOpacity,
 }: HeroV2Props) {
   const heroRef = useRef<HTMLElement>(null);
+  const [devBorder, setDevBorder] = useState(false);
+  const [msgIndex, setMsgIndex] = useState(0);
+  const [msgVisible, setMsgVisible] = useState(true);
+  useEffect(() => {
+    const t = setInterval(() => {
+      setMsgVisible(v => {
+        if (v) return false; // visible → start standby
+        setMsgIndex(i => (i + 1) % COMIC_MESSAGES.length); // advance on hidden → visible
+        return true;
+      });
+    }, 2000);
+    return () => clearInterval(t);
+  }, []);
 
   /* parallax / fade */
   const { scrollYProgress } = useScroll({
@@ -124,7 +148,7 @@ export default function HeroV2({
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.75, delay: 0.45, ease: [0.22, 1, 0.36, 1] as const }}
-            className="hidden lg:block relative lg:ml-[15%] w-full h-full min-h-[min(88vh,700px)] pt-16 overflow-hidden pointer-events-none origin-top rounded-lg border-2 border-rose-400"
+            className={`hidden lg:block relative lg:ml-[15%] w-full h-full min-h-[min(88vh,700px)] pt-16 overflow-hidden pointer-events-none origin-top rounded-lg ${devBorder ? "border-2 border-rose-400" : ""}`}
             style={{ opacity: gifOpacity, scale: gifScale }}
             aria-hidden
           >
@@ -137,11 +161,80 @@ export default function HeroV2({
               sizes="(min-width: 1400px) min(540px, 46vw), 0px"
               className="object-contain object-center"
             />
+            {/* ── Dev: head divider line ── */}
+            {devBorder && (
+              <div
+                className="absolute inset-x-0 pointer-events-none"
+                style={{ top: "23%", height: "1px", background: "rgba(255,0,0,0.6)" }}
+              />
+            )}
+            {/* ── Dev: vertical line ── */}
+            {devBorder && (
+              <div
+                className="absolute pointer-events-none"
+                style={{ left: "61.5%", top: 0, width: "1px", height: "23%", background: "rgba(255,0,0,0.6)" }}
+              />
+            )}
+
+            {/* ── Comic speech bubbles ── */}
+            {/* Static pointer line toward face */}
+            <svg
+              className="absolute inset-0 w-full h-full pointer-events-none"
+              style={{ zIndex: 10 }}
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <line x1="63%" y1="13%" x2="59%" y2="16%" stroke="rgba(255,255,255,0.9)" strokeWidth="1.5" strokeLinecap="round" />
+            </svg>
+
+            {/* Bubble — cycles with 2s visible / 2s standby */}
+            <div className="absolute pointer-events-none" style={{ top: "8.5%", left: "62.5%", zIndex: 10 }}>
+              <AnimatePresence mode="wait">
+                {msgVisible && (
+                  <motion.span
+                    key={`b-${msgIndex}`}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.4 }}
+                    style={{
+                      display: "block",
+                      fontFamily: "'Comic Sans MS', 'Comic Sans', cursive",
+                      fontSize: "0.78rem",
+                      color: "white",
+                      transform: "rotate(-3deg)",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {COMIC_MESSAGES[msgIndex]}
+                  </motion.span>
+                )}
+              </AnimatePresence>
+            </div>
+
           </motion.div>
         </div>
       </motion.div>
 
 
+      {/* ── DEV: border toggle ── */}
+      <button
+        onClick={() => setDevBorder(v => !v)}
+        className="absolute bottom-3 right-3 z-50 pointer-events-auto"
+        style={{
+          fontFamily: "ui-monospace, monospace",
+          fontSize: "0.6rem",
+          letterSpacing: "0.08em",
+          color: devBorder ? "rgba(251,113,133,0.9)" : "rgba(255,255,255,0.2)",
+          background: "transparent",
+          border: "none",
+          cursor: "pointer",
+          padding: "2px 4px",
+          userSelect: "none",
+        }}
+        title="Toggle dev border"
+      >
+        {devBorder ? "[border: on]" : "[border: off]"}
+      </button>
     </section>
   );
 }
