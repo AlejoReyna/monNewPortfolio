@@ -5,9 +5,9 @@ import Image from "next/image";
 import { motion, AnimatePresence, useScroll, useTransform, useSpring, type MotionValue } from "framer-motion";
 import ChatInterface from "@/components/chat-interface";
 
-/* ═══════════════════════════════════
+/* ═══════════════════════════════════════════
    Hero V2 — Night Sky / GIC style
-   ═══════════════════════════════════ */
+   ═══════════════════════════════════════════ */
 
 const COMIC_MESSAGES = [
   "i build ai slop 24/7",
@@ -179,7 +179,7 @@ export default function HeroV2({
                     exit={{ opacity: 0 }}
                     transition={{ duration: 0.35 }}
                     style={{
-                      fontFamily: "'Press Start 2P', monospace",
+                      fontFamily: "'Comic Sans MS', 'Comic Sans', cursive",
                       fontSize: "clamp(0.7rem, 1.1vw, 1rem)",
                       color: "#ffffff",
                       letterSpacing: "0.05em",
@@ -276,18 +276,19 @@ export default function HeroV2({
 
 
       {/* ── Draggable terminal ── */}
-      {/* ── Draggable terminal ── */}
+      <style>{`.comic-terminal, .comic-terminal * { font-family: 'Comic Sans MS', 'Comic Sans', cursive !important; }`}</style>
       <motion.div
         drag
         dragMomentum={false}
         dragConstraints={heroRef}
         dragElastic={0}
-        className="absolute z-30 cursor-grab active:cursor-grabbing"
+        className="absolute z-30 cursor-grab active:cursor-grabbing comic-terminal"
         style={{
           top: "39%",
           left: "8%",
           width: "min(520px, 42vw)",
           height: "min(450px, 50vh)",
+          fontFamily: "'Comic Sans MS', 'Comic Sans', cursive",
         }}
       >
         <ChatInterface variant="panel" className="!w-full !h-full max-w-none" />
