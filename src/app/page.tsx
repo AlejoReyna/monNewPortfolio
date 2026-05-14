@@ -6,6 +6,8 @@ import AboutMeMinimal from "@/components/v2/about-me-minimal";
 import IntegrationsShowcase from "@/components/v2/integrations-showcase";
 import ProjectsScrollSequence from "@/components/v3/projects-scroll-sequence";
 import ContactSection from "@/components/sections/contact-section";
+import UANLShowcase from "@/components/sections/uanl-showcase";
+import WeddingServiceAd from "@/components/sections/wedding-service-ad";
 
 export default function Home() {
   useScrollSection();
@@ -27,6 +29,8 @@ export default function Home() {
       <AboutMeMinimal />
       <IntegrationsShowcase />
       <ProjectsScrollSequence />
+      <UANLShowcase />
+      <WeddingServiceAd />
       <ContactSection />
     </main>
   );

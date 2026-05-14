@@ -1,422 +1,240 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import {
-  motion,
-  useMotionValueEvent,
-  useScroll,
-  useSpring,
-  useTransform,
-} from "framer-motion";
+import { useCallback, useEffect, useState } from "react";
+import useEmblaCarousel from "embla-carousel-react";
 import { PROJECTS } from "@/components/v3/data/projects";
 import "@/components/v3/v3.css";
 
-const SCROLL_RUNWAY_VH = 430;
+/* ─── tiny helpers ─────────────────────────── */
+function MediaCell({ project }: { project: (typeof PROJECTS)[number] }) {
+  if (!project.media) return null;
 
-const PHASE = {
-  introStart: 0.08,
-  fanEnd: 0.46,
-  holdUntil: 0.82,
-} as const;
-
-const SIDE_W = 215;
-const SIDE_H = 420;
-const CENTER_W = 275;
-const CENTER_H = 490;
-
-const CENTER_IDX = 3;
-const LEFT_P = PROJECTS[CENTER_IDX - 1];
-const CENTER_P = PROJECTS[CENTER_IDX];
-const RIGHT_P = PROJECTS[CENTER_IDX + 1];
-
-function PreviewCard({
-  project,
-  width,
-  height,
-  featured = false,
-}: {
-  project: (typeof PROJECTS)[number];
-  width: number;
-  height: number;
-  featured?: boolean;
-}) {
-  return (
-    <div
-      style={{
-        width,
-        height,
-        borderRadius: 18,
-        overflow: "hidden",
-        position: "relative",
-        display: "flex",
-        flexDirection: "column",
-        background: "#0f0f12",
-        border: `1px solid ${featured ? "rgba(200,168,74,0.9)" : "rgba(200,168,74,0.20)"}`,
-        boxShadow: featured
-          ? "0 36px 72px rgba(0,0,0,0.65), 0 0 0 1px rgba(200,168,74,0.10)"
-          : "0 16px 36px rgba(0,0,0,0.50)",
-        flexShrink: 0,
-      }}
-    >
-      {project.media && (
-        <div style={{ position: "relative", flex: 1, minHeight: 0, overflow: "hidden" }}>
-          {project.mediaType === "video" ? (
-            <video
-              autoPlay
-              muted
-              loop
-              playsInline
-              preload="metadata"
-              style={{
-                position: "absolute",
-                inset: 0,
-                width: "100%",
-                height: "100%",
-                objectFit: "cover",
-              }}
-            >
-              <source src={project.media} type="video/mp4" />
-            </video>
-          ) : (
-            <Image
-              src={project.media}
-              alt={project.title}
-              fill
-              sizes="400px"
-              style={{ objectFit: "cover" }}
-              unoptimized={project.media.startsWith("http")}
-            />
-          )}
-
-          <div
-            aria-hidden
-            style={{
-              position: "absolute",
-              inset: 0,
-              pointerEvents: "none",
-              background: "linear-gradient(to top, #0f0f12 0%, transparent 60%)",
-            }}
-          />
-
-          <span
-            aria-hidden
-            style={{
-              position: "absolute",
-              bottom: -10,
-              right: 8,
-              fontFamily: "var(--font-bebas,'Bebas Neue',sans-serif)",
-              fontSize: featured ? "5rem" : "3.6rem",
-              lineHeight: 1,
-              color: "rgba(200,168,74,0.07)",
-              userSelect: "none",
-              pointerEvents: "none",
-            }}
-          >
-            {project.ghost}
-          </span>
-        </div>
-      )}
-
-      <div style={{ padding: featured ? "12px 15px 15px" : "9px 11px 11px", flexShrink: 0 }}>
-        <span
-          style={{
-            display: "block",
-            fontSize: 9,
-            fontWeight: 600,
-            letterSpacing: "0.18em",
-            textTransform: "uppercase",
-            color: "var(--v3-gold,#c8a84a)",
-            marginBottom: 3,
-            fontFamily: "var(--font-space-mono,ui-monospace,monospace)",
-          }}
-        >
-          {project.badge}
-        </span>
-        <h3
-          style={{
-            fontSize: featured ? "1.05rem" : "0.82rem",
-            fontWeight: 700,
-            color: "#edeae0",
-            letterSpacing: "-0.02em",
-            lineHeight: 1.15,
-            margin: 0,
-            fontFamily: "var(--font-bebas,'Bebas Neue',sans-serif)",
-          }}
-        >
-          {project.title}
-        </h3>
-        {featured && (
-          <div style={{ display: "flex", gap: 4, marginTop: 7, flexWrap: "wrap" }}>
-            {project.tags.slice(0, 3).map((tag) => (
-              <span
-                key={tag}
-                style={{
-                  fontSize: 8.5,
-                  color: "rgba(237,234,224,0.40)",
-                  background: "rgba(255,255,255,0.05)",
-                  border: "1px solid rgba(255,255,255,0.08)",
-                  borderRadius: 4,
-                  padding: "2px 6px",
-                  fontFamily: "var(--font-space-mono,ui-monospace,monospace)",
-                  letterSpacing: "0.04em",
-                }}
-              >
-                {tag}
-              </span>
-            ))}
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
-
-function ProjectsScrollRow({ active }: { active: boolean }) {
-  const rowRef = useRef<HTMLDivElement>(null);
-  const [activeIdx, setActiveIdx] = useState(CENTER_IDX);
-
-  useEffect(() => {
-    const row = rowRef.current;
-    if (!row) return;
-    const cards = row.querySelectorAll<HTMLElement>("[data-card]");
-    const card = cards[CENTER_IDX];
-    if (card) {
-      row.scrollLeft = card.offsetLeft - (row.offsetWidth - card.offsetWidth) / 2;
-    }
-  }, []);
-
-  const handleScroll = () => {
-    const row = rowRef.current;
-    if (!row) return;
-    const mid = row.scrollLeft + row.offsetWidth / 2;
-    const cards = Array.from(row.querySelectorAll<HTMLElement>("[data-card]"));
-    let closest = 0;
-    let minDist = Infinity;
-    cards.forEach((card, i) => {
-      const dist = Math.abs(card.offsetLeft + card.offsetWidth / 2 - mid);
-      if (dist < minDist) {
-        minDist = dist;
-        closest = i;
-      }
-    });
-    setActiveIdx(closest);
-  };
-
-  return (
-    <>
-      <style>{`.proj-row::-webkit-scrollbar{display:none}`}</style>
-      <div
-        ref={rowRef}
-        onScroll={handleScroll}
-        className="proj-row"
-        style={{
-          position: "absolute",
-          bottom: "10%",
-          left: 0,
-          right: 0,
-          display: "flex",
-          alignItems: "flex-end",
-          gap: 12,
-          overflowX: "auto",
-          scrollSnapType: "x mandatory",
-          scrollBehavior: "smooth",
-          paddingLeft: `calc(50% - ${CENTER_W / 2}px)`,
-          paddingRight: `calc(50% - ${CENTER_W / 2}px)`,
-          WebkitOverflowScrolling: "touch",
-          scrollbarWidth: "none",
-          pointerEvents: active ? "auto" : "none",
-          zIndex: 20,
-          cursor: active ? "grab" : "default",
-        }}
+  if (project.mediaType === "video") {
+    return (
+      <video
+        autoPlay muted loop playsInline preload="metadata"
+        style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }}
       >
-        {PROJECTS.map((project, i) => {
-          const isActive = i === activeIdx;
-          return (
-            <div
-              key={project.id}
-              data-card
-              style={{
-                scrollSnapAlign: "center",
-                flexShrink: 0,
-                transform: isActive ? "translateY(0)" : "translateY(20px)",
-                transition: "transform 0.35s ease",
-              }}
-            >
-              <PreviewCard
-                project={project}
-                width={CENTER_W}
-                height={isActive ? CENTER_H : SIDE_H}
-                featured={isActive}
-              />
-            </div>
-          );
-        })}
-      </div>
-    </>
+        <source src={project.media} type="video/mp4" />
+      </video>
+    );
+  }
+
+  return (
+    <Image
+      src={project.media}
+      alt={project.title}
+      fill
+      sizes="(min-width: 768px) 60vw, 90vw"
+      className="object-cover"
+      unoptimized={project.media.startsWith("http")}
+    />
   );
 }
 
+/* ─── Main component ───────────────────────── */
 export default function ProjectsScrollSequence() {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [rowActive, setRowActive] = useState(false);
-
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ["start start", "end end"],
+  const [emblaRef, emblaApi] = useEmblaCarousel({
+    loop: true,
+    align: "center",
+    dragFree: false,
   });
 
-  const smooth = useSpring(scrollYProgress, { stiffness: 52, damping: 18, mass: 0.55 });
+  const [selected, setSelected] = useState(0);
+  const total = PROJECTS.length;
 
-  const syncRow = (v: number) => {
-    const on = v >= PHASE.fanEnd + 0.1;
-    setRowActive((previous) => (previous === on ? previous : on));
-  };
+  const onSelect = useCallback(() => {
+    if (!emblaApi) return;
+    setSelected(emblaApi.selectedScrollSnap());
+  }, [emblaApi]);
 
-  useLayoutEffect(() => syncRow(scrollYProgress.get()), [scrollYProgress]);
-  useMotionValueEvent(scrollYProgress, "change", syncRow);
+  useEffect(() => {
+    if (!emblaApi) return;
+    emblaApi.on("select", onSelect);
+    onSelect();
+    return () => { emblaApi.off("select", onSelect); };
+  }, [emblaApi, onSelect]);
 
-
-  const labelY = useTransform(smooth, [PHASE.introStart, PHASE.fanEnd - 0.05], ["28px", "0px"]);
-  const labelOpacity = useTransform(smooth, [PHASE.introStart, PHASE.fanEnd - 0.12], [0, 1]);
-
-  const centerScale = useTransform(smooth, [PHASE.introStart, PHASE.fanEnd], [1.42, 1]);
-  const centerOpacity = useTransform(smooth, [PHASE.introStart, PHASE.introStart + 0.16], [0, 1]);
-  const leftX = useTransform(smooth, [PHASE.introStart + 0.02, PHASE.fanEnd], ["-115%", "0%"]);
-  const leftOpacity = useTransform(smooth, [PHASE.introStart + 0.02, PHASE.introStart + 0.2], [0, 1]);
-  const rightX = useTransform(smooth, [PHASE.introStart + 0.02, PHASE.fanEnd], ["115%", "0%"]);
-  const rightOpacity = useTransform(smooth, [PHASE.introStart + 0.02, PHASE.introStart + 0.2], [0, 1]);
-
-  const fanOpacity = useTransform(smooth, [PHASE.fanEnd + 0.04, PHASE.fanEnd + 0.1], [1, 0]);
-  const rowOpacity = useTransform(smooth, [PHASE.fanEnd + 0.06, PHASE.fanEnd + 0.14], [0, 1]);
-  const hintOpacity = useTransform(smooth, [0.02, 0.18], [1, 0]);
+  const prev = useCallback(() => emblaApi?.scrollPrev(), [emblaApi]);
+  const next = useCallback(() => emblaApi?.scrollNext(), [emblaApi]);
 
   return (
     <section
       id="work"
-      ref={containerRef}
-      style={{ height: `${SCROLL_RUNWAY_VH}vh`, position: "relative", background: "transparent" }}
+      style={{
+        background: "transparent",
+        padding: "0",
+        overflow: "hidden",
+      }}
     >
-      <div style={{ position: "sticky", top: 0, height: "100svh", overflow: "hidden" }}>
-
-        <motion.div
-          aria-hidden
-          style={{
-            position: "absolute",
-            top: "9%",
-            left: "50%",
-            translateX: "-50%",
-            zIndex: 20,
-            pointerEvents: "none",
-            y: labelY,
-            opacity: labelOpacity,
-            textAlign: "center",
-            whiteSpace: "nowrap",
-          }}
-        >
-          <h2
-            className="v3-display"
-            style={{
-              fontSize: "clamp(2.4rem, 5.5vw, 4.8rem)",
-              color: "var(--v3-text,#edeae0)",
-              lineHeight: 1,
-              margin: 0,
-            }}
-          >
-            My projects
+      {/* ── Section header ── */}
+      <div style={{
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "baseline",
+        padding: "clamp(32px, 6vw, 56px) clamp(24px, 6vw, 80px)",
+        borderBottom: "1px solid rgba(255,255,255,0.07)",
+        gap: "1rem",
+        flexWrap: "wrap",
+      }}>
+        <div>
+          <p style={{
+            fontFamily: "var(--font-space-mono, ui-monospace, monospace)",
+            fontSize: "0.6rem",
+            letterSpacing: "0.3em",
+            textTransform: "uppercase",
+            color: "rgba(200,168,74,0.82)",
+            margin: "0 0 10px",
+          }}>
+            section 03 / work
+          </p>
+          <h2 style={{
+            fontFamily: "var(--font-bebas, sans-serif)",
+            fontSize: "clamp(2.8rem, 6vw, 5.5rem)",
+            lineHeight: 0.92,
+            letterSpacing: "-0.01em",
+            color: "#f8f5ea",
+            margin: 0,
+          }}>
+            My Projects
           </h2>
-        </motion.div>
+        </div>
 
-        <motion.div style={{ opacity: fanOpacity }}>
-          <motion.div
-            style={{
-              position: "absolute",
-              left: `calc(50% - ${CENTER_W / 2}px - ${SIDE_W}px - 12px)`,
-              bottom: "12%",
-              zIndex: 18,
-              x: leftX,
-              opacity: leftOpacity,
-              pointerEvents: "none",
-              willChange: "transform, opacity",
-            }}
-          >
-            <PreviewCard project={LEFT_P} width={SIDE_W} height={SIDE_H} />
-          </motion.div>
-
-          <motion.div
-            style={{
-              position: "absolute",
-              left: "50%",
-              bottom: "10%",
-              translateX: "-50%",
-              zIndex: 20,
-              scale: centerScale,
-              opacity: centerOpacity,
-              transformOrigin: "center bottom",
-              pointerEvents: "none",
-              willChange: "transform, opacity",
-            }}
-          >
-            <PreviewCard project={CENTER_P} width={CENTER_W} height={CENTER_H} featured />
-          </motion.div>
-
-          <motion.div
-            style={{
-              position: "absolute",
-              left: `calc(50% + ${CENTER_W / 2}px + 12px)`,
-              bottom: "12%",
-              zIndex: 18,
-              x: rightX,
-              opacity: rightOpacity,
-              pointerEvents: "none",
-              willChange: "transform, opacity",
-            }}
-          >
-            <PreviewCard project={RIGHT_P} width={SIDE_W} height={SIDE_H} />
-          </motion.div>
-        </motion.div>
-
-        <motion.div style={{ opacity: rowOpacity, zIndex: 20 }}>
-          <ProjectsScrollRow active={rowActive} />
-        </motion.div>
-
-        <motion.div
-          aria-hidden
-          style={{
-            position: "absolute",
-            bottom: 28,
-            left: "50%",
-            translateX: "-50%",
-            zIndex: 30,
-            opacity: hintOpacity,
-            pointerEvents: "none",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            gap: 6,
-          }}
-        >
-          <span
-            className="v3-mono"
-            style={{
-              fontSize: "0.46rem",
-              letterSpacing: "0.22em",
-              textTransform: "uppercase",
-              color: "rgba(255,255,255,0.2)",
-            }}
-          >
-            scroll projects
+        {/* counter + arrows */}
+        <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+          <span style={{
+            fontFamily: "var(--font-space-mono, ui-monospace, monospace)",
+            fontSize: "0.6rem",
+            letterSpacing: "0.25em",
+            color: "rgba(248,245,234,0.35)",
+            textTransform: "uppercase",
+          }}>
+            {String(selected + 1).padStart(2, "0")} / {String(total).padStart(2, "0")}
           </span>
-          <motion.div
-            animate={{ y: [0, 7, 0] }}
-            transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }}
+
+          <div style={{ display: "flex", gap: "8px" }}>
+            {[{ fn: prev, label: "←" }, { fn: next, label: "→" }].map(({ fn, label }) => (
+              <button
+                key={label}
+                onClick={fn}
+                className="v3-carousel-arrow"
+                aria-label={label === "←" ? "Previous" : "Next"}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* ── Embla viewport ── */}
+      <div
+        ref={emblaRef}
+        style={{ overflow: "hidden", padding: "clamp(24px, 4vw, 48px) 0" }}
+      >
+        <div style={{ display: "flex", gap: "clamp(12px, 2vw, 24px)", paddingInline: "clamp(24px, 6vw, 80px)" }}>
+          {PROJECTS.map((project, i) => (
+            <div
+              key={project.id}
+              style={{
+                flex: "0 0 clamp(300px, 80vw, 620px)",
+                minWidth: 0,
+              }}
+            >
+              {/* Card */}
+              <div
+                className="v3-carousel-card"
+                style={{
+                  height: "clamp(520px, 72vh, 720px)",
+                  opacity: i === selected ? 1 : 0.45,
+                  transform: i === selected ? "scale(1)" : "scale(0.97)",
+                  transition: "opacity 0.4s ease, transform 0.4s cubic-bezier(0.22,1,0.36,1)",
+                }}
+              >
+                {/* ghost numeral */}
+                <span className="v3-carousel-ghost" aria-hidden>{project.ghost}</span>
+
+                {/* eyebrow */}
+                <span className="v3-carousel-eyebrow">{project.badge}</span>
+
+                {/* media */}
+                {project.media && (
+                  <div className="v3-carousel-media">
+                    <div className="v3-carousel-media-inner" style={{ position: "relative", width: "100%", height: "100%" }}>
+                      <MediaCell project={project} />
+                      <div style={{
+                        position: "absolute",
+                        inset: 0,
+                        background: "linear-gradient(to top, #08080a 0%, transparent 55%)",
+                      }} />
+                    </div>
+                  </div>
+                )}
+
+                {/* badge */}
+                <span className="v3-carousel-badge">{project.id}</span>
+
+                {/* title */}
+                <h3 className="v3-carousel-title">{project.title}</h3>
+
+                {/* tagline */}
+                <p className="v3-carousel-tagline">{project.tagline.en}</p>
+
+                {/* description */}
+                <p className="v3-carousel-desc">{project.description.en}</p>
+
+                {/* tags */}
+                <div className="v3-carousel-tags">
+                  {project.tags.map((tag) => (
+                    <span key={tag} className="v3-carousel-tag">{tag}</span>
+                  ))}
+                </div>
+
+                {/* links */}
+                <div className="v3-carousel-links">
+                  {project.links.map((link) => (
+                    <a
+                      key={link.href}
+                      href={link.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="v3-carousel-link"
+                    >
+                      {link.label.en}
+                    </a>
+                  ))}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* ── Dot navigation ── */}
+      <div style={{
+        display: "flex",
+        justifyContent: "center",
+        gap: "8px",
+        paddingBottom: "clamp(32px, 5vw, 56px)",
+      }}>
+        {PROJECTS.map((_, i) => (
+          <button
+            key={i}
+            onClick={() => emblaApi?.scrollTo(i)}
+            aria-label={`Go to project ${i + 1}`}
             style={{
-              width: 1,
-              height: 32,
-              background: "linear-gradient(to bottom, rgba(200,168,74,0.45), rgba(200,168,74,0))",
+              width: i === selected ? "24px" : "6px",
+              height: "6px",
+              borderRadius: "3px",
+              background: i === selected ? "rgba(200,168,74,0.9)" : "rgba(255,255,255,0.15)",
+              border: "none",
+              cursor: "pointer",
+              padding: 0,
+              transition: "width 0.35s cubic-bezier(0.22,1,0.36,1), background 0.3s ease",
             }}
           />
-        </motion.div>
+        ))}
       </div>
     </section>
   );
