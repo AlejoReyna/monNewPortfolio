@@ -218,7 +218,7 @@ export default function HeroV2({
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.75, delay: 0.45, ease: [0.22, 1, 0.36, 1] as const }}
-            className={`hidden lg:block relative lg:ml-[15%] w-full h-full min-h-[min(88vh,700px)] pt-16 overflow-hidden pointer-events-none origin-top rounded-lg ${devBorder ? "border-2 border-rose-400" : ""}`}
+            className={`hidden lg:block relative lg:ml-[15%] w-full h-full min-h-[min(83.6vh,665px)] pt-16 mt-[60px] overflow-hidden pointer-events-none origin-top rounded-lg ${devBorder ? "border-2 border-rose-400" : ""}`}
             style={{ opacity: gifOpacity, scale: gifScale }}
             aria-hidden
           >

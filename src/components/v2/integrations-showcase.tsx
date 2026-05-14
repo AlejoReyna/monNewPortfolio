@@ -604,17 +604,18 @@ function ToolCard({ tool, isEdgeLeft, isEdgeRight }: ToolCardProps) {
       >
         <span
           style={{
-            fontFamily: "var(--gic-font-sans)",
-            fontSize: "9px",
-            fontWeight: 500,
-            letterSpacing: "0.03em",
+            fontFamily: "var(--font-space-mono, ui-monospace, monospace)",
+            fontSize: "8px",
+            fontWeight: 400,
+            letterSpacing: "0.22em",
+            textTransform: "uppercase",
             color: tool.mutedColor,
             textAlign: "center",
             lineHeight: 1.3,
             whiteSpace: "nowrap",
           }}
         >
-          Built and shipped with
+          shipped with
         </span>
       </div>
 
@@ -636,13 +637,13 @@ function ToolCard({ tool, isEdgeLeft, isEdgeRight }: ToolCardProps) {
       >
         <span
           style={{
-            fontFamily: "var(--gic-font-sans)",
-            fontSize: "10px",
-            fontWeight: 600,
-            letterSpacing: "0.02em",
+            fontFamily: "var(--font-bebas, sans-serif)",
+            fontSize: "13px",
+            fontWeight: 400,
+            letterSpacing: "0.08em",
             color: tool.textColor,
             textAlign: "center",
-            lineHeight: 1.3,
+            lineHeight: 1.1,
           }}
         >
           {tool.name}
@@ -711,48 +712,57 @@ export default function IntegrationsShowcase() {
       {/* ── Heading ── */}
       <div
         style={{
-          textAlign: "center",
           paddingTop: "clamp(64px, 9vw, 104px)",
-          paddingLeft: "24px",
-          paddingRight: "24px",
+          paddingLeft: "clamp(24px, 6vw, 80px)",
+          paddingRight: "clamp(24px, 6vw, 80px)",
+          borderBottom: "1px solid rgba(255,255,255,0.07)",
+          paddingBottom: "clamp(32px, 5vw, 56px)",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "flex-end",
+          flexWrap: "wrap",
+          gap: "24px",
         }}
       >
-        <h2
-          style={{
-            fontFamily: "var(--gic-font-sans)",
-            fontSize: "clamp(28px, 3.5vw, 48px)",
-            fontWeight: 700,
-            letterSpacing: "-0.8px",
-            lineHeight: 1.15,
+        <div>
+          <p style={{
+            fontFamily: "var(--font-space-mono, ui-monospace, monospace)",
+            fontSize: "0.6rem",
+            letterSpacing: "0.3em",
+            textTransform: "uppercase",
+            color: "rgba(200,168,74,0.82)",
+            margin: "0 0 16px",
+          }}>
+            section 02 / stack
+          </p>
+          <h2 style={{
+            fontFamily: "var(--font-bebas, sans-serif)",
+            fontSize: "clamp(3rem, 7vw, 6.5rem)",
+            lineHeight: 0.92,
+            letterSpacing: "-0.01em",
             color: "#f8f5ea",
             margin: 0,
-          }}
-        >
-          Built around{" "}
-          <span
-            style={{
-              background: "linear-gradient(90deg, #3b82f6, #6366f1)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-              backgroundClip: "text",
-            }}
-          >
-            shipped projects
-          </span>
-        </h2>
-        <p
-          style={{
-            fontFamily: "var(--gic-font-sans)",
-            fontSize: "clamp(14px, 1.5vw, 17px)",
-            color: "rgba(248,245,234,0.55)",
-            marginTop: "14px",
-            lineHeight: 1.6,
-            maxWidth: "480px",
-            marginLeft: "auto",
-            marginRight: "auto",
-          }}
-        >
-          A stack pulled from 35 public repos: TypeScript frontends, Web3 dApps,
+          }}>
+            Built from<br />
+            <em style={{
+              fontFamily: "var(--font-cormorant, serif)",
+              fontStyle: "italic",
+              color: "rgba(200,168,74,0.9)",
+              fontSize: "0.65em",
+              fontWeight: 300,
+            }}>real</em>{" "}shipped work
+          </h2>
+        </div>
+        <p style={{
+          fontFamily: "var(--font-cormorant, serif)",
+          fontStyle: "italic",
+          fontSize: "clamp(1rem, 1.4vw, 1.2rem)",
+          color: "rgba(248,245,234,0.5)",
+          lineHeight: 1.65,
+          maxWidth: "360px",
+          margin: 0,
+        }}>
+          A stack pulled from 35 public repos — TypeScript frontends, Web3 dApps,
           Python automation and mobile experiments.
         </p>
       </div>
@@ -810,6 +820,39 @@ export default function IntegrationsShowcase() {
           </div>
         </motion.div>
 
+        {/* ── Stats bar ── */}
+        <div style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          padding: "clamp(20px, 3vw, 32px) clamp(24px, 6vw, 80px)",
+          borderTop: "1px solid rgba(255,255,255,0.07)",
+          marginTop: "clamp(32px, 5vw, 56px)",
+          flexWrap: "wrap",
+          gap: "16px",
+        }}>
+          {[
+            { num: "18", label: "technologies" },
+            { num: "35", label: "public repos" },
+            { num: "6", label: "years shipping" },
+          ].map(({ num, label }) => (
+            <div key={label} style={{ display: "flex", alignItems: "baseline", gap: "10px" }}>
+              <span style={{
+                fontFamily: "var(--font-bebas, sans-serif)",
+                fontSize: "clamp(2rem, 3.5vw, 3rem)",
+                lineHeight: 1,
+                color: "#f8f5ea",
+              }}>{num}</span>
+              <span style={{
+                fontFamily: "var(--font-space-mono, ui-monospace, monospace)",
+                fontSize: "0.58rem",
+                letterSpacing: "0.28em",
+                textTransform: "uppercase",
+                color: "rgba(248,245,234,0.35)",
+              }}>{label}</span>
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* ══════════════
@@ -866,11 +909,11 @@ export default function IntegrationsShowcase() {
                   </div>
                   <span
                     style={{
-                      fontFamily: "var(--gic-font-sans)",
-                      fontSize: "11px",
-                      fontWeight: 600,
+                      fontFamily: "var(--font-bebas, sans-serif)",
+                      fontSize: "13px",
+                      fontWeight: 400,
+                      letterSpacing: "0.08em",
                       color: tool.textColor,
-                      letterSpacing: "-0.1px",
                       textAlign: "center",
                       paddingInline: "6px",
                     }}
