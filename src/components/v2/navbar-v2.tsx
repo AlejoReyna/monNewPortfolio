@@ -13,9 +13,21 @@ export default function NavbarV2() {
   const isEs = language === "es";
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [hidden, setHidden] = useState(false);
 
   useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 40);
+    let lastY = window.scrollY;
+    const handleScroll = () => {
+      const y = window.scrollY;
+      setScrolled(y > 40);
+      // hide when scrolling down past 80px, show when scrolling up
+      if (y > 80) {
+        setHidden(y > lastY);
+      } else {
+        setHidden(false);
+      }
+      lastY = y;
+    };
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
@@ -35,7 +47,13 @@ export default function NavbarV2() {
   };
 
   return (
-    <header className="fixed top-0 inset-x-0 z-50 pointer-events-none">
+    <header
+      className="fixed top-0 inset-x-0 z-50 pointer-events-none"
+      style={{
+        transform: hidden ? "translateY(-110%)" : "translateY(0)",
+        transition: "transform 0.35s cubic-bezier(0.4, 0, 0.2, 1)",
+      }}
+    >
       {/* ── Desktop pill nav ── */}
       <nav
         className="pointer-events-auto hidden sm:flex items-center justify-between px-4 py-2 w-full transition-all duration-300 relative"

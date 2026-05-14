@@ -42,11 +42,18 @@ type HeroV2Props = {
   embedInScrollSequence?: boolean;
   /** When embedded, fades hero chrome (not the BG) during the carousel wipe. */
   embedContentOpacity?: MotionValue<number>;
+  /**
+   * When true, strips the background image, vignette and dot grid so the
+   * section inherits a flat `#08080a` base — used by the v3 page which wants
+   * a uniform background throughout.
+   */
+  noBgImage?: boolean;
 };
 
 export default function HeroV2({
   embedInScrollSequence,
   embedContentOpacity,
+  noBgImage = false,
 }: HeroV2Props) {
   const heroRef = useRef<HTMLElement>(null);
   const [devBorder, setDevBorder] = useState(false);
@@ -110,44 +117,48 @@ export default function HeroV2({
       id="home"
       ref={heroRef}
       className="relative min-h-screen overflow-hidden flex"
-      style={{ backgroundColor: "var(--gic-night-sky)" }}
+      style={{ backgroundColor: noBgImage ? "#08080a" : "var(--gic-night-sky)" }}
     >
       {/* ── Background image + parallax ── */}
-      <motion.div
-        className="absolute inset-0 z-0 scale-110"
-        style={{ y: bgY }}
-      >
-        <Image
-          src="/shadersmine.png"
-          alt="Architectural night backdrop"
-          fill
-          priority
-          className="object-cover"
-          style={{ opacity: 0.28, mixBlendMode: "luminosity" }}
-        />
-        {/* Multi-layer vignette */}
-        <div
-          className="absolute inset-0"
-          style={{
-            background:
-              "linear-gradient(to bottom, rgba(31,31,41,0.55) 0%, rgba(31,31,41,0.3) 40%, rgba(31,31,41,0.85) 100%)",
-          }}
-        />
-      </motion.div>
+      {!noBgImage && (
+        <motion.div
+          className="absolute inset-0 z-0 scale-110"
+          style={{ y: bgY }}
+        >
+          <Image
+            src="/shadersmine.png"
+            alt="Architectural night backdrop"
+            fill
+            priority
+            className="object-cover"
+            style={{ opacity: 0.28, mixBlendMode: "luminosity" }}
+          />
+          {/* Multi-layer vignette */}
+          <div
+            className="absolute inset-0"
+            style={{
+              background:
+                "linear-gradient(to bottom, rgba(31,31,41,0.55) 0%, rgba(31,31,41,0.3) 40%, rgba(31,31,41,0.85) 100%)",
+            }}
+          />
+        </motion.div>
+      )}
 
       {/* ── Subtle grid pattern ── */}
-      <div
-        className="absolute inset-0 z-0 pointer-events-none"
-        style={{
-          backgroundImage:
-            "radial-gradient(circle, rgba(255,255,255,0.08) 1px, transparent 1px)",
-          backgroundSize: "36px 36px",
-          maskImage:
-            "radial-gradient(ellipse 70% 80% at 50% 50%, black 40%, transparent 100%)",
-          WebkitMaskImage:
-            "radial-gradient(ellipse 70% 80% at 50% 50%, black 40%, transparent 100%)",
-        }}
-      />
+      {!noBgImage && (
+        <div
+          className="absolute inset-0 z-0 pointer-events-none"
+          style={{
+            backgroundImage:
+              "radial-gradient(circle, rgba(255,255,255,0.08) 1px, transparent 1px)",
+            backgroundSize: "36px 36px",
+            maskImage:
+              "radial-gradient(ellipse 70% 80% at 50% 50%, black 40%, transparent 100%)",
+            WebkitMaskImage:
+              "radial-gradient(ellipse 70% 80% at 50% 50%, black 40%, transparent 100%)",
+          }}
+        />
+      )}
 
       {/* ── Main content ── */}
       <motion.div

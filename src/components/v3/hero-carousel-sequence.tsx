@@ -10,6 +10,8 @@ import {
   useMotionValueEvent,
 } from "framer-motion";
 import HeroV2 from "@/components/v2/hero-v2";
+// NOTE: HeroV2 is rendered inside a motion.div that fades to opacity 0,
+// making the terminal + gif disappear. A separate bg copy keeps mountains visible.
 import { PROJECTS } from "@/components/v3/data/projects";
 import "@/components/v3/v3.css";
 
@@ -29,17 +31,17 @@ const PHASE = {
   holdUntil:  0.90,
 } as const;
 
-/* Card sizes (+15% vs original 292/338) */
-const SIDE_W   = 175;
-const SIDE_H   = Math.round(292 * 1.15);   // 336
-const CENTER_W = 228;
-const CENTER_H = Math.round(338 * 1.15);   // 389
+/* Card sizes — bigger */
+const SIDE_W   = 215;
+const SIDE_H   = 420;
+const CENTER_W = 275;
+const CENTER_H = 490;
 
-/* Fan uses linear order so the scroll row maps 1:1 */
-const LEFT_P   = PROJECTS[0];  // Andrea & Aldo
-const CENTER_P = PROJECTS[1];  // Plebes DAO   ← featured
-const RIGHT_P  = PROJECTS[2];  // MK1 Presale
-const CENTER_IDX = 1;          // index of CENTER_P in PROJECTS[]
+/* 4th asset (index 3 = PokeFolio) always centered */
+const CENTER_IDX = 3;
+const LEFT_P     = PROJECTS[CENTER_IDX - 1];  // MK1 Presale
+const CENTER_P   = PROJECTS[CENTER_IDX];       // PokeFolio ← featured
+const RIGHT_P    = PROJECTS[CENTER_IDX + 1];  // UANL Interface+
 
 /* ─── Preview card ───────────────────────────────────────────────────────── */
 function PreviewCard({
@@ -249,12 +251,17 @@ export default function HeroCarouselSequence() {
 
   /* ── Transforms ── */
 
-  /* Fades the ENTIRE HeroV2 wrapper — terminal, gif, bg image, everything */
+  /* Fades the ENTIRE HeroV2 wrapper (terminal + gif + content all disappear) */
   const heroOpacity = useTransform(
-    smooth, [PHASE.morphStart, PHASE.morphStart + 0.24], [1, 0]
+    smooth, [PHASE.morphStart, PHASE.morphStart + 0.22], [1, 0]
   );
 
-  /* Blue-tinted overlay rises in sync so there's no dark gap */
+  /* Separate background image fades IN to keep mountains visible after hero fades out */
+  const bgImageOpacity = useTransform(
+    smooth, [PHASE.morphStart + 0.04, PHASE.morphStart + 0.28], [0, 1]
+  );
+
+  /* Blue overlay rises above the bg image */
   const bgOverlayOpacity = useTransform(
     smooth, [PHASE.morphStart, PHASE.morphStart + 0.26], [0, 1]
   );
@@ -290,32 +297,46 @@ export default function HeroCarouselSequence() {
     >
       <div style={{ position: "sticky", top: 0, height: "100svh", overflow: "hidden" }}>
 
-        {/* L1 — Hero
-            isolation:"isolate" creates a new stacking context so the terminal's
-            z-30 (and all other HeroV2 z-indices) stay contained within this layer.
-            The overlay at z-5 in the parent then correctly renders on top.
-            opacity:heroOpacity fades everything — terminal, gif, bg, grid — together. */}
-        <motion.div
-          style={{
-            position: "absolute", inset: 0, zIndex: 1,
-            isolation: "isolate",
-            opacity: heroOpacity,
-          }}
-        >
+        {/* L1 — Hero (entire wrapper fades out → terminal + gif + content all disappear) */}
+        <motion.div style={{ position: "absolute", inset: 0, zIndex: 1, opacity: heroOpacity }}>
           <HeroV2 embedInScrollSequence />
         </motion.div>
 
-        {/* L1.5 — Lighter blue-tinted overlay (night sky still visible) */}
+        {/* L2 — Persistent background image (mountains stay visible after hero fades) */}
+        <motion.div
+          aria-hidden
+          style={{
+            position: "absolute", inset: 0, zIndex: 2,
+            pointerEvents: "none", opacity: bgImageOpacity,
+          }}
+        >
+          <Image
+            src="/shadersmine.png"
+            alt=""
+            fill
+            priority={false}
+            style={{ objectFit: "cover", opacity: 0.28, mixBlendMode: "luminosity" }}
+          />
+          {/* Same multi-layer vignette as HeroV2 */}
+          <div
+            style={{
+              position: "absolute", inset: 0,
+              background: "linear-gradient(to bottom, rgba(31,31,41,0.55) 0%, rgba(31,31,41,0.3) 40%, rgba(31,31,41,0.85) 100%)",
+            }}
+          />
+        </motion.div>
+
+        {/* L3 — Blue-tinted overlay (night sky still visible through it) */}
         <motion.div
           aria-hidden
           style={{
             position: "absolute", inset: 0, zIndex: 5, pointerEvents: "none",
-            background: "rgba(5, 15, 48, 0.72)",
+            background: "rgba(5, 15, 48, 0.45)",
             opacity: bgOverlayOpacity,
           }}
         />
 
-        {/* L2 — "My projects" title */}
+        {/* L4 — "My projects" title */}
         <motion.div
           aria-hidden
           style={{
@@ -325,12 +346,6 @@ export default function HeroCarouselSequence() {
             textAlign: "center", whiteSpace: "nowrap",
           }}
         >
-          <p className="v3-mono" style={{
-            fontSize: "0.5rem", letterSpacing: "0.32em", textTransform: "uppercase",
-            color: "var(--v3-gold,#c8a84a)", marginBottom: 8,
-          }}>
-            [ PORTFOLIO / PROJECTS ]
-          </p>
           <h2 className="v3-display" style={{
             fontSize: "clamp(2.4rem, 5.5vw, 4.8rem)",
             color: "var(--v3-text,#edeae0)", lineHeight: 1, margin: 0,
@@ -339,7 +354,7 @@ export default function HeroCarouselSequence() {
           </h2>
         </motion.div>
 
-        {/* L3 — Fan of 3 cards (morph phase) */}
+        {/* L5 — Fan of 3 cards (morph phase) */}
         <motion.div style={{ opacity: fanOpacity }}>
           {/* Left */}
           <motion.div style={{
@@ -375,7 +390,7 @@ export default function HeroCarouselSequence() {
           </motion.div>
         </motion.div>
 
-        {/* L4 — Horizontal scroll row (all 7 projects, settled state) */}
+        {/* L6 — Horizontal scroll row (all 7 projects, settled state) */}
         <motion.div style={{ opacity: rowOpacity, zIndex: 20 }}>
           <ProjectsScrollRow active={rowActive} />
         </motion.div>

@@ -11,7 +11,7 @@ import MosaicWave from "@/components/v3/mosaic-wave";
 import ContactEditorial from "@/components/v3/contact-editorial";
 
 export default function V3Page() {
-  // Toggle dark editorial body color while this view is mounted
+  // Uniform dark background for the whole v3 page
   useEffect(() => {
     const original = document.body.style.backgroundColor;
     document.body.style.backgroundColor = "#08080a";
@@ -21,21 +21,12 @@ export default function V3Page() {
   }, []);
 
   return (
-    <main className="relative">
-      {/* Hero intacto */}
-      <HeroV2 />
+    <main className="relative" style={{ background: "#08080a" }}>
+      {/* Hero — flat dark bg, no image/texture */}
+      <HeroV2 noBgImage />
 
       {/* Editorial dark scroll-driven sections */}
       <div className="v3-root">
-        {/* Transición visual del hero al fondo dark */}
-        <div
-          aria-hidden
-          style={{
-            height: "120px",
-            background: "linear-gradient(to bottom, var(--gic-night-sky), #08080a)",
-          }}
-        />
-
         <ClipReveal />
         <KineticWords />
         <ParallaxDepth />

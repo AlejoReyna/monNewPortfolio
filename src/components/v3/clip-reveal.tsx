@@ -55,7 +55,7 @@ export default function ClipReveal() {
             style={{
               position: "absolute",
               inset: 0,
-              background: "var(--v3-surf)",
+              background: "var(--v3-bg)",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",

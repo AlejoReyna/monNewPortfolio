@@ -14,6 +14,7 @@ import {
   useTransform,
   useInView,
 } from "framer-motion";
+import { Github, Linkedin, Mail } from "lucide-react";
 import { useLanguage } from "@/components/lang-context";
 import "@/components/v3/v3.css";
 
@@ -43,11 +44,50 @@ const SUBJECT_MAX = 80;
 /* ─────────────────────────────────────────
    Social links
 ───────────────────────────────────────── */
-const SOCIAL_LINKS = [
-  { label: "GitHub", href: "https://github.com/AlejoReyna" },
-  { label: "LinkedIn", href: "https://www.linkedin.com/in/alexis-alberto-reyna-sánchez-6953102b4" },
-  { label: "Email", href: "mailto:alexis.rs@inverater.com" },
+type SocialId = "github" | "linkedin" | "email";
+
+const SOCIAL_LINKS: {
+  id: SocialId;
+  href: string;
+  labelEn: string;
+  labelEs: string;
+}[] = [
+  {
+    id: "github",
+    href: "https://github.com/AlejoReyna",
+    labelEn: "GitHub profile",
+    labelEs: "Perfil de GitHub",
+  },
+  {
+    id: "linkedin",
+    href: "https://www.linkedin.com/in/alexis-alberto-reyna-sánchez-6953102b4",
+    labelEn: "LinkedIn profile",
+    labelEs: "Perfil de LinkedIn",
+  },
+  {
+    id: "email",
+    href: "mailto:alexis.rs@inverater.com",
+    labelEn: "Send email",
+    labelEs: "Enviar correo",
+  },
 ];
+
+function SocialIcon({ id, className }: { id: SocialId; className?: string }) {
+  const common = {
+    className,
+    size: 22,
+    strokeWidth: 1.5,
+    "aria-hidden": true as const,
+  };
+  switch (id) {
+    case "github":
+      return <Github {...common} />;
+    case "linkedin":
+      return <Linkedin {...common} />;
+    case "email":
+      return <Mail {...common} />;
+  }
+}
 
 /* ─────────────────────────────────────────
    Stagger entry animation
@@ -93,10 +133,8 @@ export default function ContactEditorial() {
   /* ── Refs ── */
   const sectionRef = useRef<HTMLDivElement>(null);
   const headlineRef = useRef<HTMLHeadingElement>(null);
-  const eyebrowRef = useRef<HTMLDivElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
   const isFormInView = useInView(formRef, { once: true, amount: 0.15 });
-  const isEyebrowInView = useInView(eyebrowRef, { once: true, amount: 0.8 });
 
   /* ── Headline clip-path reveal via scroll ── */
   const { scrollYProgress } = useScroll({
@@ -188,7 +226,7 @@ export default function ContactEditorial() {
   return (
     <section
       ref={sectionRef}
-      className="v3-noise"
+      className="v3-noise v3-contact-editorial"
       style={{
         background: "var(--v3-bg)",
         padding: "clamp(4rem, 10vw, 8rem) clamp(1.5rem, 6vw, 5rem)",
@@ -197,93 +235,47 @@ export default function ContactEditorial() {
       }}
       aria-label={isEs ? "Contacto" : "Contact"}
     >
-      {/* ── Eyebrow with pulsing availability dot ── */}
-      <motion.div
-        ref={eyebrowRef}
-        initial={{ opacity: 0, y: 12 }}
-        animate={isEyebrowInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 12 }}
-        transition={{ duration: 0.5, ease: "easeOut" }}
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: "0.55rem",
-          marginBottom: "2rem",
-        }}
-      >
-        {/* Pulsing green dot */}
-        <motion.span
-          aria-label={isEs ? "Disponible" : "Available"}
-          animate={{ opacity: [1, 0.4, 1] }}
-          transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
+      {/* ── 2-col grid: headline + copy (left) | form + sidebar (right) ── */}
+      <div className="v3-contact-layout">
+        {/* ── LEFT: Headline + sub-copy ── */}
+        <div>
+          <motion.h2
+            ref={headlineRef}
+            className="v3-display"
+            style={{
+              fontSize: "clamp(3rem, 8vw, 7rem)",
+              lineHeight: 0.92,
+              maxWidth: "18ch",
+              marginBottom: "1.75rem",
+              clipPath: headlineClip,
+              WebkitClipPath: headlineClip as unknown as string,
+              fontWeight: 400,
+            }}
+          >
+            {isEs ? (
+              <>
+                Cuéntame qué quieres{" "}
+                <span style={{ color: "var(--v3-gold)" }}>construir</span>.
+              </>
+            ) : (
+              <>
+               Let's get in{" "}
+                <span style={{ color: "var(--v3-gold)" }}>touch.</span>
+              </>
+            )}
+          </motion.h2>
+
+         
+        </div>
+
+        {/* ── RIGHT: Form + sidebar ── */}
+        <div
           style={{
-            display: "inline-block",
-            width: "6px",
-            height: "6px",
-            borderRadius: "50%",
-            background: "#84cc16",
-            flexShrink: 0,
-          }}
-        />
-        <span
-          className="v3-mono"
-          style={{
-            fontSize: "0.6rem",
-            letterSpacing: "0.4em",
-            color: "var(--v3-gold)",
-            textTransform: "uppercase",
+            display: "flex",
+            flexDirection: "column",
+            gap: "clamp(2rem, 5vw, 3rem)",
           }}
         >
-          {isEs ? "ALEXIS · DISPONIBLE" : "ALEXIS · AVAILABLE"}
-        </span>
-      </motion.div>
-
-      {/* ── Giant headline with clip-path reveal ── */}
-      <motion.h2
-        ref={headlineRef}
-        className="v3-display"
-        style={{
-          fontSize: "clamp(3rem, 8vw, 7rem)",
-          lineHeight: 0.92,
-          maxWidth: "18ch",
-          marginBottom: "1.75rem",
-          clipPath: headlineClip,
-          WebkitClipPath: headlineClip as unknown as string,
-          fontWeight: 400,
-        }}
-      >
-        {isEs ? (
-          <>
-            Cuéntame qué quieres{" "}
-            <span style={{ color: "var(--v3-gold)" }}>construir</span>.
-          </>
-        ) : (
-          <>
-            Tell me what you want to{" "}
-            <span style={{ color: "var(--v3-gold)" }}>build</span>.
-          </>
-        )}
-      </motion.h2>
-
-      {/* ── Sub-copy ── */}
-      <p
-        className="v3-serif"
-        style={{
-          fontStyle: "italic",
-          fontSize: "clamp(1rem, 1.4vw, 1.2rem)",
-          color: "var(--v3-muted)",
-          maxWidth: "42ch",
-          lineHeight: 1.7,
-          marginBottom: "clamp(2.5rem, 6vw, 4rem)",
-        }}
-      >
-        {isEs
-          ? "Cuéntame la idea, el flujo o el producto que tienes en mente. Te respondo con el siguiente paso más claro."
-          : "Tell me the idea, flow or product you have in mind. I'll reply with the clearest next step."}
-      </p>
-
-      {/* ── 2-col grid: form (left) + sidebar (right) ── */}
-      <div className="v3-contact-layout">
-        {/* ── LEFT: Form ── */}
         <form
           ref={formRef}
           onSubmit={handleSubmit}
@@ -394,54 +386,6 @@ export default function ContactEditorial() {
             />
           </motion.div>
 
-          {/* Intent pills */}
-          <motion.div
-            variants={fieldVariant(0.32)}
-            initial="hidden"
-            animate={isFormInView ? "visible" : "hidden"}
-            style={{ marginTop: "1.25rem", marginBottom: "0.5rem" }}
-          >
-            <span
-              className="v3-mono"
-              style={{
-                display: "block",
-                fontSize: "0.58rem",
-                letterSpacing: "0.25em",
-                color: "var(--v3-muted)",
-                textTransform: "uppercase",
-                marginBottom: "0.65rem",
-              }}
-            >
-              {isEs ? "TIPO DE CONVERSACIÓN" : "TYPE OF CONVERSATION"}
-            </span>
-            <div
-              role="group"
-              aria-label={isEs ? "Tipo de conversación" : "Conversation type"}
-              style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem" }}
-            >
-              {INTENT_OPTIONS.map((option) => {
-                const active = form.intent === option;
-                return (
-                  <button
-                    key={option}
-                    type="button"
-                    aria-pressed={active}
-                    onClick={() => toggleIntent(option)}
-                    className="v3-mono v3-intent-pill"
-                    style={{
-                      background: active ? "var(--v3-gold)" : "transparent",
-                      color: active ? "var(--v3-bg)" : "var(--v3-muted)",
-                      border: active
-                        ? "1px solid var(--v3-gold)"
-                        : "1px solid var(--v3-line)",
-                    }}
-                  >
-                    {option}
-                  </button>
-                );
-              })}
-            </div>
-          </motion.div>
 
           {/* Submit button + states */}
           <motion.div
@@ -527,124 +471,23 @@ export default function ContactEditorial() {
           </motion.div>
         </form>
 
-        {/* ── RIGHT: Sidebar info ── */}
-        <aside>
-          {/* Response time */}
-          <div style={{ marginBottom: "2rem" }}>
-            <span
-              className="v3-mono"
-              style={{
-                display: "block",
-                fontSize: "0.6rem",
-                letterSpacing: "0.3em",
-                color: "var(--v3-gold)",
-                textTransform: "uppercase",
-                marginBottom: "0.65rem",
-              }}
+        <aside className="v3-social-icon-row" aria-label={isEs ? "Redes y correo" : "Social and email"}>
+          {SOCIAL_LINKS.map((link) => (
+            <a
+              key={link.id}
+              href={link.href}
+              target={link.href.startsWith("http") ? "_blank" : undefined}
+              rel={link.href.startsWith("http") ? "noopener noreferrer" : undefined}
+              className="v3-social-icon-link"
+              aria-label={isEs ? link.labelEs : link.labelEn}
             >
-              {isEs ? "PRÓXIMA RESPUESTA" : "NEXT RESPONSE"}
-            </span>
-            <p
-              className="v3-serif"
-              style={{
-                fontStyle: "italic",
-                fontSize: "1rem",
-                color: "var(--v3-muted)",
-                lineHeight: 1.65,
-                maxWidth: "28ch",
-              }}
-            >
-              {isEs
-                ? "Suelo responder en menos de 24 h en zona horaria America/Monterrey."
-                : "I usually reply within 24 h — America/Monterrey timezone."}
-            </p>
-          </div>
-
-          {/* Social links */}
-          <div style={{ marginBottom: "2.5rem" }}>
-            {SOCIAL_LINKS.map((link) => (
-              <a
-                key={link.label}
-                href={link.href}
-                target={link.href.startsWith("http") ? "_blank" : undefined}
-                rel="noopener noreferrer"
-                className="v3-mono v3-sidebar-link"
-              >
-                <span>{link.label}</span>
-                <span style={{ color: "var(--v3-muted)" }}>↗</span>
-              </a>
-            ))}
-          </div>
-
-          {/* Now working on */}
-          <div>
-            <span
-              className="v3-mono"
-              style={{
-                display: "block",
-                fontSize: "0.58rem",
-                letterSpacing: "0.3em",
-                color: "var(--v3-gold)",
-                textTransform: "uppercase",
-                marginBottom: "0.55rem",
-              }}
-            >
-              {isEs ? "AHORA TRABAJANDO EN" : "CURRENTLY BUILDING"}
-            </span>
-            <p
-              className="v3-serif"
-              style={{
-                fontStyle: "italic",
-                fontSize: "0.95rem",
-                color: "var(--v3-muted)",
-                lineHeight: 1.6,
-                maxWidth: "26ch",
-              }}
-            >
-              {isEs
-                ? "Inverater — plataforma de inversión con flujos de masterbroker y onboarding KYC."
-                : "Inverater — investment platform with masterbroker flows and KYC onboarding."}
-            </p>
-          </div>
+              <SocialIcon id={link.id} />
+            </a>
+          ))}
         </aside>
+        </div>
       </div>
 
-      {/* ── Footer line ── */}
-      <div
-        style={{
-          marginTop: "clamp(4rem, 10vw, 8rem)",
-          paddingTop: "2rem",
-          borderTop: "1px solid var(--v3-line)",
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "baseline",
-          flexWrap: "wrap",
-          gap: "1rem",
-        }}
-      >
-        <span
-          className="v3-mono"
-          style={{
-            fontSize: "0.6rem",
-            letterSpacing: "0.3em",
-            color: "var(--v3-muted)",
-            textTransform: "uppercase",
-          }}
-        >
-          ALEXIS REYNA · 2026
-        </span>
-        <span
-          className="v3-mono"
-          style={{
-            fontSize: "0.6rem",
-            letterSpacing: "0.3em",
-            color: "var(--v3-gold)",
-            textTransform: "uppercase",
-          }}
-        >
-          FIN / SCROLL COMPLETE
-        </span>
-      </div>
     </section>
   );
 }

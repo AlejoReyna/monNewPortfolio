@@ -25,7 +25,10 @@ const spaceMono = Space_Mono({
 
 export default function V3Layout({ children }: { children: React.ReactNode }) {
   return (
-    <div className={`${bebas.variable} ${cormorant.variable} ${spaceMono.variable}`}>
+    <div
+      className={`${bebas.variable} ${cormorant.variable} ${spaceMono.variable}`}
+      style={{ background: "#08080a", minHeight: "100vh" }}
+    >
       {children}
     </div>
   );
