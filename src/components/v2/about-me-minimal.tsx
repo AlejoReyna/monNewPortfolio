@@ -1,20 +1,16 @@
 "use client";
 
-import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
+import { motion, useInView, useReducedMotion } from "framer-motion";
 import { useRef } from "react";
+import aboutBackground from "@/app/background.webp";
 
 export default function AboutMeMinimal() {
   const sectionRef = useRef<HTMLElement>(null);
   const shouldReduceMotion = useReducedMotion();
-  const { scrollYProgress } = useScroll({
-    target: sectionRef,
-    offset: ["start end", "end start"],
-  });
-
-  const textY = useTransform(scrollYProgress, [0.1, 0.55], shouldReduceMotion ? [0, 0] : [42, 0]);
-  const textOpacity = useTransform(scrollYProgress, [0.12, 0.38], [0, 1]);
-  const imgY = useTransform(scrollYProgress, [0.1, 0.6], shouldReduceMotion ? [0, 0] : [28, 0]);
-  const imgOpacity = useTransform(scrollYProgress, [0.15, 0.42], [0, 1]);
+  const isInView = useInView(sectionRef, { amount: 0.28, margin: "-8% 0px -8% 0px" });
+  const contentHiddenY = shouldReduceMotion ? 0 : 34;
+  const photoHiddenY = shouldReduceMotion ? 0 : 28;
+  const bgVisibleOpacity = 1;
 
   return (
     <section
@@ -22,15 +18,50 @@ export default function AboutMeMinimal() {
       ref={sectionRef}
       style={{
         position: "relative",
-        minHeight: "92svh",
+        minHeight: "100svh",
         overflow: "hidden",
         background: "transparent",
         display: "flex",
         alignItems: "center",
       }}
     >
+      <motion.div
+        aria-hidden
+        initial={false}
+        animate={{
+          opacity: isInView ? bgVisibleOpacity : 0,
+          scale: isInView || shouldReduceMotion ? 1 : 1.04,
+        }}
+        transition={{ duration: shouldReduceMotion ? 0.01 : 1.1, ease: [0.22, 1, 0.36, 1] }}
+        style={{
+          position: "absolute",
+          inset: 0,
+          zIndex: 0,
+          backgroundImage: `url(${aboutBackground.src})`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          transformOrigin: "center",
+        }}
+      />
+
+      <motion.div
+        aria-hidden
+        initial={false}
+        animate={{ opacity: isInView ? 1 : 0 }}
+        transition={{ duration: shouldReduceMotion ? 0.01 : 1.1, ease: [0.22, 1, 0.36, 1] }}
+        style={{
+          position: "absolute",
+          inset: 0,
+          zIndex: 0,
+          background: "rgba(0,0,0,0.22)",
+          pointerEvents: "none",
+        }}
+      />
+
       <div
         style={{
+          position: "relative",
+          zIndex: 1,
           width: "min(1280px, calc(100% - 48px))",
           margin: "0 auto",
           display: "grid",
@@ -41,7 +72,18 @@ export default function AboutMeMinimal() {
         className="about-layout"
       >
         {/* ── Left: text content ── */}
-        <motion.div style={{ y: textY, opacity: textOpacity }}>
+        <motion.div
+          initial={false}
+          animate={{
+            opacity: isInView ? 1 : 0,
+            y: isInView ? 0 : contentHiddenY,
+          }}
+          transition={{
+            duration: shouldReduceMotion ? 0.01 : 0.75,
+            delay: isInView && !shouldReduceMotion ? 0.55 : 0,
+            ease: [0.22, 1, 0.36, 1],
+          }}
+        >
           <p
             style={{
               margin: "0 0 26px",
@@ -65,6 +107,7 @@ export default function AboutMeMinimal() {
               letterSpacing: "0",
               color: "#f8f5ea",
               textTransform: "uppercase",
+              textShadow: "0 2px 18px rgba(0,0,0,0.24)",
             }}
           >
             I design quiet systems that feel fast, clear and alive.
@@ -87,7 +130,8 @@ export default function AboutMeMinimal() {
                 fontFamily: "var(--gic-font-sans)",
                 fontSize: "clamp(0.95rem, 1.3vw, 1.1rem)",
                 lineHeight: 1.75,
-                color: "rgba(248,245,234,0.72)",
+                color: "rgba(248,245,234,0.78)",
+                textShadow: "0 1px 10px rgba(0,0,0,0.28)",
               }}
             >
               I build web products, experiments and automation with a bias for
@@ -103,7 +147,7 @@ export default function AboutMeMinimal() {
                 fontSize: "0.72rem",
                 letterSpacing: "0.08em",
                 textTransform: "uppercase",
-                color: "rgba(248,245,234,0.76)",
+                color: "rgba(248,245,234,0.8)",
               }}
             >
               {["Next.js / React", "TypeScript", "Web3 experiments", "Automation"].map((item, index) => (
@@ -117,7 +161,7 @@ export default function AboutMeMinimal() {
                     paddingBottom: 12,
                   }}
                 >
-                  <span style={{ color: "rgba(200,168,74,0.7)" }}>0{index + 1}</span>
+                  <span style={{ color: "rgba(200,168,74,0.72)" }}>0{index + 1}</span>
                   <span>{item}</span>
                 </div>
               ))}
@@ -127,16 +171,24 @@ export default function AboutMeMinimal() {
 
         {/* ── Right: photo / placeholder ── */}
         <motion.div
+          initial={false}
+          animate={{
+            opacity: isInView ? 1 : 0,
+            y: isInView ? 0 : photoHiddenY,
+          }}
+          transition={{
+            duration: shouldReduceMotion ? 0.01 : 0.75,
+            delay: isInView && !shouldReduceMotion ? 0.72 : 0,
+            ease: [0.22, 1, 0.36, 1],
+          }}
           style={{
-            y: imgY,
-            opacity: imgOpacity,
             position: "relative",
             width: "100%",
             aspectRatio: "3 / 4",
             borderRadius: "4px",
             overflow: "hidden",
-            border: "1px solid rgba(255,255,255,0.08)",
-            background: "rgba(255,255,255,0.03)",
+            border: "1px solid rgba(255,255,255,0.1)",
+            background: "rgba(255,255,255,0.04)",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
@@ -149,7 +201,7 @@ export default function AboutMeMinimal() {
               fontSize: "0.6rem",
               letterSpacing: "0.3em",
               textTransform: "uppercase",
-              color: "rgba(200,168,74,0.4)",
+              color: "rgba(200,168,74,0.42)",
             }}
           >
             your photo

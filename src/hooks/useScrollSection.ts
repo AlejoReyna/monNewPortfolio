@@ -3,9 +3,9 @@
 import { useEffect } from "react";
 import { useNavigation } from "@/contexts/navigation-context";
 
-type Section = "home" | "services" | "projects" | "contact";
+type Section = "home" | "about" | "services" | "projects" | "contact";
 
-const SECTION_IDS: Section[] = ["home", "services", "projects", "contact"];
+const SECTION_IDS: Section[] = ["home", "about", "services", "projects", "contact"];
 
 /**
  * Detecta automáticamente qué sección está visible en el viewport

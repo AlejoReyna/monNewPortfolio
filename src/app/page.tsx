@@ -25,7 +25,7 @@ export default function Home() {
         }}
       />
 
-      <HeroV2 noBgImage />
+      <HeroV2 />
       <AboutMeMinimal />
       <IntegrationsShowcase />
       <ProjectsScrollSequence />

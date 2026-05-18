@@ -100,7 +100,7 @@ export default function MobileDock() {
             className="group relative shrink-0"
           >
               <div
-              className={`grid place-items-center h-10 w-10 rounded-xl
+              className={`relative grid place-items-center h-10 w-10 rounded-xl
                          shadow-lg transition-all duration-200
                          active:scale-95 overflow-hidden ${
                            item.section === "home" || item.section === "projects"
