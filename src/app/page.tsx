@@ -1,41 +1,37 @@
 "use client";
 
-import { useNavigation } from "@/contexts/navigation-context";
-import HomeSection from "@/components/sections/home-section";
-import ServicesSection from "@/components/sections/services-section";
-import ProjectsSection from "@/components/sections/projects-section";
+import { useScrollSection } from "@/hooks/useScrollSection";
+import HeroV2 from "@/components/v2/hero-v2";
+import AboutMeMinimal from "@/components/v2/about-me-minimal";
+import IntegrationsShowcase from "@/components/v2/integrations-showcase";
+import ProjectsScrollSequence from "@/components/v3/projects-scroll-sequence";
 import ContactSection from "@/components/sections/contact-section";
+import UANLShowcase from "@/components/sections/uanl-showcase";
+import WeddingServiceAd from "@/components/sections/wedding-service-ad";
 
 export default function Home() {
-  const { currentSection, isTransitioning } = useNavigation();
-
-  const renderSection = () => {
-    switch (currentSection) {
-      case "home":
-        return <HomeSection />;
-      case "services":
-        return <ServicesSection />;
-      case "projects":
-        return <ProjectsSection />;
-      case "contact":
-        return <ContactSection />;
-      default:
-        return <HomeSection />;
-    }
-  };
+  useScrollSection();
 
   return (
     <main className="relative">
+      {/* Fixed background — persists across all sections */}
+      <div
+        aria-hidden
+        style={{
+          position: "fixed",
+          inset: 0,
+          background: "#08080a",
+          zIndex: -1,
+        }}
+      />
 
-      
-      {/* Contenedor con transiciones fade */}
-      <div 
-        className={`transition-opacity duration-300 ease-in-out ${
-          isTransitioning ? "opacity-0" : "opacity-100"
-        }`}
-      >
-        {renderSection()}
-      </div>
+      <HeroV2 />
+      <AboutMeMinimal />
+      <IntegrationsShowcase />
+      <ProjectsScrollSequence />
+      <UANLShowcase />
+      <WeddingServiceAd />
+      <ContactSection />
     </main>
   );
 }

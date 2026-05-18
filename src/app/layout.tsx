@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Bebas_Neue, Cormorant_Garamond, Space_Mono } from "next/font/google";
 import "./globals.css";
-import Navbar from "@/components/navbar";
+import AppChrome from "@/components/app-chrome";
 
 import { LanguageProvider, LanguageFade } from "@/components/lang-context";
 import { NavigationProvider } from "@/contexts/navigation-context";
@@ -13,8 +13,8 @@ function generateiOSMetaTags() {
     'apple-mobile-web-app-capable': 'yes',
     'apple-mobile-web-app-status-bar-style': 'black-translucent',
     'apple-mobile-web-app-title': 'Alexis\' desktop',
-    // Theme color for mobile browsers (matches navbar dark theme)
-    'theme-color': '#080404',
+    // Theme color for mobile browsers (GIC light surfaces)
+    'theme-color': '#f9faf7',
     // Additional iOS meta tags
     'format-detection': 'telephone=no',
     'viewport': 'width=device-width, initial-scale=1, viewport-fit=cover',
@@ -29,6 +29,29 @@ const geistSans = Geist({
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+});
+
+/* ── V3 editorial fonts — available app-wide ── */
+const bebas = Bebas_Neue({
+  weight: "400",
+  subsets: ["latin"],
+  variable: "--font-bebas",
+  display: "swap",
+});
+
+const cormorant = Cormorant_Garamond({
+  weight: ["300", "400", "600"],
+  style: ["normal", "italic"],
+  subsets: ["latin"],
+  variable: "--font-cormorant",
+  display: "swap",
+});
+
+const spaceMono = Space_Mono({
+  weight: ["400", "700"],
+  subsets: ["latin"],
+  variable: "--font-space-mono",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -49,7 +72,7 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <meta name="apple-mobile-web-app-title" content="Alexis' desktop" />
-        <meta name="theme-color" content="#080404" />
+        <meta name="theme-color" content="#f9faf7" />
         <meta name="format-detection" content="telephone=no" />
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
         {/* iOS splash screen color */}
@@ -61,15 +84,14 @@ export default function RootLayout({
         <link rel="manifest" href="/manifest.json" />
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-        style={{ backgroundColor: '#080404' }}
+        className={`${geistSans.variable} ${geistMono.variable} ${bebas.variable} ${cormorant.variable} ${spaceMono.variable} antialiased`}
+        style={{ backgroundColor: "var(--gic-off-white)", color: "var(--gic-dark-charcoal)" }}
       >
         <LanguageProvider>
           <NavigationProvider>
             <LanguageFade>
               <a id="top" />
-              <Navbar />
-              {children}
+              <AppChrome>{children}</AppChrome>
               {/* <Footer /> */}
             </LanguageFade>
           </NavigationProvider>

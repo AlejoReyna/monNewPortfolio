@@ -4,38 +4,7 @@ import type React from "react";
 import { useLanguage } from "@/components/lang-context";
 import { useChat } from "@/hooks/useChat";
 
-/* ========= TypewriterText Component ========= */
-type TypewriterTextProps = {
-  text: string;
-  className?: string;
-  speed?: number;
-  onComplete?: () => void;
-};
-
-function TypewriterText({ text, className = "", speed = 50, onComplete }: TypewriterTextProps) {
-  const [displayedText, setDisplayedText] = useState("");
-  const [currentIndex, setCurrentIndex] = useState(0);
-
-  useEffect(() => {
-    if (currentIndex < text.length) {
-      const timer = setTimeout(() => {
-        setDisplayedText((prev) => prev + text[currentIndex]);
-        setCurrentIndex((prev) => prev + 1);
-      }, speed);
-      return () => clearTimeout(timer);
-    } else if (currentIndex === text.length && onComplete) {
-      const timer = setTimeout(onComplete, 1000);
-      return () => clearTimeout(timer);
-    }
-  }, [currentIndex, text, speed, onComplete]);
-
-  useEffect(() => {
-    setDisplayedText("");
-    setCurrentIndex(0);
-  }, [text]);
-
-  return <p className={className}>{displayedText}</p>;
-}
+// Removed unused TypewriterText component and its props type
 
 /* ========= Loading Spinner Component ========= */
 function LoadingSpinner() {
@@ -50,16 +19,13 @@ function LoadingSpinner() {
   );
 }
 
-import { alexisData, getRandomMusicArtist, getRandomTech } from "./data/user-data";
+// Removed unused imports: alexisData, getRandomMusicArtist, getRandomTech
 // Debug imports
 import {
   detectEnhancedIntent,
   buildEnhancedHint,
   ENHANCED_SUGGESTIONS,
-  ENHANCED_PLACEHOLDERS,
 } from "./data/chat-enhancements";
-
-console.log("Imported ENHANCED_PLACEHOLDERS:", ENHANCED_PLACEHOLDERS);
 
 type Lang = "en" | "es";
 type Intent = "casual" | "work" | "about" | "projects" | "contact" | "music" | "travel" | "tech";
@@ -70,19 +36,14 @@ const getRandomSuggestions = (all: Suggestion[], count = 5) =>
   [...all].sort(() => 0.5 - Math.random()).slice(0, count);
 
 /* ========= Easter Egg (resumido, igual que antes) ========= */
-const EASTER_GIBBERISH_ES = ["weuhruqw wefhuqsbdchja scuwqe hfqusdncu"];
-const EASTER_GIBBERISH_EN = ["weuhruqw wefhuqsbdchja scuwqe hfqusdncu"];
-const buildEasterFull = (seed: string) =>
-  Array.from({ length: 80 })
-    .map((_, i) => (i % 5 === 4 ? `${seed}\n` : `${seed} `))
-    .join("");
+// Removed unused easter egg variables: EASTER_GIBBERISH_ES, EASTER_GIBBERISH_EN, buildEasterFull
 
 /* ========= Intents & Hints ========= */
 const HINT_START = "[[SYS]]";
 const HINT_END = "[[/SYS]]";
 const deriveIntent = detectEnhancedIntent;
-const buildHint = (intent: Intent, lang: Lang, userText: string) =>
-  buildEnhancedHint(intent, lang, userText);
+const buildHint = (intent: Intent, lang: Lang) =>
+  buildEnhancedHint(intent, lang);
 const stripHintFromUserMessage = (raw: unknown) => {
   const text = (raw ?? "").toString();
   if (text.startsWith(HINT_START)) {
@@ -97,7 +58,20 @@ const stripHintFromUserMessage = (raw: unknown) => {
   return text;
 };
 
-export default function ChatInterface() {
+type ChatInterfaceProps = {
+  /** Extra classes on outer wrapper (e.g. embed in hero panel). */
+  className?: string;
+  /** Extra classes on terminal chrome when variant is `card` (inner shell). */
+  terminalClassName?: string;
+  /** `panel`: root element is the terminal (fills hero column). `card`: centered layout with inner terminal frame. */
+  variant?: "card" | "panel";
+};
+
+export default function ChatInterface({
+  className,
+  terminalClassName,
+  variant = "card",
+}: ChatInterfaceProps) {
   const langCtx = useLanguage();
   const initialCtxLang: Lang = langCtx?.language === "es" ? "es" : "en";
   const setCtxLanguage = useCallback(
@@ -115,29 +89,15 @@ export default function ChatInterface() {
   const [userName, setUserName] = useState("");
   const [showNamePrompt, setShowNamePrompt] = useState(false);
 
-  // Overlays/column-left flow
-  const [showWelcome, setShowWelcome] = useState(false);
-  const [welcomeOpacity, setWelcomeOpacity] = useState(0);
-  const [showNameStep, setShowNameStep] = useState(false);
-  const [nameOpacity, setNameOpacity] = useState(0);
-  const [showLangStep, setShowLangStep] = useState(false);
-  const [langOpacity, setLangOpacity] = useState(0);
-
-  // Nombre (antes de idioma)
-  const [showNameInput, setShowNameInput] = useState(false);
-  const [nameInputOpacity, setNameInputOpacity] = useState(0);
-  const [nameInput, setNameInput] = useState("");
+  // Removed unused overlay state variables: showWelcome, setShowWelcome, welcomeOpacity, setWelcomeOpacity, 
+  // showNameStep, setNameOpacity, showLangStep, langOpacity, showNameInput, nameInputOpacity, setNameInput
 
   // Chat
   const { messages, isLoading, error, sendMessage, isRateLimit } = useChat(userName);
   const [showChat, setShowChat] = useState(false);
-  const [currentPlaceholder, setCurrentPlaceholder] = useState(
-    isEs ? "Pregúntame algo..." : "Ask me something..."
-  );
-  console.log("showChat:", showChat);
   const [inputValue, setInputValue] = useState("");
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
-  const [pendingUserText, setPendingUserText] = useState<string | null>(null);
+  // Removed unused pendingUserText state
 
   const rootRef = useRef<HTMLDivElement>(null);
   const [chatHeightPx, setChatHeightPx] = useState<number | undefined>();
@@ -179,22 +139,6 @@ export default function ChatInterface() {
     }
   }, [setCtxLanguage]);
 
-  // Placeholders dinámicos
-  const pickPlaceholder = useCallback(() => {
-    const pool = ENHANCED_PLACEHOLDERS[isEs ? "es" : "en"];
-    const randomIndex = Math.floor(Math.random() * pool.length);
-    const newPlaceholder = pool[randomIndex];
-    console.log("New placeholder:", newPlaceholder);
-    setCurrentPlaceholder(newPlaceholder);
-  }, [isEs]);
-
-  useEffect(() => {
-    console.log("Setting up placeholder effect");
-    pickPlaceholder();
-    const interval = setInterval(pickPlaceholder, 5000);
-    return () => clearInterval(interval);
-  }, [pickPlaceholder]);
-
   // Initialize suggestions on client side to prevent hydration mismatch
   useEffect(() => {
     setSuggestions(getRandomSuggestions(ENHANCED_SUGGESTIONS, 5));
@@ -207,62 +151,9 @@ export default function ChatInterface() {
   }, [messages]);
 
   /* ========= Handlers ========= */
-  const handleLanguageSelection = (lang: Lang) => {
-    setPreferredLang(lang);
-    setCtxLanguage?.(lang);
+  // Removed unused handlers: handleLanguageSelection, handleNameStepComplete
 
-    setLangOpacity(0);
-    setTimeout(() => {
-      setShowLangStep(false);
-      setShowNameStep(true);
-      requestAnimationFrame(() => setNameOpacity(1));
-    }, 350);
-  };
-
-  const handleNameStepComplete = () => {
-    setShowNameInput(true);
-    requestAnimationFrame(() => setNameInputOpacity(1));
-  };
-
-  const handleNameSubmit = () => {
-    const trimmed = nameInput.trim();
-    if (!trimmed) return;
-    setUserName(trimmed);
-
-    const langToSave: Lang = preferredLang ?? initialCtxLang;
-    try {
-      localStorage.setItem("userName", trimmed);
-      localStorage.setItem("preferredLanguage", langToSave);
-    } catch {}
-
-    setNameOpacity(0);
-    setNameInputOpacity(0);
-    setTimeout(() => {
-      setShowNameStep(false);
-      setShowNameInput(false);
-      setShowNamePrompt(false);
-      setShowChat(true);
-
-      if (pendingUserText) {
-        const raw = pendingUserText.trim();
-        if (raw) {
-          const intent = deriveIntent(raw, currentLang);
-          const payload = buildHint(intent, currentLang, raw) + "\n" + raw;
-          sendMessage(payload);
-          setInputValue("");
-          setPendingUserText(null);
-          pickPlaceholder();
-        }
-      }
-    }, 350);
-  };
-
-  const handleNameKey = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      handleNameSubmit();
-    }
-  };
+  // Removed unused handlers: handleNameSubmit, handleNameKey (these were for name input functionality that's not being used)
 
   const handleSendMessage = () => {
     const raw = inputValue.trim();
@@ -277,11 +168,10 @@ export default function ChatInterface() {
       setShowChat(true);
     }
     const intent = deriveIntent(raw, currentLang);
-    const payload = buildHint(intent, currentLang, raw) + "\n" + raw;
+    const payload = buildHint(intent, currentLang) + "\n" + raw;
     sendMessage(payload);
     setInputValue("");
     if (!showChat) setShowChat(true);
-    pickPlaceholder();
   };
 
   const handleSuggestionClick = (text: string, intent: Intent) => {
@@ -295,10 +185,9 @@ export default function ChatInterface() {
       setShowNamePrompt(false);
       setShowChat(true);
     }
-    const payload = buildHint(intent, currentLang, text) + "\n" + text;
+    const payload = buildHint(intent, currentLang) + "\n" + text;
     sendMessage(payload);
     if (!showChat) setShowChat(true);
-    pickPlaceholder();
   };
 
   /* ========= Intro text (portada) ========= */
@@ -306,6 +195,7 @@ export default function ChatInterface() {
   const [typewriterComplete, setTypewriterComplete] = useState(false);
   const [visibleButtons, setVisibleButtons] = useState(0);
   const [showInput, setShowInput] = useState(false);
+  const [lastLoginLine, setLastLoginLine] = useState("Last login: -- on ttys009");
 
   const greetings = [
     {
@@ -330,6 +220,13 @@ export default function ChatInterface() {
 
   useEffect(() => {
     setGreetingIndex(Math.floor(Math.random() * greetings.length));
+  }, [greetings.length]);
+
+  useEffect(() => {
+    const now = new Date();
+    const date = now.toDateString();
+    const time = now.toTimeString().split(" ")[0];
+    setLastLoginLine(`Last login: ${date} ${time} on ttys009`);
   }, []);
 
   const baseGreeting = isEs ? greetings[greetingIndex].es : greetings[greetingIndex].en;
@@ -376,99 +273,100 @@ export default function ChatInterface() {
   /* ========= UI normal del chat ========= */
   const sorted = [...messages].sort((a, b) => +a.timestamp - +b.timestamp);
 
+  const isPanel = variant === "panel";
+
+  const rootClassName = isPanel
+    ? [
+        "pointer-events-auto relative z-10 flex flex-col w-full rounded-lg border border-gray-500/35 bg-black/30 backdrop-blur-md shadow-2xl shadow-black/35 overflow-hidden min-h-0",
+        terminalClassName,
+        className,
+      ]
+        .filter(Boolean)
+        .join(" ")
+    : [
+        "relative z-10 flex flex-col px-0 lg:px-4 w-full max-w-3xl mx-auto mb-0 lg:mb-12 h-full lg:h-auto",
+        className,
+      ]
+        .filter(Boolean)
+        .join(" ");
+
+  const innerShellClassName = [
+    "pointer-events-auto w-full rounded-lg border border-gray-500/35 bg-black/30 backdrop-blur-md shadow-2xl shadow-black/35 overflow-hidden max-h-[35vh] lg:h-auto flex flex-col",
+    terminalClassName,
+  ]
+    .filter(Boolean)
+    .join(" ");
+
+  const terminalFrame = (body: React.ReactNode) =>
+    isPanel ? body : <div className={innerShellClassName}>{body}</div>;
+
   return (
-    <div ref={rootRef} className="relative z-10 flex flex-col px-4 w-full max-w-3xl mx-auto mb-12">
-      {/* Terminal unificada */}
-      <div className="pointer-events-auto w-full rounded-lg border border-orange-500/30 bg-black/30 backdrop-blur-md shadow-2xl shadow-orange-500/10 overflow-hidden">
-        {/* Terminal header */}
-        <div
-          className="flex items-center justify-between px-4 py-3 bg-black/40 border-b border-orange-500/30 cursor-move"
-          data-drag-handle
-        >
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full bg-red-500 border border-red-600" />
-            <div className="w-3 h-3 rounded-full bg-yellow-500 border border-yellow-600" />
-            <div className="w-3 h-3 rounded-full bg-green-500 border border-green-600" />
-          </div>
-          <div className="text-xs text-gray-300 font-mono">admin — alexis@portfolio — ~ — zsh — 80x24</div>
-          <div className="flex items-center gap-2">
-            <div className="text-xs text-orange-400 font-mono">●</div>
-          </div>
-        </div>
-
-        {/* Contenido de la terminal */}
-        <div className="p-4">
-          {/* Mensaje inicial o última línea de login */}
-          <div className="text-xs text-gray-500 font-mono mb-2">
-            Last login: {new Date().toDateString()} {new Date().toTimeString().split(" ")[0]} on ttys009
+    <div ref={rootRef} className={rootClassName}>
+      {terminalFrame(
+        <>
+          {/* Terminal header */}
+          <div
+            className={`flex items-center px-4 py-3 bg-black/40 border-b border-gray-500/35 shrink-0 ${isPanel ? "cursor-default" : "cursor-move"}`}
+            {...(!isPanel ? { "data-drag-handle": "" } : {})}
+          >
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full bg-red-500 border border-red-600" />
+              <div className="w-3 h-3 rounded-full bg-yellow-500 border border-yellow-600" />
+              <div className="w-3 h-3 rounded-full bg-green-500 border border-green-600" />
+            </div>
           </div>
 
-          {/* Portada (misma línea con el $, envuelve debajo si falta ancho) */}
-          {!showChat && (
-            <div className="mb-4">
-              <div className="grid grid-cols-[auto_1fr] gap-x-2 font-mono text-[13px] leading-6 mb-2">
-                {/* Prefix fijo */}
-                <div className="flex items-baseline shrink-0 text-nowrap">
-                  <span className="text-green-400">➜</span>
-                  <span className="text-blue-400 ml-2">~</span>
-                  <span className="text-orange-400 ml-2">alexis@portfolio:</span>
-                  <span className="text-blue-400">~</span>
-                  <span className="text-orange-400">$</span>
-                </div>
-                {/* Texto que envuelve */}
-                <div className="min-w-0 text-gray-100 whitespace-pre-wrap break-words">
+        {/* Contenido — min-h-0 + scroll interno para que el texto de portada/comandos no quede cortado */}
+        <div className="p-2 lg:p-4 flex-1 flex flex-col min-h-0 overflow-hidden">
+          <div className="flex-1 min-h-0 flex flex-col gap-4 mb-4 overflow-y-auto">
+            {/* Portada */}
+            {!showChat && (
+              <div className="shrink-0 font-mono text-[17px] lg:text-[18px] xl:text-[19px] leading-6">
+                <span className="text-gray-200">&gt;</span>
+                <span className="text-gray-400 ml-2">GPT-5</span>
+                <span className="text-gray-100 ml-2">
                   {displayed || text}
                   {!showNamePrompt && displayed.length < text.length && (
                     <span className="ml-1 inline-block h-4 w-0.5 align-[-0.15em] bg-gray-300 animate-pulse" />
                   )}
-                </div>
+                </span>
               </div>
-            </div>
-          )}
+            )}
 
-          {/* Chat messages */}
-          {(sorted.length > 0 || showChat) && (
-            <div
-              className="space-y-4 overflow-y-auto mb-4"
-              style={{
-                height: chatHeightPx ? `${chatHeightPx - 120}px` : "400px",
-                maxHeight: chatHeightPx ? `${chatHeightPx - 120}px` : "400px",
-              }}
-            >
-              {sorted.map((m) => {
+            {/* Chat messages */}
+            {(sorted.length > 0 || showChat) && (
+              <div
+                className="space-y-4 overflow-y-auto shrink-0"
+                style={{
+                  height: chatHeightPx ? `${chatHeightPx - 120}px` : "400px",
+                  maxHeight: chatHeightPx ? `${chatHeightPx - 120}px` : "400px",
+                }}
+              >
+                {sorted.map((m) => {
                 const isUser = m.role === "user";
                 const key = (m.id ?? String(+m.timestamp)) as string;
                 const content = isUser ? stripHintFromUserMessage(m.content) : m.content ?? "";
                 return (
-                  <div key={key} className="font-mono text-[13px] leading-6 animate-fadeIn">
+                  <div key={key} className="font-mono text-[17px] lg:text-[18px] xl:text-[19px] leading-6 animate-fadeIn">
                     {isUser ? (
                       // Usuario - estilo comando de terminal con wrap correcto
                       <div className="mb-2">
-                        <div className="grid grid-cols-[auto_1fr] gap-x-2 text-[13px]">
-                          {/* Prefix */}
-                          <div className="flex items-baseline shrink-0 text-nowrap">
-                            <span className="text-green-400">➜</span>
-                            <span className="text-blue-400 ml-2">~</span>
-                            <span className="text-orange-400 ml-2">alexis@portfolio:</span>
-                            <span className="text-blue-400">~</span>
-                            <span className="text-orange-400">$</span>
-                          </div>
-                          {/* Contenido que envuelve */}
-                          <div className="min-w-0 text-gray-100 whitespace-pre-wrap break-words">
-                            {content}
-                          </div>
+                        <div className="text-[17px] lg:text-[18px] xl:text-[19px]">
+                          <span className="text-gray-200">&gt;</span>
+                          <span className="text-gray-400 ml-2">GPT-5</span>
+                          <span className="text-gray-100 ml-2">{content}</span>
                         </div>
-                        <div className="text-[11px] text-gray-500 ml-6 mt-1">
+                        <div className="text-[14px] text-gray-500 mt-1">
                           {m.timestamp.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
                         </div>
                       </div>
                     ) : (
                       // Respuesta del sistema
                       <div className="mb-2">
-                        <div className="text-gray-100 bg-black/10 rounded p-3 border-l-4 border-orange-500 text-[13px] leading-6">
+                        <div className="text-gray-100 bg-black/10 rounded p-3 border-l-4 border-orange-500 text-[17px] lg:text-[18px] xl:text-[19px] leading-6">
                           {content}
                         </div>
-                        <div className="text-[11px] text-gray-500 mt-1">
+                        <div className="text-[14px] text-gray-500 mt-1">
                           {m.timestamp.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
                         </div>
                       </div>
@@ -477,42 +375,39 @@ export default function ChatInterface() {
                 );
               })}
               {isLoading && (
-                <div className="font-mono text-[13px] animate-fadeIn">
+                <div className="font-mono text-[17px] lg:text-[18px] xl:text-[19px] animate-fadeIn">
                   <div className="text-gray-100 bg-black/10 rounded p-3 border-l-4 border-orange-500 flex items-center gap-3">
                     <LoadingSpinner />
                     <span>Procesando respuesta...</span>
                   </div>
                 </div>
               )}
-              <div ref={messagesEndRef} />
-            </div>
-          )}
-
-          {/* Error */}
-          {error && (
-            <div className="bg-black/30 border-l-4 border-red-500 text-red-100 p-4 rounded font-mono text-[13px] animate-fadeIn mb-4">
-              <div className="flex items-center text-[13px] mb-2">
-                <span className="text-green-400">➜</span>
-                <span className="text-blue-400 ml-2">~</span>
-                <span className="text-red-400 ml-2">alexis@portfolio:</span>
-                <span className="text-blue-400">~</span>
-                <span className="text-red-400">$</span>
-                <span className="text-red-300 ml-2">error</span>
+                <div ref={messagesEndRef} />
               </div>
-              <div className="ml-6">
-                <p className="text-red-200">bash: {error}</p>
-                {isRateLimit && (
-                  <p className="text-xs mt-2 opacity-80 text-red-300">
-                    {isEs ? "Límite de velocidad alcanzado. Intenta en unos segundos..." : "Rate limit reached. Try in a few seconds..."}
-                  </p>
-                )}
-              </div>
-            </div>
-          )}
+            )}
 
-          {/* Sugerencias antes de iniciar chat */}
-          {!showNamePrompt && !showChat && sorted.length === 0 && (
-            <div className="space-y-2 mb-4">
+            {/* Error */}
+            {error && (
+              <div className="bg-black/30 border-l-4 border-red-500 text-red-100 p-4 rounded font-mono text-[17px] lg:text-[18px] xl:text-[19px] animate-fadeIn shrink-0">
+                <div className="flex items-center text-[17px] mb-2">
+                  <span className="text-gray-200">&gt;</span>
+                  <span className="text-gray-400 ml-2">GPT-5</span>
+                  <span className="text-red-300 ml-2">error</span>
+                </div>
+                <div className="ml-6">
+                  <p className="text-red-200">bash: {error}</p>
+                  {isRateLimit && (
+                    <p className="text-xs mt-2 opacity-80 text-red-300">
+                      {isEs ? "Límite de velocidad alcanzado. Intenta en unos segundos..." : "Rate limit reached. Try in a few seconds..."}
+                    </p>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Sugerencias antes de iniciar chat */}
+            {!showNamePrompt && !showChat && sorted.length === 0 && (
+              <div className="space-y-2 shrink-0">
               <div className="text-xs text-gray-400 font-mono mb-3">Comandos disponibles:</div>
               <div className="flex flex-wrap gap-2">
                 {suggestions.map((s, index) => (
@@ -527,15 +422,15 @@ export default function ChatInterface() {
                     ./{isEs ? s.es.replace(/\s+/g, "_").toLowerCase() : s.en.replace(/\s+/g, "_").toLowerCase()}
                   </button>
                 ))}
+                </div>
               </div>
-            </div>
-          )}
+            )}
+          </div>
 
           {/* Input - siempre al final */}
-          <div className="border-t border-orange-500/20 pt-3">
-            <div className="flex items-center font-mono text-[13px]">
-              <span className="text-green-400">➜</span>
-              <span className="text-blue-400 ml-2">~</span>
+          <div className="border-t border-gray-500/30 pt-3 shrink-0">
+            <div className="flex items-center font-mono text-[17px] lg:text-[18px] xl:text-[19px]">
+              <span className="text-gray-200 ml-2">&gt;</span>
 
               <input
                 type="text"
@@ -547,16 +442,8 @@ export default function ChatInterface() {
                     handleSendMessage();
                   }
                 }}
-                placeholder={currentPlaceholder || (isEs ? "Pregúntame algo..." : "Ask me something...")}
-                onFocus={() => {
-                  console.log("Input focus - States:", {
-                    showChat,
-                    isLoading,
-                    currentPlaceholder,
-                    isDisabled: isLoading,
-                  });
-                }}
-                className="flex-1 bg-transparent text-gray-100 placeholder-gray-400 font-mono text-[13px] focus:outline-none disabled:opacity-50 caret-gray-300 ml-2"
+                placeholder={isEs ? "Pregúntame algo..." : "Ask me something..."}
+                className="flex-1 bg-transparent text-gray-100 placeholder-gray-400 font-mono text-[17px] lg:text-[18px] xl:text-[19px] focus:outline-none disabled:opacity-50 caret-gray-300 ml-2"
                 disabled={isLoading}
                 maxLength={500}
               />
@@ -570,12 +457,12 @@ export default function ChatInterface() {
 
             {/* Terminal status line */}
             <div className="flex justify-between items-center mt-1 text-xs text-gray-500 font-mono">
-              <span>{isLoading ? "Ejecutando comando..." : "Listo para comandos"}</span>
               <span>{inputValue.length}/500</span>
             </div>
           </div>
         </div>
-      </div>
+        </>
+      )}
     </div>
   );
 }

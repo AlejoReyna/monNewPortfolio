@@ -2,11 +2,11 @@
 
 import { createContext, useContext, useState, ReactNode } from "react";
 
-type Section = "home" | "services" | "projects" | "contact";
+type Section = "home" | "about" | "services" | "projects" | "contact";
 
 interface NavigationContextType {
   currentSection: Section;
-  isTransitioning: boolean;
+  setCurrentSection: (section: Section) => void;
   navigateToSection: (section: Section) => void;
 }
 
@@ -14,25 +14,16 @@ const NavigationContext = createContext<NavigationContextType | undefined>(undef
 
 export function NavigationProvider({ children }: { children: ReactNode }) {
   const [currentSection, setCurrentSection] = useState<Section>("home");
-  const [isTransitioning, setIsTransitioning] = useState(false);
 
   const navigateToSection = (section: Section) => {
-    if (section === currentSection || isTransitioning) return;
-    
-    setIsTransitioning(true);
-    
-    // Tiempo para fade out
-    setTimeout(() => {
-      setCurrentSection(section);
-      // Tiempo para fade in
-      setTimeout(() => {
-        setIsTransitioning(false);
-      }, 150);
-    }, 150);
+    const el = document.getElementById(section);
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
   };
 
   return (
-    <NavigationContext.Provider value={{ currentSection, isTransitioning, navigateToSection }}>
+    <NavigationContext.Provider value={{ currentSection, setCurrentSection, navigateToSection }}>
       {children}
     </NavigationContext.Provider>
   );

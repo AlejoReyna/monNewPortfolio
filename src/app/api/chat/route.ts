@@ -15,7 +15,7 @@ function createOpenAIClient(): OpenAI | null {
 
 /**
  * Config de cuota:
- * - 5 prompts por sesión
+ * - 20 prompts por sesión
  * - ventana: 2 horas 30 minutos (2.5h = 9,000,000 ms)
  */
 const QUOTA_COOKIE = 'chat_quota_v1';
@@ -37,7 +37,7 @@ function stripHintBlock(raw: unknown): string {
   }
   return text;
 }
-const MAX_PROMPTS = 5;
+const MAX_PROMPTS = 20;
 const WINDOW_MS = 2.5 * 60 * 60 * 1000; // 2.5h -> 9_000_000 ms
 
 type Quota = { remaining: number; resetAt: number };
