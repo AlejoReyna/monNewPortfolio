@@ -48,12 +48,15 @@ type HeroV2Props = {
    * a uniform background throughout.
    */
   noBgImage?: boolean;
+  /** Keeps the BG image/grid, but removes the dark translucent vignette layer. */
+  disableBgVignette?: boolean;
 };
 
 export default function HeroV2({
   embedInScrollSequence,
   embedContentOpacity,
   noBgImage = false,
+  disableBgVignette = false,
 }: HeroV2Props) {
   const heroRef = useRef<HTMLElement>(null);
   const [devBorder, setDevBorder] = useState(false);
@@ -134,13 +137,15 @@ export default function HeroV2({
             style={{ opacity: 0.28, mixBlendMode: "luminosity" }}
           />
           {/* Multi-layer vignette */}
-          <div
-            className="absolute inset-0"
-            style={{
-              background:
-                "linear-gradient(to bottom, rgba(31,31,41,0.55) 0%, rgba(31,31,41,0.3) 40%, rgba(31,31,41,0.85) 100%)",
-            }}
-          />
+          {!disableBgVignette && (
+            <div
+              className="absolute inset-0"
+              style={{
+                background:
+                  "linear-gradient(to bottom, rgba(31,31,41,0.55) 0%, rgba(31,31,41,0.3) 40%, rgba(31,31,41,0.85) 100%)",
+              }}
+            />
+          )}
         </motion.div>
       )}
 

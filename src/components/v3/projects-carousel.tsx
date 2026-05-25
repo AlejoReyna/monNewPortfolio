@@ -26,27 +26,20 @@ const EDGE_SCROLL_SPEED = 1.25;
    ═══════════════════════════════════════════ */
 interface CardProps {
   project: V3Project;
-  idx: number;
   isActive: boolean;
   videoRef: (el: HTMLVideoElement | null) => void;
   isEs: boolean;
 }
 
-function ProjectCard({ project, idx, isActive, videoRef, isEs }: CardProps) {
+function ProjectCard({ project, isActive, videoRef, isEs }: CardProps) {
   return (
     <article
       className="v3-carousel-card"
       aria-label={project.title}
       style={{
-        borderColor: isActive ? "rgba(248,245,234,0.72)" : "rgba(248,245,234,0.24)",
         transform: isActive ? "scale(1.035)" : "scale(1)",
       }}
     >
-      {/* ① Eyebrow */}
-      <span className="v3-carousel-eyebrow">
-        {`ARCHIVO / ${pad(idx + 1)}`}
-      </span>
-
       {/* ② Media */}
       {project.media && (
         <div className="v3-carousel-media">
@@ -92,45 +85,47 @@ function ProjectCard({ project, idx, isActive, videoRef, isEs }: CardProps) {
         </div>
       )}
 
-      {/* ③ Badge */}
-      <span className="v3-carousel-badge">{project.badge}</span>
+      <div className="v3-carousel-content">
+        {/* ③ Badge */}
+        <span className="v3-carousel-badge">{project.badge}</span>
 
-      {/* ④ Title */}
-      <h3 className="v3-carousel-title">{project.title}</h3>
+        {/* ④ Title */}
+        <h3 className="v3-carousel-title">{project.title}</h3>
 
-      {/* ⑤ Tagline */}
-      <p className="v3-carousel-tagline">
-        {isEs ? project.tagline.es : project.tagline.en}
-      </p>
+        {/* ⑤ Tagline */}
+        <p className="v3-carousel-tagline">
+          {isEs ? project.tagline.es : project.tagline.en}
+        </p>
 
-      {/* ⑥ Description */}
-      <p className="v3-carousel-desc">
-        {isEs ? project.description.es : project.description.en}
-      </p>
+        {/* ⑥ Description */}
+        <p className="v3-carousel-desc">
+          {isEs ? project.description.es : project.description.en}
+        </p>
 
-      {/* ⑦ Stack tags */}
-      <div className="v3-carousel-tags" aria-label="Stack">
-        {project.tags.map((tag) => (
-          <span key={tag} className="v3-carousel-tag">
-            {tag}
-          </span>
-        ))}
-      </div>
+        {/* ⑦ Stack tags */}
+        <div className="v3-carousel-tags" aria-label="Stack">
+          {project.tags.map((tag) => (
+            <span key={tag} className="v3-carousel-tag">
+              {tag}
+            </span>
+          ))}
+        </div>
 
-      {/* ⑧ Links */}
-      <div className="v3-carousel-links">
-        {project.links.map((link) => (
-          <a
-            key={link.href}
-            href={link.href}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="v3-carousel-link"
-          >
-            {isEs ? link.label.es : link.label.en}
-            {" ↗"}
-          </a>
-        ))}
+        {/* ⑧ Links */}
+        <div className="v3-carousel-links">
+          {project.links.map((link) => (
+            <a
+              key={link.href}
+              href={link.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="v3-carousel-link"
+            >
+              {isEs ? link.label.es : link.label.en}
+              {" ↗"}
+            </a>
+          ))}
+        </div>
       </div>
     </article>
   );
@@ -343,7 +338,7 @@ export default function ProjectsCarousel({ transparentBackdrop, introActive = tr
           role="list"
           style={{
             display: "flex",
-            gap: "clamp(1rem, 2vw, 1.5rem)",
+            gap: "clamp(2rem, 4vw, 4rem)",
             paddingLeft: "clamp(1.5rem, 8vw, 5rem)",
             paddingRight: "clamp(1.5rem, 8vw, 5rem)",
           }}
@@ -365,7 +360,6 @@ export default function ProjectsCarousel({ transparentBackdrop, introActive = tr
             >
               <ProjectCard
                 project={project}
-                idx={i}
                 isActive={i === activeIndex}
                 videoRef={(el) => {
                   videoRefs.current[i] = el;
@@ -392,7 +386,7 @@ export default function ProjectsCarousel({ transparentBackdrop, introActive = tr
               zIndex: 5,
               cursor: canScrollPrev ? "w-resize" : "default",
               pointerEvents: introActive && canScrollPrev ? "auto" : "none",
-              background: "linear-gradient(to right, rgba(8,8,10,0.28), rgba(8,8,10,0))",
+              background: "transparent",
             }}
           />
           <div
@@ -408,7 +402,7 @@ export default function ProjectsCarousel({ transparentBackdrop, introActive = tr
               zIndex: 5,
               cursor: canScrollNext ? "e-resize" : "default",
               pointerEvents: introActive && canScrollNext ? "auto" : "none",
-              background: "linear-gradient(to left, rgba(8,8,10,0.28), rgba(8,8,10,0))",
+              background: "transparent",
             }}
           />
         </>
@@ -465,7 +459,8 @@ export default function ProjectsCarousel({ transparentBackdrop, introActive = tr
           position: transparentBackdrop ? "absolute" : "relative",
           left: transparentBackdrop ? 0 : undefined,
           right: transparentBackdrop ? 0 : undefined,
-          bottom: transparentBackdrop ? "calc(5svh - 1.2rem)" : undefined,
+          bottom: transparentBackdrop ? "clamp(4rem, 7svh, 5.5rem)" : undefined,
+          zIndex: transparentBackdrop ? 7 : undefined,
         }}
       >
         {/* Progress bar (thin line, not dots) */}

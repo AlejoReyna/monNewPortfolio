@@ -143,7 +143,11 @@ export default function HeroCarouselSequence() {
             scale: heroScale,
           }}
         >
-          <HeroV2 embedInScrollSequence embedContentOpacity={heroForegroundOpacity} />
+          <HeroV2
+            embedInScrollSequence
+            embedContentOpacity={heroForegroundOpacity}
+            disableBgVignette
+          />
         </motion.div>
 
         <motion.div
