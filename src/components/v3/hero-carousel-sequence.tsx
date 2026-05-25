@@ -111,12 +111,6 @@ export default function HeroCarouselSequence() {
     ["inset(100% 0% 0% 0%)", "inset(0% 0% 0% 0%)"]
   );
 
-  const hintOpacity = useTransform(
-    revealProgress,
-    [0, PHASE.heroOnlyUntil - 0.04],
-    [1, 0]
-  );
-
   return (
     <div
       ref={containerRef}
@@ -166,53 +160,6 @@ export default function HeroCarouselSequence() {
           <div className="relative z-[1] flex flex-col justify-center h-full w-full overflow-hidden">
             <ProjectsCarousel transparentBackdrop introActive={carouselIntroActive} />
           </div>
-        </motion.div>
-
-        <motion.div
-          aria-hidden
-          style={{
-            position: "absolute",
-            bottom: 28,
-            left: "50%",
-            translateX: "-50%",
-            zIndex: 30,
-            opacity: hintOpacity,
-            pointerEvents: "none",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            gap: 6,
-          }}
-        >
-          <span
-            style={{
-              fontFamily: "'Comic Sans MS', 'Comic Sans', cursive",
-              fontSize: "1rem",
-              letterSpacing: "0.22em",
-              textTransform: "uppercase",
-              color: "rgba(255,255,255,0.45)",
-            }}
-          >
-            scroll
-          </span>
-          <svg
-            width="36" height="52"
-            viewBox="0 0 36 52"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            style={{ display: "block", opacity: 0.8 }}
-          >
-            {/* curved path: starts top-left, arcs right then down */}
-            <path
-              d="M 8 4 C 8 28, 28 28, 28 48"
-              stroke="white" strokeWidth="1.6" strokeLinecap="round" fill="none"
-            />
-            {/* arrowhead pointing down */}
-            <polyline
-              points="22,43 28,48 34,43"
-              stroke="white" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" fill="none"
-            />
-          </svg>
         </motion.div>
       </div>
     </div>

@@ -20,19 +20,7 @@ const COMIC_MESSAGES = [
   "console.log everything",
 ];
 
-/** Full-line rotating greetings above the draggable terminal */
-const DRAG_GREETINGS = [
-  "hey, you made it — drag me anywhere",
-  "welcome in, grab the window",
-  "good to see you — pull me around",
-  "pull up a chair, then drag the chat",
-  "make yourself at home, move me if you like",
-  "you're in the right place — try dragging",
-  "glad you're here, terminal's draggable",
-  "take a look around, i'm not glued down",
-  "vibes: online — toss me anywhere",
-  "ready when you are — drag me anywhere",
-];
+const SCROLL_PROMPT = "SCROLL DOWN TO SEE MY PROJECTS!";
 type HeroV2Props = {
   /**
    * Inside `HeroCarouselSequence` the hero stays in a sticky frame; window-based
@@ -62,8 +50,6 @@ export default function HeroV2({
   const [devBorder, setDevBorder] = useState(false);
   const [msgIndex, setMsgIndex] = useState(0);
   const [msgVisible, setMsgVisible] = useState(true);
-  const [dragGreetIndex, setDragGreetIndex] = useState(0);
-  const [dragGreetVisible, setDragGreetVisible] = useState(true);
   useEffect(() => {
     const t = setInterval(() => {
       setMsgVisible(v => {
@@ -72,16 +58,6 @@ export default function HeroV2({
         return true;
       });
     }, 2000);
-    return () => clearInterval(t);
-  }, []);
-  useEffect(() => {
-    const t = setInterval(() => {
-      setDragGreetVisible(v => {
-        if (v) return false;
-        setDragGreetIndex(i => (i + 1) % DRAG_GREETINGS.length);
-        return true;
-      });
-    }, 2800);
     return () => clearInterval(t);
   }, []);
 
@@ -113,7 +89,6 @@ export default function HeroV2({
       : baseGifOpacity;
   const assetZoom = 1.4;
   const gifScale = useTransform(smooth, [0, 1], embed ? [assetZoom, assetZoom] : [assetZoom, 0.93 * assetZoom]);
-  const arrowOpacity = useTransform(scrollYProgress, embed ? [0, 1] : [0, 0.08], embed ? [0, 0] : [1, 0]);
 
   return (
     <section
@@ -179,36 +154,6 @@ export default function HeroV2({
 
           {/* ── Left column: layout placeholder ── */}
           <div className={`relative w-full h-full min-h-[min(70vh,520px)] lg:min-h-[min(88vh,780px)] ${devBorder ? "border-2 border-rose-400" : ""}`}>
-
-            {/* ── Pixelated phrase above the line ── */}
-            <div
-              className="absolute pointer-events-none select-none max-w-[min(92vw,520px)]"
-              style={{ top: "30%", left: "8%", zIndex: 5 }}
-            >
-              <style>{`@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');`}</style>
-              <AnimatePresence mode="wait">
-                {dragGreetVisible && (
-                  <motion.span
-                    key={`drag-greet-${dragGreetIndex}`}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.35 }}
-                    style={{
-                      fontFamily: "'Comic Sans MS', 'Comic Sans', cursive",
-                      fontSize: "clamp(0.7rem, 1.1vw, 1rem)",
-                      color: "#ffffff",
-                      letterSpacing: "0.05em",
-                      lineHeight: 1.85,
-                      display: "block",
-                    }}
-                  >
-                    &gt; {DRAG_GREETINGS[dragGreetIndex]}_
-                  </motion.span>
-                )}
-              </AnimatePresence>
-            </div>
-
             {/* ── Dev: horizontal line at 45% ── */}
             {devBorder && (
               <div
@@ -317,15 +262,66 @@ export default function HeroV2({
         dragElastic={0}
         className="absolute z-30 cursor-grab active:cursor-grabbing comic-terminal"
         style={{
-          top: "39%",
+          top: "22%",
           left: "8%",
-          width: "min(520px, 42vw)",
-          height: "min(450px, 50vh)",
+          width: "min(546px, 44.1vw)",
           opacity: contentOpacity,
           fontFamily: "'Comic Sans MS', 'Comic Sans', cursive",
         }}
       >
-        <ChatInterface variant="panel" className="!w-full !h-full max-w-none" />
+        <div style={{ width: "100%", height: "min(472.5px, 52.5vh)" }}>
+          <ChatInterface variant="panel" className="!w-full !h-full max-w-none" />
+        </div>
+        <motion.div
+          className="pointer-events-none select-none"
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.55, delay: 0.75, ease: [0.22, 1, 0.36, 1] as const }}
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: 8,
+            marginTop: "clamp(0.65rem, 1.5vh, 1rem)",
+            color: "rgba(255,255,255,0.78)",
+            textAlign: "center",
+          }}
+        >
+          <span
+            style={{
+              minHeight: "1.25em",
+              fontSize: "clamp(0.68rem, 0.9vw, 0.84rem)",
+              letterSpacing: "0.18em",
+              lineHeight: 1.2,
+              textTransform: "uppercase",
+              textShadow: "0 2px 10px rgba(0,0,0,0.45)",
+            }}
+          >
+            {SCROLL_PROMPT}
+          </span>
+          <svg
+            width="54"
+            height="78"
+            viewBox="0 0 54 78"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            style={{ display: "block", opacity: 0.9 }}
+          >
+            <path
+              d="M17 4 C17 36, 38 38, 38 68"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+            />
+            <path
+              d="M29 60 L38 69 L47 60"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </motion.div>
       </motion.div>
 
       {/* ── DEV: border toggle ── */}
