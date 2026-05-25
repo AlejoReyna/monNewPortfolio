@@ -11,12 +11,9 @@ import "@/components/v3/v3.css";
    ═══════════════════════════════════════════════════════════════════════════ */
 
 const PHASE = {
-  /** 0% - 25%: Pure Hero. ChatInterface is fully interactive. */
-  heroOnlyUntil: 0.25,
-  /** 25% - 65%: The carousel wipes up over the hero. */
-  revealCompleteBy: 0.65,
-  /** 65% - 90%: Stable carousel. User can interact with Embla. */
-  holdStableUntil: 0.90,
+  heroOnlyUntil: 0.08,
+  revealCompleteBy: 0.82,
+  cardsEnterAt: 0.58,
 } as const;
 
 const WHEEL_THRESHOLD = 16;
@@ -59,10 +56,15 @@ export default function HeroCarouselSequence() {
   const isRevealedRef = useRef(false);
   const touchStartYRef = useRef<number | null>(null);
   const [carouselPointerEvents, setCarouselPointerEvents] = useState<"none" | "auto">("none");
+  const [carouselIntroActive, setCarouselIntroActive] = useState(false);
 
   useMotionValueEvent(revealProgress, "change", (latest) => {
     const next = latest >= 0.98 ? "auto" : "none";
     setCarouselPointerEvents((prev) => (prev === next ? prev : next));
+    setCarouselIntroActive((prev) => {
+      const shouldShow = latest >= PHASE.cardsEnterAt;
+      return prev === shouldShow ? prev : shouldShow;
+    });
   });
 
   const animateReveal = useCallback(
@@ -71,14 +73,16 @@ export default function HeroCarouselSequence() {
 
       isAnimatingRef.current = true;
       setCarouselPointerEvents("none");
+      if (next === 0) setCarouselIntroActive(false);
 
       animate(revealProgress, next, {
-        duration: 0.9,
-        ease: [0.22, 1, 0.36, 1],
+        duration: 1.35,
+        ease: [0.16, 1, 0.3, 1],
         onComplete: () => {
           isRevealedRef.current = next === 1;
           isAnimatingRef.current = false;
           setCarouselPointerEvents(next === 1 ? "auto" : "none");
+          setCarouselIntroActive(next === 1);
         },
       });
     },
@@ -125,9 +129,12 @@ export default function HeroCarouselSequence() {
 
   const heroForegroundOpacity = useTransform(
     revealProgress,
-    [PHASE.heroOnlyUntil, PHASE.heroOnlyUntil + (PHASE.revealCompleteBy - PHASE.heroOnlyUntil) * 0.85],
+    [0.12, 0.72],
     [1, 0]
   );
+  const heroScale = useTransform(revealProgress, [0, 1], [1, 0.985]);
+  const carouselOpacity = useTransform(revealProgress, [0.04, 0.42], [0, 1]);
+  const carouselY = useTransform(revealProgress, [0, 1], ["7%", "0%"]);
 
   const carouselClip = useTransform(
     revealProgress,
@@ -137,7 +144,7 @@ export default function HeroCarouselSequence() {
 
   const carouselBackdropOpacity = useTransform(
     revealProgress,
-    [PHASE.heroOnlyUntil, PHASE.revealCompleteBy],
+    [0.02, 0.68],
     [0, 1]
   );
 
@@ -165,15 +172,16 @@ export default function HeroCarouselSequence() {
           overflow: "hidden",
         }}
       >
-        <div
+        <motion.div
           style={{
             position: "absolute",
             inset: 0,
             zIndex: 1,
+            scale: heroScale,
           }}
         >
           <HeroV2 embedInScrollSequence embedContentOpacity={heroForegroundOpacity} />
-        </div>
+        </motion.div>
 
         <motion.div
           className="v3-root"
@@ -182,7 +190,9 @@ export default function HeroCarouselSequence() {
             inset: 0,
             zIndex: 5,
             clipPath: carouselClip,
+            opacity: carouselOpacity,
             pointerEvents: carouselPointerEvents,
+            y: carouselY,
             willChange: "clip-path",
             background: "transparent",
           }}
@@ -198,7 +208,7 @@ export default function HeroCarouselSequence() {
             }}
           />
           <div className="relative z-[1] flex flex-col justify-center h-full w-full overflow-hidden">
-            <ProjectsCarousel transparentBackdrop />
+            <ProjectsCarousel transparentBackdrop introActive={carouselIntroActive} />
           </div>
         </motion.div>
 

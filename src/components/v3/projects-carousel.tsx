@@ -38,8 +38,7 @@ function ProjectCard({ project, idx, isActive, videoRef, isEs }: CardProps) {
       aria-label={project.title}
       style={{
         opacity: isActive ? 1 : 0.52,
-        borderColor: isActive ? "var(--v3-gold)" : "var(--v3-line)",
-        transition: "opacity 0.35s ease, border-color 0.3s ease",
+        borderColor: isActive ? "rgba(248,245,234,0.72)" : "rgba(248,245,234,0.24)",
       }}
     >
       {/* Ghost roman numeral — positioned absolute, bottom-right */}
@@ -142,42 +141,16 @@ function ProjectCard({ project, idx, isActive, videoRef, isEs }: CardProps) {
 }
 
 /* ═══════════════════════════════════════════
-   SECTION HEADER
-   ═══════════════════════════════════════════ */
-function CarouselSectionHeader({
-  isEs,
-  transparentBackdrop,
-}: {
-  isEs: boolean;
-  transparentBackdrop?: boolean;
-}) {
-  return (
-    <div
-      className="v3-section-header"
-      style={
-        transparentBackdrop ? { background: "transparent", borderBottomColor: "var(--v3-line)" } : undefined
-      }
-    >
-      <span className="v3-sh-tag v3-mono">
-        {isEs ? "[ SECCIÓN 04 / PROYECTOS ]" : "[ SECTION 04 / PROJECTS ]"}
-      </span>
-      <span className="v3-sh-title v3-display">ARCHIVO</span>
-      <span className="v3-sh-num v3-serif" style={{ fontStyle: "italic" }}>
-        {isEs ? "scroll horizontal · arrastra" : "scroll horizontal · drag"}
-      </span>
-    </div>
-  );
-}
-
-/* ═══════════════════════════════════════════
    MAIN COMPONENT
    ═══════════════════════════════════════════ */
 type ProjectsCarouselProps = {
   /** Hero scroll sequence: keep solid v3 panels off so the hero night-sky reads through. */
   transparentBackdrop?: boolean;
+  /** Hero sequence intro: cards appear sequentially after the curtain opens. */
+  introActive?: boolean;
 };
 
-export default function ProjectsCarousel({ transparentBackdrop }: ProjectsCarouselProps = {}) {
+export default function ProjectsCarousel({ transparentBackdrop, introActive = true }: ProjectsCarouselProps = {}) {
   const { language } = useLanguage();
   const isEs = language === "es";
 
@@ -192,6 +165,7 @@ export default function ProjectsCarousel({ transparentBackdrop }: ProjectsCarous
   const [activeIndex, setActiveIndex] = useState(0);
   const [canScrollPrev, setCanScrollPrev] = useState(false);
   const [canScrollNext, setCanScrollNext] = useState(true);
+  const edgeScrollTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // Stable array of refs — one per project slot
   const videoRefs = useRef<(HTMLVideoElement | null)[]>(
@@ -244,25 +218,89 @@ export default function ProjectsCarousel({ transparentBackdrop }: ProjectsCarous
   const scrollPrev = useCallback(() => emblaApi?.scrollPrev(), [emblaApi]);
   const scrollNext = useCallback(() => emblaApi?.scrollNext(), [emblaApi]);
 
+  const stopEdgeScroll = useCallback(() => {
+    if (!edgeScrollTimerRef.current) return;
+    window.clearInterval(edgeScrollTimerRef.current);
+    edgeScrollTimerRef.current = null;
+  }, []);
+
+  const startEdgeScroll = useCallback(
+    (direction: "prev" | "next") => {
+      if (!emblaApi) return;
+
+      const canMove = direction === "prev" ? emblaApi.canScrollPrev() : emblaApi.canScrollNext();
+      if (!canMove) return;
+
+      stopEdgeScroll();
+
+      const scroll = () => {
+        const canStillMove = direction === "prev" ? emblaApi.canScrollPrev() : emblaApi.canScrollNext();
+        if (!canStillMove) {
+          stopEdgeScroll();
+          return;
+        }
+
+        if (direction === "prev") {
+          emblaApi.scrollPrev();
+        } else {
+          emblaApi.scrollNext();
+        }
+      };
+
+      scroll();
+      edgeScrollTimerRef.current = setInterval(scroll, 950);
+    },
+    [emblaApi, stopEdgeScroll]
+  );
+
+  useEffect(() => stopEdgeScroll, [stopEdgeScroll]);
+
   /* Progress as 0–1 */
   const progress = TOTAL > 1 ? activeIndex / (TOTAL - 1) : 0;
 
   return (
     <section
+      className={transparentBackdrop ? "v3-carousel-sequence-frame" : undefined}
       style={{
         background: transparentBackdrop ? "transparent" : "var(--v3-bg)",
         position: "relative",
+        minHeight: "100svh",
       }}
       aria-label={isEs ? "Proyectos" : "Projects"}
     >
-      <CarouselSectionHeader isEs={isEs} transparentBackdrop={transparentBackdrop} />
+      <div
+        aria-hidden
+        style={{
+          position: "absolute",
+          top: "10svh",
+          left: 0,
+          right: 0,
+          height: 1,
+          background: "var(--v3-line)",
+          pointerEvents: "none",
+        }}
+      />
+      <div
+        aria-hidden
+        style={{
+          position: "absolute",
+          left: 0,
+          right: 0,
+          bottom: "10svh",
+          height: 1,
+          background: "var(--v3-line)",
+          pointerEvents: "none",
+        }}
+      />
 
       {/* ── Embla viewport ── */}
       <div
         ref={emblaRef}
         style={{
           overflow: "hidden",
-          padding: "clamp(2rem, 4vh, 3.5rem) 0",
+          padding: transparentBackdrop
+            ? "calc(10svh + clamp(0.75rem, 2vh, 1.25rem)) 0 clamp(0.75rem, 2vh, 1.25rem)"
+            : "clamp(1rem, 2.6vh, 2rem) 0 clamp(1rem, 2.6vh, 2rem)",
         }}
       >
         <div
@@ -280,6 +318,15 @@ export default function ProjectsCarousel({ transparentBackdrop }: ProjectsCarous
               className="v3-carousel-slide"
               role="listitem"
               aria-label={`${project.title}, ${pad(i + 1)} de ${pad(TOTAL)}`}
+              style={{
+                opacity: introActive ? 1 : 0,
+                transform: introActive ? "translate3d(0,0,0) scale(1)" : "translate3d(0,42px,0) scale(0.96)",
+                transitionProperty: "opacity, transform",
+                transitionDuration: "900ms",
+                transitionTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)",
+                transitionDelay: introActive ? `${140 + i * 110}ms` : "0ms",
+                willChange: "opacity, transform",
+              }}
             >
               <ProjectCard
                 project={project}
@@ -295,16 +342,65 @@ export default function ProjectsCarousel({ transparentBackdrop }: ProjectsCarous
         </div>
       </div>
 
+      {transparentBackdrop && (
+        <>
+          <div
+            aria-hidden
+            onMouseEnter={() => startEdgeScroll("prev")}
+            onMouseLeave={stopEdgeScroll}
+            style={{
+              position: "absolute",
+              top: "10svh",
+              bottom: "10svh",
+              left: 0,
+              width: "clamp(72px, 11vw, 160px)",
+              zIndex: 5,
+              cursor: canScrollPrev ? "w-resize" : "default",
+              pointerEvents: introActive && canScrollPrev ? "auto" : "none",
+              background: "linear-gradient(to right, rgba(8,8,10,0.28), rgba(8,8,10,0))",
+            }}
+          />
+          <div
+            aria-hidden
+            onMouseEnter={() => startEdgeScroll("next")}
+            onMouseLeave={stopEdgeScroll}
+            style={{
+              position: "absolute",
+              top: "10svh",
+              bottom: "10svh",
+              right: 0,
+              width: "clamp(72px, 11vw, 160px)",
+              zIndex: 5,
+              cursor: canScrollNext ? "e-resize" : "default",
+              pointerEvents: introActive && canScrollNext ? "auto" : "none",
+              background: "linear-gradient(to left, rgba(8,8,10,0.28), rgba(8,8,10,0))",
+            }}
+          />
+        </>
+      )}
+
       {/* ── Controls bar ── */}
-      <div
+      <motion.div
+        initial={false}
+        animate={{
+          opacity: introActive ? 1 : 0,
+          y: introActive ? 0 : 16,
+        }}
+        transition={{ duration: 0.68, ease: [0.16, 1, 0.3, 1], delay: introActive ? 0.42 : 0 }}
         style={{
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
           gap: "clamp(1rem, 3vw, 2rem)",
-          padding: "1.25rem clamp(1.5rem, 6vw, 5rem) 2.5rem",
-          borderTop: "1px solid var(--v3-line)",
+          padding: transparentBackdrop
+            ? "0 clamp(1.5rem, 6vw, 5rem)"
+            : "1.25rem clamp(1.5rem, 6vw, 5rem) 2.5rem",
+          borderTop: transparentBackdrop ? "none" : "1px solid var(--v3-line)",
           flexWrap: "wrap",
+          position: transparentBackdrop ? "absolute" : "relative",
+          left: transparentBackdrop ? 0 : undefined,
+          right: transparentBackdrop ? 0 : undefined,
+          bottom: transparentBackdrop ? "calc(5svh - 1.2rem)" : undefined,
         }}
       >
         {/* Arrow buttons */}
@@ -351,14 +447,14 @@ export default function ProjectsCarousel({ transparentBackdrop }: ProjectsCarous
           aria-atomic="true"
           style={{
             fontSize: "clamp(1rem, 1.6vw, 1.25rem)",
-            color: "var(--v3-gold)",
+            color: "rgba(248,245,234,0.88)",
             letterSpacing: "0.08em",
             fontVariantNumeric: "tabular-nums",
           }}
         >
           {pad(activeIndex + 1)}&thinsp;/&thinsp;{pad(TOTAL)}
         </span>
-      </div>
+      </motion.div>
     </section>
   );
 }
