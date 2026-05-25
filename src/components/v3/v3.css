@@ -416,6 +416,24 @@
   }
 }
 
+.v3-carousel-slide--feature {
+  flex: 0 0 auto;
+}
+
+.v3-carousel-static-stage {
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+}
+
+.v3-carousel-feature-grid {
+  display: grid;
+  grid-template-columns: repeat(2, clamp(520px, 46vw, 620px));
+  align-items: stretch;
+  gap: 0;
+  width: max-content;
+}
+
 /* Card box */
 .v3-carousel-card {
   position: relative;
@@ -427,7 +445,7 @@
   border: none;
   overflow: hidden;
   height: clamp(560px, 76vh, 720px);
-  border-radius: 8px;
+  border-radius: 8px 0 0 8px;
   transform: scale(1);
   transform-origin: center;
   transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
@@ -436,6 +454,100 @@
 }
 .v3-carousel-card * {
   font-family: inherit !important;
+}
+
+.v3-carousel-sticker-panel {
+  position: relative;
+  min-height: clamp(560px, 76vh, 720px);
+  overflow: hidden;
+  border-radius: 0 8px 8px 0;
+  height: 100%;
+}
+
+.v3-carousel-sticker-orbit {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: transparent;
+  backdrop-filter: blur(8px);
+}
+
+.v3-carousel-build-note {
+  position: absolute;
+  z-index: 3;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: clamp(0.85rem, 1.6vw, 1.35rem);
+  padding: clamp(1.6rem, 3.4vw, 3.25rem);
+  border-radius: 0 8px 8px 0;
+  border: 1px solid rgba(248, 245, 234, 0.18);
+  background: rgba(0, 0, 0, 0.72);
+  backdrop-filter: blur(12px);
+}
+
+.v3-carousel-build-kicker {
+  display: block;
+  font-family: var(--font-space-mono, ui-monospace, monospace);
+  font-size: 0.58rem;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: rgba(248, 245, 234, 0.62);
+}
+
+.v3-carousel-build-note h3 {
+  margin: 0;
+  font-family: var(--font-space-mono, ui-monospace, monospace);
+  font-size: clamp(2.25rem, 5vw, 5.25rem);
+  line-height: 0.95;
+  color: rgba(248, 245, 234, 0.92);
+  font-weight: 400;
+}
+
+.v3-carousel-build-dek {
+  margin: 0;
+  max-width: 38ch;
+  font-size: clamp(1rem, 1.55vw, 1.35rem);
+  line-height: 1.4;
+  color: rgba(248, 245, 234, 0.82);
+  font-style: italic;
+}
+
+.v3-carousel-build-body {
+  column-count: 2;
+  column-gap: clamp(1.25rem, 3vw, 2.5rem);
+  max-width: 68ch;
+  border-top: 1px solid rgba(248, 245, 234, 0.18);
+  border-bottom: 1px solid rgba(248, 245, 234, 0.18);
+  padding: clamp(1rem, 2vw, 1.5rem) 0;
+}
+
+.v3-carousel-build-body p {
+  margin: 0 0 0.9rem;
+  font-size: clamp(0.9rem, 1.12vw, 1.04rem);
+  line-height: 1.65;
+  color: rgba(248, 245, 234, 0.78);
+}
+
+.v3-carousel-build-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin-top: auto;
+}
+
+.v3-carousel-build-tags span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-family: var(--font-space-mono, ui-monospace, monospace);
+  font-size: 0.58rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(248, 245, 234, 0.78);
+  border: 1px solid rgba(248, 245, 234, 0.24);
+  padding: 0.24rem 0.52rem;
 }
 
 /* Hero transition frame: use 20% top/bottom guide lines without shrinking cards. */
@@ -461,7 +573,7 @@
   position: relative;
   width: 100%;
   height: auto;
-  flex: 0 0 50%;
+  flex: 1 1 auto;
   overflow: hidden;
   background: var(--v3-bg);
   border: none;
@@ -469,7 +581,7 @@
   box-shadow: none;
   margin-bottom: 0;
   z-index: 2;
-  border-radius: 8px 8px 0 0;
+  border-radius: 8px 0 0 8px;
 }
 .v3-carousel-media-inner {
   position: absolute;
@@ -483,15 +595,16 @@
 .v3-carousel-content {
   position: relative;
   z-index: 2;
-  flex: 0 0 50%;
+  flex: 0 0 20%;
   min-height: 0;
   display: flex;
   flex-direction: column;
+  justify-content: center;
   padding: clamp(1.4rem, 3vw, 2.2rem);
   overflow: hidden;
-  background: rgba(0, 0, 0, 0.78);
+  background: rgba(0, 0, 0, 0.72);
   backdrop-filter: blur(12px);
-  border-radius: 0 0 8px 8px;
+  border-radius: 0 0 0 8px;
 }
 
 /* ③ Badge */
@@ -509,11 +622,11 @@
 
 /* ④ Title */
 .v3-carousel-title {
-  font-family: var(--font-bebas, "Bebas Neue", sans-serif);
-  font-size: clamp(1.8rem, 3vw, 2.6rem);
-  line-height: 1;
+  font-family: var(--font-space-mono, ui-monospace, monospace) !important;
+  font-size: clamp(1.55rem, 3vw, 3.35rem);
+  line-height: 1.05;
   color: var(--v3-text);
-  margin: 0 0 0.4rem;
+  margin: 0;
   position: relative;
   z-index: 2;
   font-weight: 400;
@@ -762,6 +875,16 @@
   }
   .v3-carousel-card {
     height: clamp(520px, 85vh, 680px);
+  }
+  .v3-carousel-slide--feature {
+    flex-basis: min(92vw, 620px);
+  }
+  .v3-carousel-feature-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  .v3-carousel-sticker-panel {
+    display: none;
   }
   .v3-contact-layout {
     grid-template-columns: 1fr;

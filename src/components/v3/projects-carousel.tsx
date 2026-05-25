@@ -6,9 +6,9 @@ import {
   useRef,
   useState,
 } from "react";
-import useEmblaCarousel from "embla-carousel-react";
 import Image from "next/image";
 import { motion } from "framer-motion";
+import { Github } from "lucide-react";
 import { useLanguage } from "@/components/lang-context";
 import { PROJECTS, type V3Project } from "./data/projects";
 import "@/components/v3/v3.css";
@@ -19,8 +19,6 @@ function pad(n: number): string {
 }
 
 const TOTAL = PROJECTS.length;
-const EDGE_SCROLL_SPEED = 1.25;
-
 /* ═══════════════════════════════════════════
    CARD
    ═══════════════════════════════════════════ */
@@ -28,17 +26,14 @@ interface CardProps {
   project: V3Project;
   isActive: boolean;
   videoRef: (el: HTMLVideoElement | null) => void;
-  isEs: boolean;
 }
 
-function ProjectCard({ project, isActive, videoRef, isEs }: CardProps) {
+function ProjectCard({ project, isActive, videoRef }: CardProps) {
   return (
     <article
       className="v3-carousel-card"
       aria-label={project.title}
-      style={{
-        transform: isActive ? "scale(1.035)" : "scale(1)",
-      }}
+      style={{ transform: "scale(1)" }}
     >
       {/* ② Media */}
       {project.media && (
@@ -84,50 +79,71 @@ function ProjectCard({ project, isActive, videoRef, isEs }: CardProps) {
           />
         </div>
       )}
+    </article>
+  );
+}
 
-      <div className="v3-carousel-content">
-        {/* ③ Badge */}
-        <span className="v3-carousel-badge">{project.badge}</span>
+const BUILD_NOTES: Record<string, { es: string; en: string }> = {
+  "plebes-dao": {
+    es: "Construí esto como una mezcla rara entre gobernanza, cultura de internet y producto cripto que tenía que sentirse vivo, no corporativo.",
+    en: "I built this as a weird mix of governance, internet culture and crypto product work that had to feel alive, not corporate.",
+  },
+  "andrea-aldo": {
+    es: "Este fue más delicado: la interfaz tenía que sentirse íntima, útil y emocional sin romper el flujo de una boda real.",
+    en: "This one was delicate: the interface had to feel intimate, useful and emotional without getting in the way of a real wedding.",
+  },
+  "mk1-presale": {
+    es: "Aquí me fui por impacto rápido: una landing que se entendiera en segundos, capturara leads y sostuviera el hype.",
+    en: "Here I chased fast impact: a landing that made sense in seconds, captured leads and carried the hype.",
+  },
+  pokefolio: {
+    es: "Lo armé como si el portfolio fuera un juego: diálogo, ritmo y pequeñas recompensas en vez de una página estática.",
+    en: "I built it like the portfolio was a game: dialogue, rhythm and small rewards instead of a static page.",
+  },
+  "uanl-interface": {
+    es: "Este fue puro rescate de UX: tomar pantallas heredadas, pelearme con frames viejos y devolverles algo usable.",
+    en: "This was straight UX rescue work: taking legacy screens, fighting old frames and giving them something usable back.",
+  },
+  mpbot: {
+    es: "Fue un sprint de hackathon: convertir DeFi en conversación, recortar lo innecesario y hacer que funcionara rápido.",
+    en: "This was a hackathon sprint: turning DeFi into conversation, cutting the noise and making it work fast.",
+  },
+  birdlypay: {
+    es: "La idea era simple y difícil: pagos on-chain que se sintieran tan naturales como compartir un enlace.",
+    en: "The idea was simple and hard: on-chain payments that felt as natural as sharing a link.",
+  },
+};
 
-        {/* ④ Title */}
-        <h3 className="v3-carousel-title">{project.title}</h3>
+function ProjectStickerPanel({ project, isEs }: { project: V3Project; isEs: boolean }) {
+  const buildNote = BUILD_NOTES[project.id] ?? {
+    es: "Construí esto iterando entre lo visual, lo técnico y lo raro hasta que empezó a sentirse propio.",
+    en: "I built this by pushing between visuals, engineering and weird little details until it started feeling like its own thing.",
+  };
 
-        {/* ⑤ Tagline */}
-        <p className="v3-carousel-tagline">
-          {isEs ? project.tagline.es : project.tagline.en}
-        </p>
-
-        {/* ⑥ Description */}
-        <p className="v3-carousel-desc">
-          {isEs ? project.description.es : project.description.en}
-        </p>
-
-        {/* ⑦ Stack tags */}
-        <div className="v3-carousel-tags" aria-label="Stack">
-          {project.tags.map((tag) => (
-            <span key={tag} className="v3-carousel-tag">
-              {tag}
-            </span>
-          ))}
-        </div>
-
-        {/* ⑧ Links */}
-        <div className="v3-carousel-links">
-          {project.links.map((link) => (
-            <a
-              key={link.href}
-              href={link.href}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="v3-carousel-link"
-            >
-              {isEs ? link.label.es : link.label.en}
-              {" ↗"}
-            </a>
-          ))}
+  return (
+    <aside className="v3-carousel-sticker-panel" aria-label={`${project.title} build note`}>
+      <div className="v3-carousel-sticker-orbit">
+        <div className="v3-carousel-build-note">
+          <span className="v3-carousel-build-kicker">{isEs ? "bitacora" : "build log"}</span>
+          <h3>{project.title}</h3>
+          <p className="v3-carousel-build-dek">
+            {isEs ? project.tagline.es : project.tagline.en}
+          </p>
+          <div className="v3-carousel-build-body">
+            <p>{isEs ? project.description.es : project.description.en}</p>
+            <p>{isEs ? buildNote.es : buildNote.en}</p>
+          </div>
+          <div className="v3-carousel-build-tags" aria-label="Stack">
+            {project.tags.map((tag) => (
+              <span key={tag}>
+                <Github aria-hidden="true" size={12} strokeWidth={1.8} />
+                {tag}
+              </span>
+            ))}
+          </div>
         </div>
       </div>
-    </article>
+    </aside>
   );
 }
 
@@ -145,170 +161,35 @@ export default function ProjectsCarousel({ transparentBackdrop, introActive = tr
   const { language } = useLanguage();
   const isEs = language === "es";
 
-  const [emblaRef, emblaApi] = useEmblaCarousel({
-    loop: false,
-    align: "center",
-    containScroll: "trimSnaps",
-    dragFree: false,
-    slidesToScroll: 1,
-  });
-
   const [activeIndex, setActiveIndex] = useState(0);
-  const [canScrollPrev, setCanScrollPrev] = useState(false);
-  const [canScrollNext, setCanScrollNext] = useState(true);
-  const edgeScrollActiveRef = useRef(false);
-  const defaultScrollBodyRef = useRef<
-    ReturnType<NonNullable<typeof emblaApi>["internalEngine"]>["scrollBody"] | null
-  >(null);
-
-  // Stable array of refs — one per project slot
-  const videoRefs = useRef<(HTMLVideoElement | null)[]>(
-    Array.from({ length: TOTAL }, () => null)
-  );
-
-  /* ── Embla select callback ── */
-  const onSelect = useCallback(() => {
-    if (!emblaApi) return;
-    const idx = emblaApi.selectedScrollSnap();
-    setActiveIndex(idx);
-    setCanScrollPrev(emblaApi.canScrollPrev());
-    setCanScrollNext(emblaApi.canScrollNext());
-  }, [emblaApi]);
+  const activeProject = PROJECTS[activeIndex] ?? PROJECTS[0];
+  const canScrollPrev = activeIndex > 0;
+  const canScrollNext = activeIndex < TOTAL - 1;
+  const videoRef = useRef<HTMLVideoElement | null>(null);
 
   useEffect(() => {
-    if (!emblaApi) return;
-    onSelect(); // seed initial state
-    emblaApi.on("select", onSelect);
-    emblaApi.on("reInit", onSelect);
-    return () => {
-      emblaApi.off("select", onSelect);
-      emblaApi.off("reInit", onSelect);
-    };
-  }, [emblaApi, onSelect]);
+    const vid = videoRef.current;
+    if (!vid) return;
+    vid.play().catch(() => {});
+  }, [activeProject.id]);
 
-  /* ── Video play/pause management (active ± 1 play, rest pause) ── */
-  useEffect(() => {
-    videoRefs.current.forEach((vid, i) => {
-      if (!vid) return;
-      if (Math.abs(i - activeIndex) <= 1) {
-        vid.play().catch(() => {});
-      } else {
-        vid.pause();
-      }
-    });
-  }, [activeIndex]);
+  const scrollPrev = useCallback(() => {
+    setActiveIndex((idx) => Math.max(0, idx - 1));
+  }, []);
+
+  const scrollNext = useCallback(() => {
+    setActiveIndex((idx) => Math.min(TOTAL - 1, idx + 1));
+  }, []);
 
   /* ── Keyboard navigation ── */
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
-      if (!emblaApi) return;
-      if (e.key === "ArrowLeft") emblaApi.scrollPrev();
-      if (e.key === "ArrowRight") emblaApi.scrollNext();
+      if (e.key === "ArrowLeft") scrollPrev();
+      if (e.key === "ArrowRight") scrollNext();
     };
     window.addEventListener("keydown", handleKey);
     return () => window.removeEventListener("keydown", handleKey);
-  }, [emblaApi]);
-
-  const scrollPrev = useCallback(() => emblaApi?.scrollPrev(), [emblaApi]);
-  const scrollNext = useCallback(() => emblaApi?.scrollNext(), [emblaApi]);
-
-  const stopEdgeScroll = useCallback(() => {
-    if (!emblaApi || !edgeScrollActiveRef.current) return;
-
-    const engine = emblaApi.internalEngine();
-    if (defaultScrollBodyRef.current) {
-      engine.scrollBody = defaultScrollBodyRef.current;
-    }
-
-    edgeScrollActiveRef.current = false;
-    onSelect();
-  }, [emblaApi, onSelect]);
-
-  const startEdgeScroll = useCallback(
-    (direction: "prev" | "next") => {
-      if (!emblaApi) return;
-
-      const canMove = direction === "prev" ? emblaApi.canScrollPrev() : emblaApi.canScrollNext();
-      if (!canMove) return;
-
-      stopEdgeScroll();
-
-      const engine = emblaApi.internalEngine();
-      const {
-        location,
-        previousLocation,
-        offsetLocation,
-        target,
-        scrollTarget,
-        index,
-        indexPrevious,
-        limit: { reachedMin, reachedMax, constrain },
-      } = engine;
-      const directionSign = direction === "next" ? -1 : 1;
-      const noop = () => edgeScrollBody;
-
-      let bodyVelocity = 0;
-      let scrollDirection = 0;
-      let rawLocation = location.get();
-      let rawLocationPrevious = rawLocation;
-      let hasSettled = false;
-
-      const edgeScrollBody = {
-        direction: () => scrollDirection,
-        duration: () => -1,
-        velocity: () => bodyVelocity,
-        settled: () => hasSettled,
-        seek: () => {
-          previousLocation.set(location);
-
-          bodyVelocity = directionSign * EDGE_SCROLL_SPEED;
-          rawLocation += bodyVelocity;
-          location.add(bodyVelocity);
-          target.set(location);
-
-          const directionDiff = rawLocation - rawLocationPrevious;
-          scrollDirection = Math.sign(directionDiff);
-          rawLocationPrevious = rawLocation;
-
-          const currentIndex = scrollTarget.byDistance(0, false).index;
-          if (index.get() !== currentIndex) {
-            indexPrevious.set(index.get());
-            index.set(currentIndex);
-            emblaApi.emit("select");
-          }
-
-          const reachedEnd =
-            direction === "next"
-              ? reachedMin(offsetLocation.get())
-              : reachedMax(offsetLocation.get());
-
-          if (reachedEnd) {
-            hasSettled = true;
-            const constrainedLocation = constrain(location.get());
-            location.set(constrainedLocation);
-            target.set(location);
-            stopEdgeScroll();
-          }
-
-          return edgeScrollBody;
-        },
-        useBaseFriction: noop,
-        useBaseDuration: noop,
-        useFriction: noop,
-        useDuration: noop,
-      };
-
-      if (!edgeScrollActiveRef.current) {
-        defaultScrollBodyRef.current = engine.scrollBody;
-        edgeScrollActiveRef.current = true;
-        engine.scrollBody = edgeScrollBody;
-        engine.animation.start();
-      }
-    },
-    [emblaApi, stopEdgeScroll]
-  );
-
-  useEffect(() => stopEdgeScroll, [stopEdgeScroll]);
+  }, [scrollNext, scrollPrev]);
 
   /* Progress as 0–1 */
   const progress = TOTAL > 1 ? activeIndex / (TOTAL - 1) : 0;
@@ -324,9 +205,9 @@ export default function ProjectsCarousel({ transparentBackdrop, introActive = tr
       }}
       aria-label={isEs ? "Proyectos" : "Projects"}
     >
-      {/* ── Embla viewport ── */}
+      {/* ── Static project frame: only the content swaps. ── */}
       <div
-        ref={emblaRef}
+        className="v3-carousel-static-viewport"
         style={{
           overflow: "hidden",
           padding: transparentBackdrop
@@ -336,77 +217,38 @@ export default function ProjectsCarousel({ transparentBackdrop, introActive = tr
       >
         <div
           role="list"
+          className="v3-carousel-static-stage"
           style={{
-            display: "flex",
-            gap: "clamp(2rem, 4vw, 4rem)",
             paddingLeft: "clamp(1.5rem, 8vw, 5rem)",
             paddingRight: "clamp(1.5rem, 8vw, 5rem)",
           }}
         >
-          {PROJECTS.map((project, i) => (
-            <div
-              key={project.id}
-              className="v3-carousel-slide"
-              role="listitem"
-              aria-label={`${project.title}, ${pad(i + 1)} de ${pad(TOTAL)}`}
-              style={{
-                transform: introActive ? "translate3d(0,0,0) scale(1)" : "translate3d(0,42px,0) scale(0.96)",
-                transitionProperty: "transform",
-                transitionDuration: "900ms",
-                transitionTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)",
-                transitionDelay: introActive ? `${140 + i * 110}ms` : "0ms",
-                willChange: "transform",
-              }}
-            >
+          <div
+            className="v3-carousel-slide v3-carousel-slide--feature"
+            role="listitem"
+            aria-label={`${activeProject.title}, ${pad(activeIndex + 1)} de ${pad(TOTAL)}`}
+            style={{
+              transform: introActive ? "translate3d(0,0,0) scale(1)" : "translate3d(0,42px,0) scale(0.96)",
+              transitionProperty: "transform",
+              transitionDuration: "900ms",
+              transitionTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)",
+              transitionDelay: introActive ? "140ms" : "0ms",
+              willChange: "transform",
+            }}
+          >
+            <div className="v3-carousel-feature-grid">
               <ProjectCard
-                project={project}
-                isActive={i === activeIndex}
+                project={activeProject}
+                isActive
                 videoRef={(el) => {
-                  videoRefs.current[i] = el;
+                  videoRef.current = el;
                 }}
-                isEs={isEs}
               />
+              <ProjectStickerPanel project={activeProject} isEs={isEs} />
             </div>
-          ))}
+          </div>
         </div>
       </div>
-
-      {transparentBackdrop && (
-        <>
-          <div
-            aria-hidden
-            onMouseEnter={() => startEdgeScroll("prev")}
-            onMouseLeave={stopEdgeScroll}
-            style={{
-              position: "absolute",
-              top: "10svh",
-              bottom: "10svh",
-              left: 0,
-              width: "clamp(72px, 11vw, 160px)",
-              zIndex: 5,
-              cursor: canScrollPrev ? "w-resize" : "default",
-              pointerEvents: introActive && canScrollPrev ? "auto" : "none",
-              background: "transparent",
-            }}
-          />
-          <div
-            aria-hidden
-            onMouseEnter={() => startEdgeScroll("next")}
-            onMouseLeave={stopEdgeScroll}
-            style={{
-              position: "absolute",
-              top: "10svh",
-              bottom: "10svh",
-              right: 0,
-              width: "clamp(72px, 11vw, 160px)",
-              zIndex: 5,
-              cursor: canScrollNext ? "e-resize" : "default",
-              pointerEvents: introActive && canScrollNext ? "auto" : "none",
-              background: "transparent",
-            }}
-          />
-        </>
-      )}
 
       <motion.button
         initial={false}
