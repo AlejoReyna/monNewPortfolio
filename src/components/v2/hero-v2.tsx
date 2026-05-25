@@ -252,14 +252,31 @@ export default function HeroV2({
             )}
 
             {/* ── Comic speech bubbles ── */}
-            {/* Static pointer line toward face */}
-            <svg
-              className="absolute inset-0 w-full h-full pointer-events-none"
-              style={{ zIndex: 10 }}
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <line x1="63%" y1="13%" x2="59%" y2="16%" stroke="rgba(255,255,255,0.9)" strokeWidth="1.5" strokeLinecap="round" />
-            </svg>
+            <AnimatePresence mode="wait">
+              {msgVisible && (
+                <motion.svg
+                  key={`pointer-${msgIndex}`}
+                  className="absolute inset-0 w-full h-full pointer-events-none"
+                  style={{ zIndex: 10 }}
+                  viewBox="0 0 100 100"
+                  preserveAspectRatio="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.4 }}
+                >
+                  <path
+                    d="M 63 13 C 62.2 13.8, 60.8 15.1, 59 16.4"
+                    stroke="#ffffff"
+                    strokeWidth="0.5"
+                    strokeLinecap="round"
+                    fill="none"
+                    vectorEffect="non-scaling-stroke"
+                  />
+                </motion.svg>
+              )}
+            </AnimatePresence>
 
             {/* Bubble — cycles with 2s visible / 2s standby */}
             <div className="absolute pointer-events-none" style={{ top: "8.5%", left: "62.5%", zIndex: 10 }}>

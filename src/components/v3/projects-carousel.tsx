@@ -19,32 +19,110 @@ function pad(n: number): string {
 }
 
 const TOTAL = PROJECTS.length;
+const PROJECT_FADE_MS = 240;
+
+function useTypewriterText(text: string, activeKey: string, enabled = true, delay = 180, speed = 14) {
+  const [visibleText, setVisibleText] = useState("");
+
+  useEffect(() => {
+    if (!enabled) {
+      setVisibleText("");
+      return;
+    }
+
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      setVisibleText(text);
+      return;
+    }
+
+    const chars = Array.from(text);
+    let index = 0;
+    let intervalId: number | undefined;
+
+    setVisibleText("");
+
+    const timeoutId = window.setTimeout(() => {
+      intervalId = window.setInterval(() => {
+        index += 1;
+        setVisibleText(chars.slice(0, index).join(""));
+
+        if (index >= chars.length && intervalId) {
+          window.clearInterval(intervalId);
+        }
+      }, speed);
+    }, delay);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+      if (intervalId) window.clearInterval(intervalId);
+    };
+  }, [activeKey, delay, enabled, speed, text]);
+
+  return visibleText;
+}
+
+function TypewriterText({
+  as: Component,
+  text,
+  activeKey,
+  className,
+  enabled = true,
+  delay = 180,
+  speed = 14,
+}: {
+  as: "h3" | "p" | "span";
+  text: string;
+  activeKey: string;
+  className?: string;
+  enabled?: boolean;
+  delay?: number;
+  speed?: number;
+}) {
+  const visibleText = useTypewriterText(text, activeKey, enabled, delay, speed);
+  const isTyping = visibleText.length > 0 && visibleText.length < Array.from(text).length;
+
+  return (
+    <Component
+      className={className}
+      aria-label={text}
+      data-typing={isTyping ? "true" : "false"}
+    >
+      {visibleText}
+    </Component>
+  );
+}
+
 /* ═══════════════════════════════════════════
    CARD
    ═══════════════════════════════════════════ */
 interface CardProps {
   project: V3Project;
   isActive: boolean;
+  isVisible: boolean;
   videoRef: (el: HTMLVideoElement | null) => void;
 }
 
-function ProjectCard({ project, isActive, videoRef }: CardProps) {
+function ProjectCard({ project, isActive, isVisible, videoRef }: CardProps) {
   return (
-    <article
+    <motion.article
       className="v3-carousel-card"
       aria-label={project.title}
       style={{ transform: "scale(1)" }}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: isVisible ? 1 : 0 }}
+      transition={{ duration: 0.24, ease: "easeOut" }}
     >
       {/* ② Media */}
       {project.media && (
-        <div className="v3-carousel-media">
+        <div key={`${project.id}-${project.media}`} className="v3-carousel-media">
           {project.mediaType === "video" ? (
             <video
+              key={project.media}
               ref={videoRef}
               muted
               loop
               playsInline
-              preload="metadata"
+              preload="auto"
               className="v3-carousel-media-inner"
               style={{
                 filter: isActive ? "none" : "grayscale(0.6)",
@@ -55,6 +133,7 @@ function ProjectCard({ project, isActive, videoRef }: CardProps) {
             </video>
           ) : (
             <Image
+              key={project.media}
               src={project.media}
               alt={project.title}
               fill
@@ -79,7 +158,7 @@ function ProjectCard({ project, isActive, videoRef }: CardProps) {
           />
         </div>
       )}
-    </article>
+    </motion.article>
   );
 }
 
@@ -114,24 +193,78 @@ const BUILD_NOTES: Record<string, { es: string; en: string }> = {
   },
 };
 
-function ProjectStickerPanel({ project, isEs }: { project: V3Project; isEs: boolean }) {
+function ProjectStickerPanel({
+  project,
+  isEs,
+  isVisible,
+  typingReady,
+}: {
+  project: V3Project;
+  isEs: boolean;
+  isVisible: boolean;
+  typingReady: boolean;
+}) {
   const buildNote = BUILD_NOTES[project.id] ?? {
     es: "Construí esto iterando entre lo visual, lo técnico y lo raro hasta que empezó a sentirse propio.",
     en: "I built this by pushing between visuals, engineering and weird little details until it started feeling like its own thing.",
   };
+  const tagline = isEs ? project.tagline.es : project.tagline.en;
+  const description = isEs ? project.description.es : project.description.en;
+  const note = isEs ? buildNote.es : buildNote.en;
+  const typingKey = `${project.id}-${isEs ? "es" : "en"}`;
 
   return (
     <aside className="v3-carousel-sticker-panel" aria-label={`${project.title} build note`}>
       <div className="v3-carousel-sticker-orbit">
-        <div className="v3-carousel-build-note">
-          <span className="v3-carousel-build-kicker">{isEs ? "bitacora" : "build log"}</span>
-          <h3>{project.title}</h3>
-          <p className="v3-carousel-build-dek">
-            {isEs ? project.tagline.es : project.tagline.en}
-          </p>
+        <motion.div
+          className="v3-carousel-build-note"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: isVisible ? 1 : 0 }}
+          transition={{ duration: 0.24, ease: "easeOut" }}
+        >
+          <TypewriterText
+            as="span"
+            text={isEs ? "bitacora" : "build log"}
+            activeKey={typingKey}
+            className="v3-carousel-build-kicker"
+            enabled={typingReady}
+            delay={60}
+            speed={20}
+          />
+          <TypewriterText
+            as="h3"
+            text={project.title}
+            activeKey={typingKey}
+            enabled={typingReady}
+            delay={180}
+            speed={26}
+          />
+          <TypewriterText
+            as="p"
+            text={tagline}
+            activeKey={typingKey}
+            className="v3-carousel-build-dek"
+            enabled={typingReady}
+            delay={360}
+            speed={16}
+          />
           <div className="v3-carousel-build-body">
-            <p>{isEs ? project.description.es : project.description.en}</p>
-            <p>{isEs ? buildNote.es : buildNote.en}</p>
+            <TypewriterText
+              as="p"
+              text={description}
+              activeKey={typingKey}
+              enabled={typingReady}
+              delay={620}
+              speed={10}
+            />
+            <TypewriterText
+              as="p"
+              text={note}
+              activeKey={typingKey}
+              enabled={typingReady}
+              delay={880}
+              speed={10}
+            />
           </div>
           <div className="v3-carousel-build-tags" aria-label="Stack">
             {project.tags.map((tag) => (
@@ -141,7 +274,7 @@ function ProjectStickerPanel({ project, isEs }: { project: V3Project; isEs: bool
               </span>
             ))}
           </div>
-        </div>
+        </motion.div>
       </div>
     </aside>
   );
@@ -162,24 +295,66 @@ export default function ProjectsCarousel({ transparentBackdrop, introActive = tr
   const isEs = language === "es";
 
   const [activeIndex, setActiveIndex] = useState(0);
+  const [isProjectVisible, setIsProjectVisible] = useState(true);
+  const [isProjectSwitching, setIsProjectSwitching] = useState(false);
+  const [isTypingReady, setIsTypingReady] = useState(true);
   const activeProject = PROJECTS[activeIndex] ?? PROJECTS[0];
   const canScrollPrev = activeIndex > 0;
   const canScrollNext = activeIndex < TOTAL - 1;
   const videoRef = useRef<HTMLVideoElement | null>(null);
+  const switchTimeoutRef = useRef<number | null>(null);
+  const typingTimeoutRef = useRef<number | null>(null);
 
   useEffect(() => {
     const vid = videoRef.current;
     if (!vid) return;
+    vid.load();
+    vid.currentTime = 0;
     vid.play().catch(() => {});
   }, [activeProject.id]);
 
-  const scrollPrev = useCallback(() => {
-    setActiveIndex((idx) => Math.max(0, idx - 1));
+  const switchProject = useCallback(
+    (nextIndex: number) => {
+      const clampedIndex = Math.min(TOTAL - 1, Math.max(0, nextIndex));
+      if (clampedIndex === activeIndex || isProjectSwitching) return;
+
+      setIsProjectSwitching(true);
+      setIsTypingReady(false);
+      setIsProjectVisible(false);
+
+      switchTimeoutRef.current = window.setTimeout(() => {
+        setActiveIndex(clampedIndex);
+        setIsProjectVisible(true);
+        switchTimeoutRef.current = null;
+
+        typingTimeoutRef.current = window.setTimeout(() => {
+          setIsTypingReady(true);
+          setIsProjectSwitching(false);
+          typingTimeoutRef.current = null;
+        }, PROJECT_FADE_MS);
+      }, PROJECT_FADE_MS);
+    },
+    [activeIndex, isProjectSwitching]
+  );
+
+  useEffect(() => {
+    return () => {
+      if (switchTimeoutRef.current !== null) {
+        window.clearTimeout(switchTimeoutRef.current);
+      }
+      if (typingTimeoutRef.current !== null) {
+        window.clearTimeout(typingTimeoutRef.current);
+      }
+    };
   }, []);
 
+  const scrollPrev = useCallback(() => {
+    switchProject(activeIndex - 1);
+  }, [activeIndex, switchProject]);
+
   const scrollNext = useCallback(() => {
-    setActiveIndex((idx) => Math.min(TOTAL - 1, idx + 1));
-  }, []);
+    switchProject(activeIndex + 1);
+  }, [activeIndex, switchProject]);
 
   /* ── Keyboard navigation ── */
   useEffect(() => {
@@ -238,13 +413,21 @@ export default function ProjectsCarousel({ transparentBackdrop, introActive = tr
           >
             <div className="v3-carousel-feature-grid">
               <ProjectCard
+                key={activeProject.id}
                 project={activeProject}
                 isActive
+                isVisible={isProjectVisible}
                 videoRef={(el) => {
                   videoRef.current = el;
                 }}
               />
-              <ProjectStickerPanel project={activeProject} isEs={isEs} />
+              <ProjectStickerPanel
+                key={`${activeProject.id}-${language}`}
+                project={activeProject}
+                isEs={isEs}
+                isVisible={isProjectVisible}
+                typingReady={isTypingReady}
+              />
             </div>
           </div>
         </div>
@@ -255,12 +438,12 @@ export default function ProjectsCarousel({ transparentBackdrop, introActive = tr
         animate={{}}
         transition={{ duration: 0.3 }}
         onClick={scrollPrev}
-        disabled={!canScrollPrev}
+        disabled={!canScrollPrev || isProjectSwitching}
         aria-label={isEs ? "Proyecto anterior" : "Previous project"}
         className="v3-carousel-arrow v3-carousel-arrow--prev"
         style={{
           pointerEvents: introActive ? "auto" : "none",
-          cursor: canScrollPrev ? "pointer" : "not-allowed",
+          cursor: canScrollPrev && !isProjectSwitching ? "pointer" : "not-allowed",
         }}
       >
         ←
@@ -270,12 +453,12 @@ export default function ProjectsCarousel({ transparentBackdrop, introActive = tr
         animate={{}}
         transition={{ duration: 0.3 }}
         onClick={scrollNext}
-        disabled={!canScrollNext}
+        disabled={!canScrollNext || isProjectSwitching}
         aria-label={isEs ? "Proyecto siguiente" : "Next project"}
         className="v3-carousel-arrow v3-carousel-arrow--next"
         style={{
           pointerEvents: introActive ? "auto" : "none",
-          cursor: canScrollNext ? "pointer" : "not-allowed",
+          cursor: canScrollNext && !isProjectSwitching ? "pointer" : "not-allowed",
         }}
       >
         →

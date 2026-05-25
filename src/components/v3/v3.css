@@ -550,6 +550,20 @@
   padding: 0.24rem 0.52rem;
 }
 
+.v3-carousel-build-note [data-typing="true"]::after {
+  content: "_";
+  display: inline-block;
+  margin-left: 0.08em;
+  color: rgba(248, 245, 234, 0.7);
+  animation: v3-type-cursor 0.8s steps(2, start) infinite;
+}
+
+@keyframes v3-type-cursor {
+  50% {
+    opacity: 0;
+  }
+}
+
 /* Hero transition frame: use 20% top/bottom guide lines without shrinking cards. */
 .v3-carousel-sequence-frame {
   box-sizing: border-box;
