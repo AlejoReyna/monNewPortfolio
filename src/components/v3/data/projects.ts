@@ -171,3 +171,23 @@ export const PROJECTS: V3Project[] = [
     ghost: "VII",
   },
 ];
+
+export function getProjectById(id: string): V3Project | undefined {
+  return PROJECTS.find((project) => project.id === id);
+}
+
+export function getProjectNeighbors(id: string): {
+  previous?: V3Project;
+  next?: V3Project;
+} {
+  const index = PROJECTS.findIndex((project) => project.id === id);
+
+  if (index === -1) {
+    return {};
+  }
+
+  return {
+    previous: PROJECTS[index - 1],
+    next: PROJECTS[index + 1],
+  };
+}
