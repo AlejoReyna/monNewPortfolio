@@ -19,6 +19,7 @@ function pad(n: number): string {
 }
 
 const TOTAL = PROJECTS.length;
+const EDGE_SCROLL_SPEED = 1.25;
 
 /* ═══════════════════════════════════════════
    CARD
@@ -37,15 +38,10 @@ function ProjectCard({ project, idx, isActive, videoRef, isEs }: CardProps) {
       className="v3-carousel-card"
       aria-label={project.title}
       style={{
-        opacity: isActive ? 1 : 0.52,
         borderColor: isActive ? "rgba(248,245,234,0.72)" : "rgba(248,245,234,0.24)",
+        transform: isActive ? "scale(1.035)" : "scale(1)",
       }}
     >
-      {/* Ghost roman numeral — positioned absolute, bottom-right */}
-      <span className="v3-carousel-ghost" aria-hidden="true">
-        {project.ghost}
-      </span>
-
       {/* ① Eyebrow */}
       <span className="v3-carousel-eyebrow">
         {`ARCHIVO / ${pad(idx + 1)}`}
@@ -165,7 +161,10 @@ export default function ProjectsCarousel({ transparentBackdrop, introActive = tr
   const [activeIndex, setActiveIndex] = useState(0);
   const [canScrollPrev, setCanScrollPrev] = useState(false);
   const [canScrollNext, setCanScrollNext] = useState(true);
-  const edgeScrollTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const edgeScrollActiveRef = useRef(false);
+  const defaultScrollBodyRef = useRef<
+    ReturnType<NonNullable<typeof emblaApi>["internalEngine"]>["scrollBody"] | null
+  >(null);
 
   // Stable array of refs — one per project slot
   const videoRefs = useRef<(HTMLVideoElement | null)[]>(
@@ -219,10 +218,16 @@ export default function ProjectsCarousel({ transparentBackdrop, introActive = tr
   const scrollNext = useCallback(() => emblaApi?.scrollNext(), [emblaApi]);
 
   const stopEdgeScroll = useCallback(() => {
-    if (!edgeScrollTimerRef.current) return;
-    window.clearInterval(edgeScrollTimerRef.current);
-    edgeScrollTimerRef.current = null;
-  }, []);
+    if (!emblaApi || !edgeScrollActiveRef.current) return;
+
+    const engine = emblaApi.internalEngine();
+    if (defaultScrollBodyRef.current) {
+      engine.scrollBody = defaultScrollBodyRef.current;
+    }
+
+    edgeScrollActiveRef.current = false;
+    onSelect();
+  }, [emblaApi, onSelect]);
 
   const startEdgeScroll = useCallback(
     (direction: "prev" | "next") => {
@@ -233,22 +238,77 @@ export default function ProjectsCarousel({ transparentBackdrop, introActive = tr
 
       stopEdgeScroll();
 
-      const scroll = () => {
-        const canStillMove = direction === "prev" ? emblaApi.canScrollPrev() : emblaApi.canScrollNext();
-        if (!canStillMove) {
-          stopEdgeScroll();
-          return;
-        }
+      const engine = emblaApi.internalEngine();
+      const {
+        location,
+        previousLocation,
+        offsetLocation,
+        target,
+        scrollTarget,
+        index,
+        indexPrevious,
+        limit: { reachedMin, reachedMax, constrain },
+      } = engine;
+      const directionSign = direction === "next" ? -1 : 1;
+      const noop = () => edgeScrollBody;
 
-        if (direction === "prev") {
-          emblaApi.scrollPrev();
-        } else {
-          emblaApi.scrollNext();
-        }
+      let bodyVelocity = 0;
+      let scrollDirection = 0;
+      let rawLocation = location.get();
+      let rawLocationPrevious = rawLocation;
+      let hasSettled = false;
+
+      const edgeScrollBody = {
+        direction: () => scrollDirection,
+        duration: () => -1,
+        velocity: () => bodyVelocity,
+        settled: () => hasSettled,
+        seek: () => {
+          previousLocation.set(location);
+
+          bodyVelocity = directionSign * EDGE_SCROLL_SPEED;
+          rawLocation += bodyVelocity;
+          location.add(bodyVelocity);
+          target.set(location);
+
+          const directionDiff = rawLocation - rawLocationPrevious;
+          scrollDirection = Math.sign(directionDiff);
+          rawLocationPrevious = rawLocation;
+
+          const currentIndex = scrollTarget.byDistance(0, false).index;
+          if (index.get() !== currentIndex) {
+            indexPrevious.set(index.get());
+            index.set(currentIndex);
+            emblaApi.emit("select");
+          }
+
+          const reachedEnd =
+            direction === "next"
+              ? reachedMin(offsetLocation.get())
+              : reachedMax(offsetLocation.get());
+
+          if (reachedEnd) {
+            hasSettled = true;
+            const constrainedLocation = constrain(location.get());
+            location.set(constrainedLocation);
+            target.set(location);
+            stopEdgeScroll();
+          }
+
+          return edgeScrollBody;
+        },
+        useBaseFriction: noop,
+        useBaseDuration: noop,
+        useFriction: noop,
+        useDuration: noop,
       };
 
-      scroll();
-      edgeScrollTimerRef.current = setInterval(scroll, 950);
+      if (!edgeScrollActiveRef.current) {
+        defaultScrollBodyRef.current = engine.scrollBody;
+        edgeScrollActiveRef.current = true;
+        engine.scrollBody = edgeScrollBody;
+        engine.animation.start();
+      }
     },
     [emblaApi, stopEdgeScroll]
   );
@@ -265,34 +325,10 @@ export default function ProjectsCarousel({ transparentBackdrop, introActive = tr
         background: transparentBackdrop ? "transparent" : "var(--v3-bg)",
         position: "relative",
         minHeight: "100svh",
+        marginTop: "5rem",
       }}
       aria-label={isEs ? "Proyectos" : "Projects"}
     >
-      <div
-        aria-hidden
-        style={{
-          position: "absolute",
-          top: "10svh",
-          left: 0,
-          right: 0,
-          height: 1,
-          background: "var(--v3-line)",
-          pointerEvents: "none",
-        }}
-      />
-      <div
-        aria-hidden
-        style={{
-          position: "absolute",
-          left: 0,
-          right: 0,
-          bottom: "10svh",
-          height: 1,
-          background: "var(--v3-line)",
-          pointerEvents: "none",
-        }}
-      />
-
       {/* ── Embla viewport ── */}
       <div
         ref={emblaRef}
@@ -319,13 +355,12 @@ export default function ProjectsCarousel({ transparentBackdrop, introActive = tr
               role="listitem"
               aria-label={`${project.title}, ${pad(i + 1)} de ${pad(TOTAL)}`}
               style={{
-                opacity: introActive ? 1 : 0,
                 transform: introActive ? "translate3d(0,0,0) scale(1)" : "translate3d(0,42px,0) scale(0.96)",
-                transitionProperty: "opacity, transform",
+                transitionProperty: "transform",
                 transitionDuration: "900ms",
                 transitionTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)",
                 transitionDelay: introActive ? `${140 + i * 110}ms` : "0ms",
-                willChange: "opacity, transform",
+                willChange: "transform",
               }}
             >
               <ProjectCard
@@ -379,18 +414,48 @@ export default function ProjectsCarousel({ transparentBackdrop, introActive = tr
         </>
       )}
 
+      <motion.button
+        initial={false}
+        animate={{}}
+        transition={{ duration: 0.3 }}
+        onClick={scrollPrev}
+        disabled={!canScrollPrev}
+        aria-label={isEs ? "Proyecto anterior" : "Previous project"}
+        className="v3-carousel-arrow v3-carousel-arrow--prev"
+        style={{
+          pointerEvents: introActive ? "auto" : "none",
+          cursor: canScrollPrev ? "pointer" : "not-allowed",
+        }}
+      >
+        ←
+      </motion.button>
+      <motion.button
+        initial={false}
+        animate={{}}
+        transition={{ duration: 0.3 }}
+        onClick={scrollNext}
+        disabled={!canScrollNext}
+        aria-label={isEs ? "Proyecto siguiente" : "Next project"}
+        className="v3-carousel-arrow v3-carousel-arrow--next"
+        style={{
+          pointerEvents: introActive ? "auto" : "none",
+          cursor: canScrollNext ? "pointer" : "not-allowed",
+        }}
+      >
+        →
+      </motion.button>
+
       {/* ── Controls bar ── */}
       <motion.div
         initial={false}
         animate={{
-          opacity: introActive ? 1 : 0,
           y: introActive ? 0 : 16,
         }}
         transition={{ duration: 0.68, ease: [0.16, 1, 0.3, 1], delay: introActive ? 0.42 : 0 }}
         style={{
           display: "flex",
           alignItems: "center",
-          justifyContent: "space-between",
+          justifyContent: "center",
           gap: "clamp(1rem, 3vw, 2rem)",
           padding: transparentBackdrop
             ? "0 clamp(1.5rem, 6vw, 5rem)"
@@ -403,28 +468,6 @@ export default function ProjectsCarousel({ transparentBackdrop, introActive = tr
           bottom: transparentBackdrop ? "calc(5svh - 1.2rem)" : undefined,
         }}
       >
-        {/* Arrow buttons */}
-        <div style={{ display: "flex", gap: "0.5rem" }}>
-          <button
-            onClick={scrollPrev}
-            disabled={!canScrollPrev}
-            aria-label={isEs ? "Proyecto anterior" : "Previous project"}
-            className="v3-carousel-arrow"
-            style={{ opacity: canScrollPrev ? 1 : 0.25, cursor: canScrollPrev ? "pointer" : "not-allowed" }}
-          >
-            ←
-          </button>
-          <button
-            onClick={scrollNext}
-            disabled={!canScrollNext}
-            aria-label={isEs ? "Proyecto siguiente" : "Next project"}
-            className="v3-carousel-arrow"
-            style={{ opacity: canScrollNext ? 1 : 0.25, cursor: canScrollNext ? "pointer" : "not-allowed" }}
-          >
-            →
-          </button>
-        </div>
-
         {/* Progress bar (thin line, not dots) */}
         <div
           className="v3-carousel-progress-wrap"
@@ -439,21 +482,6 @@ export default function ProjectsCarousel({ transparentBackdrop, introActive = tr
             style={{ transformOrigin: "left center" }}
           />
         </div>
-
-        {/* Counter — Bebas Neue */}
-        <span
-          className="v3-display"
-          aria-live="polite"
-          aria-atomic="true"
-          style={{
-            fontSize: "clamp(1rem, 1.6vw, 1.25rem)",
-            color: "rgba(248,245,234,0.88)",
-            letterSpacing: "0.08em",
-            fontVariantNumeric: "tabular-nums",
-          }}
-        >
-          {pad(activeIndex + 1)}&thinsp;/&thinsp;{pad(TOTAL)}
-        </span>
       </motion.div>
     </section>
   );

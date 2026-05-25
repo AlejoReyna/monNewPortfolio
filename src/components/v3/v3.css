@@ -422,6 +422,7 @@
   display: flex;
   flex-direction: column;
   gap: 0;
+  font-family: "Comic Sans MS", "Comic Sans", cursive;
   background: var(--v3-bg);
   border: 1px solid rgba(248, 245, 234, 0.24);
   padding: clamp(1.4rem, 3vw, 2.2rem);
@@ -429,13 +430,15 @@
   height: clamp(560px, 76vh, 720px);
   transform: scale(1);
   transform-origin: center;
-  transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease, opacity 0.35s ease;
+  transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease;
   will-change: transform;
   /* Intentional: no border-radius per spec ("esquinas duras") */
 }
 .v3-carousel-card:hover {
   border-color: rgba(248, 245, 234, 0.72);
-  transform: scale(1.035);
+}
+.v3-carousel-card * {
+  font-family: inherit !important;
 }
 
 /* Hero transition frame: use 20% top/bottom guide lines without shrinking cards. */
@@ -570,25 +573,6 @@
   opacity: 0.65;
 }
 
-/* Ghost numeral — bottom-right, behind content */
-.v3-carousel-ghost {
-  position: absolute;
-  right: -0.05em;
-  bottom: -0.18em;
-  font-family: var(--font-bebas, "Bebas Neue", sans-serif);
-  font-size: clamp(7rem, 16vw, 14rem);
-  line-height: 1;
-  color: transparent;
-  -webkit-text-stroke: 1px var(--v3-faint);
-  user-select: none;
-  pointer-events: none;
-  z-index: 1;
-  transition: -webkit-text-stroke-color 0.3s ease;
-}
-.v3-carousel-card:hover .v3-carousel-ghost {
-  -webkit-text-stroke-color: var(--v3-line);
-}
-
 /* Arrow buttons */
 .v3-carousel-arrow {
   background: transparent;
@@ -601,7 +585,22 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  transition: border-color 0.25s ease, color 0.25s ease, opacity 0.25s ease;
+  transition: border-color 0.25s ease, color 0.25s ease;
+}
+.v3-carousel-arrow--prev,
+.v3-carousel-arrow--next {
+  position: absolute;
+  top: 50%;
+  z-index: 8;
+  transform: translateY(-50%);
+  background: rgba(8, 8, 10, 0.68);
+  backdrop-filter: blur(8px);
+}
+.v3-carousel-arrow--prev {
+  left: clamp(0.75rem, 2vw, 1.5rem);
+}
+.v3-carousel-arrow--next {
+  right: clamp(0.75rem, 2vw, 1.5rem);
 }
 .v3-carousel-arrow:not(:disabled):hover {
   border-color: rgba(248, 245, 234, 0.72);
@@ -615,8 +614,7 @@
 /* Progress bar — thin horizontal line */
 .v3-carousel-progress-wrap {
   position: relative;
-  flex: 1;
-  max-width: clamp(120px, 30vw, 320px);
+  flex: 0 0 clamp(120px, 30vw, 320px);
   height: 1px;
   background: var(--v3-faint);
   overflow: hidden;

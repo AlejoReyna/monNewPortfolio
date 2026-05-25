@@ -98,14 +98,14 @@ export default function HeroV2({
     embed && embedContentOpacity
       ? useTransform(
           [baseContentOpacity, embedContentOpacity],
-          ([a, b]) => (Number(a) || 1) * (Number(b) || 1)
+          ([a, b]) => Number(a) * Number(b)
         )
       : baseContentOpacity;
   const gifOpacity =
     embed && embedContentOpacity
       ? useTransform(
           [baseGifOpacity, embedContentOpacity],
-          ([a, b]) => (Number(a) || 1) * (Number(b) || 1)
+          ([a, b]) => Number(a) * Number(b)
         )
       : baseGifOpacity;
   const assetZoom = 1.4;
@@ -215,8 +215,8 @@ export default function HeroV2({
 
           {/* ── Right column: GIF full height ── */}
           <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
+            initial={{ opacity: embed ? 1 : 0, y: embed ? 0 : 16 }}
+            animate={{ y: 0 }}
             transition={{ duration: 0.75, delay: 0.45, ease: [0.22, 1, 0.36, 1] as const }}
             className={`hidden lg:block relative lg:ml-[15%] w-full h-full min-h-[min(83.6vh,665px)] pt-16 mt-[60px] overflow-hidden pointer-events-none origin-top rounded-lg ${devBorder ? "border-2 border-rose-400" : ""}`}
             style={{ opacity: gifOpacity, scale: gifScale }}
@@ -299,6 +299,7 @@ export default function HeroV2({
           left: "8%",
           width: "min(520px, 42vw)",
           height: "min(450px, 50vh)",
+          opacity: contentOpacity,
           fontFamily: "'Comic Sans MS', 'Comic Sans', cursive",
         }}
       >
