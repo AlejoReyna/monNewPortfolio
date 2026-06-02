@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState, type TouchEvent, type WheelEvent } from "react";
 import { animate, motion, useMotionValue, useMotionValueEvent, useTransform } from "framer-motion";
 import HeroV2 from "@/components/v2/hero-v2";
-import ProjectsCarousel from "@/components/v3/projects-carousel";
+// import ProjectsCarousel from "@/components/v3/projects-carousel";
 import ThisCafeteriaGateway from "@/components/this-cafeteria-gateway";
 import MinecraftModGateway from "@/components/minecraft-mod-gateway";
 import WeddingServiceGateway from "@/components/wedding-service-gateway";
@@ -23,7 +23,7 @@ const PHASE = {
 
 const WHEEL_THRESHOLD = 16;
 const SWIPE_THRESHOLD = 36;
-type SequencePanel = 0 | 1 | 2 | 3 | 4 | 5 | 6;
+type SequencePanel = 0 | 1 | 2 | 3 | 4 | 5; // | 6 — carousel hidden
 
 export default function HeroCarouselSequence() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -36,6 +36,7 @@ export default function HeroCarouselSequence() {
   const isAnimatingRef = useRef(false);
   const isRevealedRef = useRef(false);
   const activePanelRef = useRef<SequencePanel>(0);
+  const [activePanel, setActivePanelState] = useState<SequencePanel>(0);
   const navTransitionTimeoutRef = useRef<number | null>(null);
   const touchStartYRef = useRef<number | null>(null);
   const [carouselPointerEvents, setCarouselPointerEvents] = useState<"none" | "auto">("none");
@@ -81,6 +82,7 @@ export default function HeroCarouselSequence() {
 
   const setActivePanel = useCallback((panel: SequencePanel) => {
     activePanelRef.current = panel;
+    setActivePanelState(panel);
   }, []);
 
   useMotionValueEvent(cafeteriaProgress, "change", (latest) => {
@@ -248,9 +250,8 @@ export default function HeroCarouselSequence() {
         setCarouselPointerEvents("none");
         setCarouselIntroActive(false);
 
-        const motionValue = activePanelRef.current === 6 ? revealProgress : plebesProgress;
-        animate(motionValue, activePanelRef.current === 6 ? 0 : 1, {
-          duration: activePanelRef.current === 6 ? 0.95 : 1.15,
+        animate(plebesProgress, 1, {
+          duration: 1.15,
           ease: [0.16, 1, 0.3, 1],
           onComplete: () => {
             isRevealedRef.current = false;
@@ -262,27 +263,7 @@ export default function HeroCarouselSequence() {
         return;
       }
 
-      if (nextPanel === 6) {
-        setCafeteriaPointerEvents("none");
-        setMinecraftPointerEvents("none");
-        setWeddingPointerEvents("none");
-        setUanlPointerEvents("none");
-        setPlebesPointerEvents("none");
-        setCarouselPointerEvents("none");
-
-        animate(revealProgress, 1, {
-          duration: 1.25,
-          ease: [0.16, 1, 0.3, 1],
-          onComplete: () => {
-            isRevealedRef.current = true;
-            setActivePanel(6);
-            isAnimatingRef.current = false;
-            setCarouselPointerEvents("auto");
-            setCarouselIntroActive(true);
-          },
-        });
-        return;
-      }
+      // Panel 6 (projects carousel) hidden — restore block + import to re-enable
     },
     [
       cafeteriaProgress,
@@ -305,7 +286,7 @@ export default function HeroCarouselSequence() {
       if (interactiveTarget) return;
 
       if (event.deltaY > 0) {
-        animateToPanel(Math.min(activePanelRef.current + 1, 6) as SequencePanel);
+        animateToPanel(Math.min(activePanelRef.current + 1, 5) as SequencePanel);
       } else {
         animateToPanel(Math.max(activePanelRef.current - 1, 0) as SequencePanel);
       }
@@ -330,7 +311,7 @@ export default function HeroCarouselSequence() {
       if (Math.abs(deltaY) < SWIPE_THRESHOLD) return;
 
       if (deltaY > 0) {
-        animateToPanel(Math.min(activePanelRef.current + 1, 6) as SequencePanel);
+        animateToPanel(Math.min(activePanelRef.current + 1, 5) as SequencePanel);
       } else {
         animateToPanel(Math.max(activePanelRef.current - 1, 0) as SequencePanel);
       }
@@ -400,7 +381,7 @@ export default function HeroCarouselSequence() {
             willChange: "transform",
           }}
         >
-          <ThisCafeteriaGateway />
+          <ThisCafeteriaGateway isActive={activePanel === 1} />
         </motion.div>
 
         <motion.div
@@ -413,7 +394,7 @@ export default function HeroCarouselSequence() {
             willChange: "transform",
           }}
         >
-          <MinecraftModGateway onSeeMore={() => animateToPanel(3)} />
+          <MinecraftModGateway onSeeMore={() => animateToPanel(3)} isActive={activePanel === 2} />
         </motion.div>
 
         <motion.div
@@ -426,7 +407,7 @@ export default function HeroCarouselSequence() {
             willChange: "transform",
           }}
         >
-          <WeddingServiceGateway />
+          <WeddingServiceGateway isActive={activePanel === 3} />
         </motion.div>
 
         <motion.div
@@ -439,7 +420,7 @@ export default function HeroCarouselSequence() {
             willChange: "transform",
           }}
         >
-          <UANLExtensionGateway />
+          <UANLExtensionGateway isActive={activePanel === 4} />
         </motion.div>
 
         <motion.div
@@ -452,9 +433,10 @@ export default function HeroCarouselSequence() {
             willChange: "transform",
           }}
         >
-          <PlebesProjectGateway />
+          <PlebesProjectGateway isActive={activePanel === 5} />
         </motion.div>
 
+        {/* Projects carousel hidden — uncomment import + block to restore
         <motion.div
           className="v3-root"
           style={{
@@ -472,6 +454,7 @@ export default function HeroCarouselSequence() {
             <ProjectsCarousel introActive={carouselIntroActive} />
           </div>
         </motion.div>
+        */}
       </div>
     </div>
   );

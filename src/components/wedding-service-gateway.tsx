@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
 import styles from "./wedding-service-gateway.module.css";
 
 const previewProjects = [
@@ -135,10 +136,16 @@ function Countdown({ targetDate, variant }: { targetDate: string; variant: "andr
   );
 }
 
-export default function WeddingServiceGateway() {
+export default function WeddingServiceGateway({ isActive = false }: { isActive?: boolean }) {
   return (
     <section className={styles.screen} aria-labelledby="wedding-service-title">
-      <div className={styles.previewLayer} aria-label="Wedding invitation mobile hero previews">
+      <motion.div 
+        className={styles.previewLayer} 
+        aria-label="Wedding invitation mobile hero previews"
+        initial={{ opacity: 0 }}
+        animate={isActive ? { opacity: 1 } : { opacity: 0 }}
+        transition={{ duration: 1, delay: 0.1 }}
+      >
         <div className={styles.previewGrid}>
           <a
             className={`${styles.previewCol} ${styles.andreaCol}`}
@@ -158,9 +165,14 @@ export default function WeddingServiceGateway() {
             <CindyHeroPreview />
           </a>
         </div>
-      </div>
+      </motion.div>
 
-      <div className={styles.foreground}>
+      <motion.div 
+        className={styles.foreground}
+        initial={{ clipPath: "circle(0% at 50% 50%)" }}
+        animate={isActive ? { clipPath: "circle(150% at 50% 50%)" } : { clipPath: "circle(0% at 50% 50%)" }}
+        transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
+      >
           <div className={styles.copyBlock}>
             <h2 id="wedding-service-title" className={styles.title}>
               Wedding invitations, engineered.
@@ -183,7 +195,7 @@ export default function WeddingServiceGateway() {
               Build one
             </a>
           </div>
-        </div>
+        </motion.div>
     </section>
   );
 }

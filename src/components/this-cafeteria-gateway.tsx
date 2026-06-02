@@ -1,3 +1,4 @@
+import { motion } from "framer-motion";
 import styles from "./this-cafeteria-gateway.module.css";
 
 const simpleIcon = (slug: string, color: string) => `https://cdn.simpleicons.org/${slug}/${color}`;
@@ -18,21 +19,45 @@ const techStack = [
   { label: "GitHub", logo: simpleIcon("github", "181717") },
 ];
 
-export default function ThisCafeteriaGateway() {
+export default function ThisCafeteriaGateway({ isActive = false }: { isActive?: boolean }) {
+  const container = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: { staggerChildren: 0.15, delayChildren: 0.2 },
+    },
+  };
+
+  const item = {
+    hidden: { opacity: 0, scale: 1.1 },
+    show: { opacity: 1, scale: 1, transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] } },
+  };
+
   return (
     <section className={styles.screen} aria-labelledby="this-cafeteria-title">
-      <div className={styles.content}>
-        <p className={styles.eyebrow}>Cafeteria commerce</p>
-        <h1 id="this-cafeteria-title" className={styles.title}>
+      <motion.div 
+        className={styles.content}
+        variants={container}
+        initial="hidden"
+        animate={isActive ? "show" : "hidden"}
+      >
+        <motion.h1 id="this-cafeteria-title" className={styles.title} variants={item}>
           Artisanal Brew
-        </h1>
-        <p className={styles.stackLead}>
+        </motion.h1>
+        <motion.p className={styles.stackLead} variants={item}>
           A cloud-ready ASP.NET commerce platform for specialty coffee, pairing durable product
           and order flows with Identity access, Blazor interfaces, AWS services, and Ethereum
           Sepolia token payments, staking, and rewards.
-        </p>
+        </motion.p>
 
-        <div className={styles.carouselShell} aria-label="Artisanal Brew technical stack">
+        <motion.div className={styles.actions} variants={item}>
+          <a className={styles.cta} href="https://cafe.alexisreyna.dev">
+            Visit the cafe
+          </a>
+          <span className={styles.status}>Clean Architecture · Web3 commerce · AWS-ready backend</span>
+        </motion.div>
+
+        <motion.div className={styles.carouselShell} aria-label="Artisanal Brew technical stack" variants={item}>
           <div className={styles.stackTrack}>
             {techStack.map((item) => (
               <span className={styles.stackChip} key={item.label}>
@@ -47,15 +72,8 @@ export default function ThisCafeteriaGateway() {
               </span>
             ))}
           </div>
-        </div>
-
-        <div className={styles.actions}>
-          <a className={styles.cta} href="https://cafe.alexisreyna.dev">
-            Visit the cafe
-          </a>
-          <span className={styles.status}>Clean Architecture · Web3 commerce · AWS-ready backend</span>
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
     </section>
   );
 }
