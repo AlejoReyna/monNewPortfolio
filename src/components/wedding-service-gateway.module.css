@@ -1,0 +1,564 @@
+@import url("https://fonts.googleapis.com/css2?family=Mrs+Saint+Delafield&display=swap");
+
+.screen {
+  --wedding-ivory: #f8f2ea;
+  --wedding-ink: #181313;
+  --wedding-plum: #3d2639;
+  --wedding-rose: #c98d8b;
+  --wedding-gold: #b99256;
+  --wedding-sage: #6f806f;
+
+  background:
+    linear-gradient(135deg, rgba(248, 242, 234, 0.96), rgba(226, 214, 205, 0.9)),
+    var(--wedding-ivory);
+  color: var(--wedding-ink);
+  min-height: 100vh;
+  min-height: 100dvh;
+  overflow: hidden;
+  padding: 0;
+  position: relative;
+}
+
+.screen::before {
+  background:
+    linear-gradient(90deg, rgba(61, 38, 57, 0.08) 1px, transparent 1px),
+    linear-gradient(180deg, rgba(61, 38, 57, 0.06) 1px, transparent 1px);
+  background-size: 96px 96px;
+  content: "";
+  inset: 0;
+  mask-image: radial-gradient(circle at 50% 45%, black, transparent 74%);
+  pointer-events: none;
+  position: absolute;
+  z-index: 0;
+}
+
+.screen::after {
+  background:
+    radial-gradient(circle at 50% 8%, rgba(201, 141, 139, 0.24), transparent 28%),
+    radial-gradient(circle at 18% 84%, rgba(111, 128, 111, 0.16), transparent 24%),
+    radial-gradient(circle at 84% 78%, rgba(185, 146, 86, 0.14), transparent 26%);
+  content: "";
+  inset: 0;
+  pointer-events: none;
+  position: absolute;
+  z-index: 0;
+}
+
+.previewLayer {
+  inset: 0;
+  min-height: 100dvh;
+  pointer-events: none;
+  position: absolute;
+  z-index: 1;
+}
+
+.previewLayer::after {
+  background: rgba(0, 0, 0, 0.5);
+  content: "";
+  inset: 0;
+  pointer-events: none;
+  position: absolute;
+  z-index: 5;
+}
+
+.previewGrid {
+  align-items: stretch;
+  display: grid;
+  gap: 0;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-rows: minmax(100dvh, 1fr);
+  height: 100%;
+  min-height: 100dvh;
+  pointer-events: auto;
+  width: 100%;
+}
+
+.previewCol {
+  color: inherit;
+  display: block;
+  height: 100%;
+  isolation: isolate;
+  min-height: 100%;
+  overflow: hidden;
+  position: relative;
+  text-decoration: none;
+  width: 100%;
+}
+
+.heroShell {
+  height: 100%;
+  inset: 0;
+  overflow: hidden;
+  position: absolute;
+  width: 100%;
+}
+
+.foreground {
+  align-content: center;
+  align-items: center;
+  display: grid;
+  gap: clamp(0.45rem, 1vw, 0.65rem);
+  justify-items: center;
+  min-height: 100dvh;
+  padding: clamp(4.75rem, 8vw, 6.5rem) clamp(1.25rem, 5vw, 4rem) clamp(1.25rem, 5vw, 3.5rem);
+  pointer-events: none;
+  position: relative;
+  text-align: center;
+  width: 100%;
+  z-index: 2;
+}
+
+.copyBlock {
+  display: grid;
+  gap: clamp(0.85rem, 2.2vw, 1.25rem);
+  justify-items: center;
+  max-width: 48rem;
+  padding-bottom: 0;
+  pointer-events: auto;
+  position: relative;
+}
+
+.eyebrow {
+  color: rgba(255, 255, 255, 0.78);
+  font-family: var(--font-cormorant), Georgia, "Times New Roman", serif;
+  font-size: clamp(0.72rem, 1.1vw, 0.88rem);
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: 0.08em;
+  line-height: 1.2;
+  margin: 0;
+  text-shadow: 0 2px 16px rgba(0, 0, 0, 0.45);
+  text-transform: uppercase;
+}
+
+.title {
+  color: #fff;
+  font-family: var(--font-cormorant), Georgia, "Times New Roman", serif;
+  font-size: clamp(3.25rem, 8.5vw, 8.2rem);
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 0.88;
+  margin: 0;
+  max-width: 10.5ch;
+  text-align: center;
+  text-shadow: 0 4px 28px rgba(0, 0, 0, 0.5);
+}
+
+.lede {
+  color: rgba(255, 255, 255, 0.88);
+  font-family: var(--font-cormorant), Georgia, "Times New Roman", serif;
+  font-size: clamp(1rem, 1.55vw, 1.22rem);
+  font-weight: 300;
+  line-height: 1.62;
+  margin: 0;
+  max-width: 48rem;
+  text-shadow: 0 2px 18px rgba(0, 0, 0, 0.42);
+  text-wrap: balance;
+}
+
+.andreaCol {
+  background-image: url("https://aldoyandrea.com/hero.jpeg");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  color: #fff;
+  font-family: var(--font-cormorant), "Cormorant Garamond", serif;
+  height: 100%;
+  width: 100%;
+}
+
+.cindyCol {
+  background: #f9f5e9;
+  background-image: url("https://cindy-s-wedding.vercel.app/assets/hero-0624.jpg");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  color: #fff;
+  font-family: var(--font-cormorant), "Cormorant Garamond", serif;
+  height: 100%;
+  width: 100%;
+}
+
+.andreaOverlay,
+.andreaTopOverlay {
+  height: 100%;
+  inset: 0;
+  pointer-events: none;
+  position: absolute;
+  width: 100%;
+}
+
+.andreaOverlay {
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.4));
+  z-index: 1;
+}
+
+.andreaTopOverlay {
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.3), transparent);
+  height: 25%;
+  z-index: 2;
+}
+
+.andreaContent {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  inset: 0;
+  justify-content: flex-start;
+  padding: clamp(2.5rem, 12%, 4.35rem) clamp(0.75rem, 4%, 1.25rem) 0;
+  position: absolute;
+  width: 100%;
+  z-index: 10;
+}
+
+.andreaDate {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: clamp(0.42rem, 1.6vw, 0.7rem);
+  font-weight: 300;
+  letter-spacing: 0.25em;
+  margin: clamp(0.75rem, 4%, 1.5rem) 0 clamp(0.5rem, 2.5%, 1rem);
+}
+
+.andreaNames {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  margin-bottom: clamp(0.5rem, 2.5%, 1rem);
+  padding-inline: 0.5rem;
+}
+
+.andreaNames h3 {
+  color: #fff;
+  font-size: clamp(1rem, 4.8vw, 1.84rem);
+  font-weight: 400;
+  letter-spacing: 0.03em;
+  line-height: 0.85;
+  margin: 0;
+  text-shadow: 0 10px 24px rgba(0, 0, 0, 0.55);
+}
+
+.andreaNames span {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: clamp(0.65rem, 3vw, 1.15rem);
+  font-weight: 400;
+  line-height: 1;
+  margin-inline: clamp(0.45rem, 2vw, 1rem);
+  text-shadow: 0 10px 24px rgba(0, 0, 0, 0.55);
+}
+
+.andreaKicker {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: clamp(0.34rem, 1.2vw, 0.57rem);
+  font-style: italic;
+  font-weight: 300;
+  letter-spacing: 0.2em;
+  margin: 0 0 clamp(0.65rem, 3%, 1.5rem);
+  text-transform: uppercase;
+}
+
+.andreaButton {
+  align-items: center;
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  color: rgba(255, 255, 255, 0.95);
+  display: inline-flex;
+  font-size: clamp(0.36rem, 1.2vw, 0.64rem);
+  font-weight: 300;
+  justify-content: center;
+  letter-spacing: 0.15em;
+  padding: clamp(0.38rem, 1.4vw, 0.64rem) clamp(0.65rem, 2.5vw, 1.3rem);
+  text-transform: uppercase;
+}
+
+.andreaTimer {
+  bottom: clamp(0.85rem, 4%, 2rem);
+  left: 50%;
+  padding-inline: clamp(0.45rem, 2.5%, 1rem);
+  position: absolute;
+  transform: translateX(-50%);
+  width: 100%;
+  z-index: 20;
+}
+
+.cindyVisualShell {
+  height: 100%;
+  inset: 0;
+  pointer-events: none;
+  position: absolute;
+  width: 100%;
+  z-index: 1;
+}
+
+.cindyOverlay {
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.5));
+  height: 100%;
+  inset: 0;
+  position: absolute;
+  width: 100%;
+}
+
+.cindyContent {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  inset: 0;
+  justify-content: flex-start;
+  padding: clamp(2rem, 10%, 4rem) clamp(0.75rem, 4%, 1.5rem);
+  position: absolute;
+  text-align: center;
+  width: 100%;
+  z-index: 10;
+}
+
+.cindyTopSpacer {
+  height: 8%;
+  min-height: clamp(18px, 4%, 36px);
+}
+
+.cindyCenterGroup {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  flex: 0 0 auto;
+}
+
+.cindyNamesText {
+  color: #fff;
+  font-family: var(--font-cormorant), "Cormorant Garamond", serif;
+  font-size: clamp(1.1rem, 5.2vw, 2.2rem);
+  font-weight: 300;
+  letter-spacing: 0.18em;
+  line-height: 1.05;
+  margin: 0;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  text-transform: uppercase;
+}
+
+.cindyNamesText span {
+  display: inline-block;
+}
+
+.cindyAmpersand {
+  color: #fff;
+  display: block;
+  font-family: "Mrs Saint Delafield", cursive;
+  font-size: clamp(0.82rem, 3.8vw, 1.58rem);
+  font-weight: 400;
+  line-height: 1;
+  margin: -2px 0;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+}
+
+.cindyDate {
+  color: #fff;
+  font-size: clamp(0.34rem, 1.3vw, 0.58rem);
+  font-weight: 300;
+  letter-spacing: 0.35em;
+  margin-top: clamp(0.35rem, 2%, 0.75rem);
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+  text-transform: uppercase;
+}
+
+.cindyBottomGroup {
+  align-items: center;
+  bottom: 10%;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(0.35rem, 2%, 0.75rem);
+  inset-inline: 0;
+  position: absolute;
+}
+
+.cindyButton {
+  align-items: center;
+  cursor: pointer;
+  display: inline-flex;
+  justify-content: center;
+  min-width: clamp(6.5rem, 68%, 12.5rem);
+  padding: clamp(0.38rem, 1.6vw, 0.62rem) clamp(0.75rem, 4vw, 1.62rem);
+  position: relative;
+  text-decoration: none;
+}
+
+.cindyButtonBorder {
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35), 0 1px 4px rgba(0, 0, 0, 0.2);
+  inset: 0;
+  pointer-events: none;
+  position: absolute;
+}
+
+.cindyButtonBg {
+  backdrop-filter: blur(4px);
+  background: rgba(101, 67, 33, 0.35);
+  border-radius: 7px;
+  inset: 1px;
+  pointer-events: none;
+  position: absolute;
+}
+
+.cindyButtonLabel {
+  color: #fff;
+  font-family: var(--font-cormorant), "Cormorant Garamond", serif;
+  font-size: clamp(0.32rem, 1.1vw, 0.57rem);
+  font-weight: 400;
+  letter-spacing: 0.34em;
+  position: relative;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.5), 0 0 2px rgba(0, 0, 0, 0.3);
+  text-transform: uppercase;
+  z-index: 1;
+}
+
+.cindyTimer {
+  transform: scale(clamp(0.52, calc(0.12vw + 0.48), 0.82));
+  transform-origin: top center;
+}
+
+.countdown {
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: center;
+}
+
+.andreaCountdown {
+  gap: clamp(0.22rem, 1.2vw, 0.5rem);
+}
+
+.cindyCountdown {
+  gap: clamp(0.28rem, 1.5vw, 0.75rem);
+}
+
+.countdownItem {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+}
+
+.countdownCard {
+  min-width: clamp(1.85rem, 8vw, 3.25rem);
+  padding: clamp(0.22rem, 1vw, 0.5rem);
+  text-align: center;
+}
+
+.andreaCountdown .countdownCard {
+  backdrop-filter: blur(4px);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.cindyCountdown .countdownCard {
+  min-width: clamp(2.4rem, 10vw, 4.5rem);
+}
+
+.countdownNumber {
+  font-family: var(--font-cormorant), "Cormorant Garamond", serif;
+  font-weight: 300;
+  letter-spacing: 0.025em;
+}
+
+.andreaCountdown .countdownNumber {
+  color: #fff;
+  font-size: clamp(0.72rem, 3vw, 1.35rem);
+}
+
+.cindyCountdown .countdownNumber {
+  color: #f9f6ee;
+  font-size: clamp(0.95rem, 4.2vw, 2.15rem);
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+.countdownLabel {
+  font-family: var(--font-cormorant), "Cormorant Garamond", serif;
+  font-weight: 300;
+  letter-spacing: 0.08em;
+  margin-top: 0.25rem;
+  text-transform: uppercase;
+}
+
+.andreaCountdown .countdownLabel {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: clamp(0.32rem, 1.1vw, 0.62rem);
+}
+
+.cindyCountdown .countdownLabel {
+  color: rgba(249, 246, 238, 0.7);
+  font-size: clamp(0.38rem, 1.3vw, 0.72rem);
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+  justify-content: center;
+  pointer-events: auto;
+  position: relative;
+}
+
+.primary,
+.secondary {
+  align-items: center;
+  display: inline-flex;
+  font-family: var(--font-cormorant), Georgia, "Times New Roman", serif;
+  font-size: 0.82rem;
+  font-weight: 400;
+  justify-content: center;
+  letter-spacing: 0.12em;
+  min-height: 3rem;
+  padding: 0.85rem 1.05rem;
+  text-decoration: none;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.35);
+  text-transform: uppercase;
+}
+
+.primary {
+  background: rgba(255, 255, 255, 0.92);
+  color: #181313;
+  text-shadow: none;
+}
+
+.secondary {
+  backdrop-filter: blur(4px);
+  background: rgba(0, 0, 0, 0.22);
+  border: 1px solid rgba(255, 255, 255, 0.52);
+  color: #fff;
+}
+
+@media (max-width: 760px) {
+  .foreground {
+    padding-top: clamp(4.25rem, 8svh, 5rem);
+  }
+
+  .lede {
+    line-height: 1.5;
+  }
+}
+
+@media (max-width: 560px) {
+  .foreground {
+    padding-bottom: 1rem;
+  }
+
+  .title {
+    font-size: clamp(2.85rem, 13vw, 4.1rem);
+    line-height: 0.9;
+  }
+
+  .lede {
+    font-size: 0.92rem;
+    max-width: 22rem;
+  }
+
+  .actions {
+    gap: 0.55rem;
+  }
+
+  .primary,
+  .secondary {
+    font-size: 0.62rem;
+    min-height: 2.55rem;
+    padding: 0.68rem 0.78rem;
+  }
+}

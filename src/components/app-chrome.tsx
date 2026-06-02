@@ -2,7 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import NavbarV2 from "@/components/v2/navbar-v2";
-import MobileDock from "@/components/MobileDock";
+// import MobileDock from "@/components/MobileDock";
 
 const HIDE_CHROME_PREFIXES = ["/historia"];
 
@@ -21,7 +21,8 @@ export default function AppChrome({ children }: { children: React.ReactNode }) {
     <>
       {!hide && <NavbarV2 />}
       {children}
-      {!hide && <MobileDock />}
+      {/* Old mac dock — hidden on mobile while v3 scroll sequence is active */}
+      {/* {!hide && <MobileDock />} */}
     </>
   );
 }

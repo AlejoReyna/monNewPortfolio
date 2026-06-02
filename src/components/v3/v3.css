@@ -128,14 +128,6 @@
 .v3-manifesto-word.gold { color: var(--v3-gold); }
 
 /* ── PARALLAX DEPTH ──────────────────────── */
-.v3-depth-grid-svg {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  opacity: 0.05;
-  color: var(--v3-text);
-}
 .v3-depth-eyebrow {
   font-size: 0.6rem;
   letter-spacing: 0.35em;
@@ -896,6 +888,10 @@
   .v3-carousel-feature-grid {
     grid-template-columns: 1fr;
     gap: 1rem;
+    width: min(92vw, 620px);
+  }
+  .v3-carousel-card {
+    width: 100%;
   }
   .v3-carousel-sticker-panel {
     display: none;
@@ -903,5 +899,4 @@
   .v3-contact-layout {
     grid-template-columns: 1fr;
   }
-  /* stack: copy, then form + sidebar */
 }

@@ -17,7 +17,6 @@ export default function ParallaxDepth() {
   const smooth = useSpring(scrollYProgress, { stiffness: 80, damping: 22 });
 
   // distintas velocidades por capa
-  const bgY = useTransform(smooth, [0, 1], ["-12%", "12%"]);
   const midY = useTransform(smooth, [0, 1], ["-25%", "25%"]);
   const fgY = useTransform(smooth, [0, 1], ["-45%", "45%"]);
   const numScale = useTransform(smooth, [0, 1], [0.85, 1.15]);
@@ -54,32 +53,6 @@ export default function ParallaxDepth() {
             overflow: "hidden",
           }}
         >
-          {/* capa fondo: grid lento */}
-          <motion.div
-            style={{
-              position: "absolute",
-              inset: "-10%",
-              y: bgY,
-            }}
-          >
-            <svg
-              className="v3-depth-grid-svg"
-              viewBox="0 0 1400 900"
-              fill="none"
-              preserveAspectRatio="xMidYMid slice"
-            >
-              <defs>
-                <pattern id="v3-grd" width="80" height="80" patternUnits="userSpaceOnUse">
-                  <path d="M80 0 L0 0 0 80" fill="none" stroke="currentColor" strokeWidth="0.5" />
-                </pattern>
-              </defs>
-              <rect width="100%" height="100%" fill="url(#v3-grd)" />
-              <circle cx="700" cy="450" r="300" stroke="currentColor" strokeWidth="0.5" />
-              <circle cx="700" cy="450" r="200" stroke="currentColor" strokeWidth="0.5" />
-              <circle cx="700" cy="450" r="100" stroke="currentColor" strokeWidth="0.5" />
-            </svg>
-          </motion.div>
-
           {/* capa media: contenido */}
           <motion.div
             style={{
