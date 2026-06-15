@@ -19,13 +19,29 @@ const PHASE = {
   cardsEnterAt: 0.58,
 } as const;
 
-const WHEEL_THRESHOLD = 16;
-const SWIPE_THRESHOLD = 36;
+// Delta a acumular antes de disparar UN salto de panel.
+const WHEEL_THRESHOLD = 30;
+// Tras un gesto, la rueda debe quedar en silencio este tiempo (ms) antes de
+// permitir el siguiente salto. Esto "absorbe" la inercia del trackpad que, de
+// otro modo, encadenaba 2 secciones con un solo swipe.
+const WHEEL_IDLE_MS = 240;
+const SWIPE_THRESHOLD = 44;
 const PANEL_TRANSITION = {
-  duration: 0.34,
-  ease: [0.22, 1, 0.36, 1] as const,
+  duration: 0.62,
+  ease: [0.16, 1, 0.3, 1] as const, // expo-out: arranque firme, asentado suave
 };
 type SequencePanel = 0 | 1 | 2 | 3; // | 4 — carousel hidden; minecraft + uanl panels removed
+
+const PANELS: { id: SequencePanel; label: string }[] = [
+  { id: 0, label: "Inicio" },
+  { id: 1, label: "This Cafetería" },
+  { id: 2, label: "Wedding Service" },
+  { id: 3, label: "Plebes" },
+];
+const LAST_PANEL = (PANELS.length - 1) as SequencePanel;
+
+const clampPanel = (value: number): SequencePanel =>
+  Math.max(0, Math.min(LAST_PANEL, value)) as SequencePanel;
 
 export default function HeroCarouselSequence() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -37,7 +53,13 @@ export default function HeroCarouselSequence() {
   const isRevealedRef = useRef(false);
   const activePanelRef = useRef<SequencePanel>(0);
   const [activePanel, setActivePanelState] = useState<SequencePanel>(0);
+  const [hasInteracted, setHasInteracted] = useState(false);
   const touchStartYRef = useRef<number | null>(null);
+
+  // ── Control de gesto de rueda (anti doble-salto por inercia) ──────────────
+  const navLockedRef = useRef(false); // true mientras dura un gesto + enfriamiento
+  const wheelAccumRef = useRef(0); // acumulador de deltaY hacia el umbral
+  const idleTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [carouselPointerEvents, setCarouselPointerEvents] = useState<"none" | "auto">("none");
   const [carouselIntroActive, setCarouselIntroActive] = useState(false);
   const [cafeteriaPointerEvents, setCafeteriaPointerEvents] = useState<"none" | "auto">("none");
@@ -196,21 +218,65 @@ export default function HeroCarouselSequence() {
     ]
   );
 
+  // Salto a un panel concreto (rueda, teclado, swipe o clic en los puntos).
+  const goToPanel = useCallback(
+    (next: SequencePanel) => {
+      setHasInteracted((prev) => (prev ? prev : true));
+      animateToPanel(next);
+    },
+    [animateToPanel]
+  );
+
+  const stepPanel = useCallback(
+    (dir: 1 | -1) => {
+      goToPanel(clampPanel(activePanelRef.current + dir));
+    },
+    [goToPanel]
+  );
+
+  // Libera el bloqueo SOLO cuando la rueda lleva WHEEL_IDLE_MS en silencio y la
+  // animación ya terminó. Mientras llega inercia, el temporizador se reinicia,
+  // de modo que un único flick = un único salto por mucha inercia que arrastre.
+  const scheduleUnlock = useCallback(() => {
+    if (idleTimerRef.current) clearTimeout(idleTimerRef.current);
+    idleTimerRef.current = setTimeout(function unlock() {
+      if (isAnimatingRef.current) {
+        idleTimerRef.current = setTimeout(unlock, WHEEL_IDLE_MS);
+        return;
+      }
+      navLockedRef.current = false;
+      wheelAccumRef.current = 0;
+      idleTimerRef.current = null;
+    }, WHEEL_IDLE_MS);
+  }, []);
+
   const handleWheel = useCallback(
     (event: WheelEvent<HTMLDivElement>) => {
-      if (Math.abs(event.deltaY) < WHEEL_THRESHOLD) return;
       const interactiveTarget = (event.target as HTMLElement | null)?.closest(
         "input, textarea, select, button, a"
       );
       if (interactiveTarget) return;
 
-      if (event.deltaY > 0) {
-        animateToPanel(Math.min(activePanelRef.current + 1, 3) as SequencePanel);
-      } else {
-        animateToPanel(Math.max(activePanelRef.current - 1, 0) as SequencePanel);
+      // Bloqueado (gesto en curso, animando o enfriando): tragamos la inercia y
+      // mantenemos vivo el temporizador hasta que la rueda quede en silencio.
+      if (navLockedRef.current || isAnimatingRef.current) {
+        scheduleUnlock();
+        return;
       }
+
+      wheelAccumRef.current += event.deltaY;
+      if (Math.abs(wheelAccumRef.current) < WHEEL_THRESHOLD) {
+        scheduleUnlock(); // si el usuario pausa, el acumulador se resetea
+        return;
+      }
+
+      const dir: 1 | -1 = wheelAccumRef.current > 0 ? 1 : -1;
+      navLockedRef.current = true;
+      wheelAccumRef.current = 0;
+      stepPanel(dir);
+      scheduleUnlock();
     },
-    [animateToPanel]
+    [scheduleUnlock, stepPanel]
   );
 
   const handleTouchStart = useCallback((event: TouchEvent<HTMLDivElement>) => {
@@ -229,14 +295,59 @@ export default function HeroCarouselSequence() {
       const deltaY = startY - endY;
       if (Math.abs(deltaY) < SWIPE_THRESHOLD) return;
 
-      if (deltaY > 0) {
-        animateToPanel(Math.min(activePanelRef.current + 1, 3) as SequencePanel);
-      } else {
-        animateToPanel(Math.max(activePanelRef.current - 1, 0) as SequencePanel);
-      }
+      stepPanel(deltaY > 0 ? 1 : -1);
     },
-    [animateToPanel]
+    [stepPanel]
   );
+
+  // ── Navegación por teclado (flechas, Página, Inicio/Fin, Espacio) ─────────
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      const target = event.target as HTMLElement | null;
+      if (
+        target?.closest("input, textarea, select, [contenteditable='true']")
+      ) {
+        return;
+      }
+
+      switch (event.key) {
+        case "ArrowDown":
+        case "PageDown":
+          event.preventDefault();
+          stepPanel(1);
+          break;
+        case "ArrowUp":
+        case "PageUp":
+          event.preventDefault();
+          stepPanel(-1);
+          break;
+        case " ": // barra espaciadora (Shift = hacia arriba)
+          event.preventDefault();
+          stepPanel(event.shiftKey ? -1 : 1);
+          break;
+        case "Home":
+          event.preventDefault();
+          goToPanel(0);
+          break;
+        case "End":
+          event.preventDefault();
+          goToPanel(LAST_PANEL);
+          break;
+        default:
+          break;
+      }
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [stepPanel, goToPanel]);
+
+  // Limpieza del temporizador de inercia al desmontar.
+  useEffect(() => {
+    return () => {
+      if (idleTimerRef.current) clearTimeout(idleTimerRef.current);
+    };
+  }, []);
 
   const heroForegroundOpacity = useTransform(
     cafeteriaProgress,
@@ -346,6 +457,41 @@ export default function HeroCarouselSequence() {
           </div>
         </motion.div>
         */}
+      </div>
+
+      {/* ── Indicador de progreso / navegación por secciones ──────────────── */}
+      <nav className="hcs-progress" aria-label="Secciones del portafolio">
+        <ul className="hcs-progress__list">
+          {PANELS.map((panel) => {
+            const isCurrent = panel.id === activePanel;
+            return (
+              <li key={panel.id} className="hcs-progress__item">
+                <button
+                  type="button"
+                  className={`hcs-progress__dot${isCurrent ? " is-active" : ""}`}
+                  aria-label={panel.label}
+                  aria-current={isCurrent ? "true" : undefined}
+                  onClick={() => goToPanel(panel.id)}
+                >
+                  <span className="hcs-progress__label">{panel.label}</span>
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+      </nav>
+
+      {/* ── Pista "scroll para explorar" (se desvanece tras interactuar) ──── */}
+      <div
+        className={`hcs-scroll-cue${
+          hasInteracted || activePanel !== 0 ? " is-hidden" : ""
+        }`}
+        aria-hidden="true"
+      >
+        <span className="hcs-scroll-cue__text">Desliza para explorar</span>
+        <span className="hcs-scroll-cue__mouse">
+          <span className="hcs-scroll-cue__wheel" />
+        </span>
       </div>
     </div>
   );

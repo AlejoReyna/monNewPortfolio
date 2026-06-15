@@ -100,15 +100,15 @@ export default function HeroV2({
       {/* ── Background image + parallax ── */}
       {!noBgImage && (
         <motion.div
-          className="absolute inset-0 z-0 scale-110"
+          className="absolute inset-0 z-0 scale-[1.02] md:scale-110"
           style={{ y: bgY }}
         >
           <Image
-            src="/shadersmine.png"
+            src="/racoons_linux.webp"
             alt="Architectural night backdrop"
             fill
             priority
-            className="object-cover"
+            className="object-cover object-[center_18%] md:object-center"
             style={{ opacity: 0.28, mixBlendMode: "luminosity" }}
           />
           {/* Multi-layer vignette */}
