@@ -9,7 +9,6 @@ const previewProjects = [
     id: "andrea" as const,
     href: "https://aldoyandrea.com",
     label: "View deploy",
-    stack: ["Next.js", "CSS Modules", "Framer Motion"],
     story: {
       title: "Andrea & Aldo",
       spec: "Production SPA — 2025",
@@ -20,7 +19,6 @@ const previewProjects = [
     id: "cindy" as const,
     href: "https://cindyjorge.com",
     label: "REVEALING IN AUGUST",
-    stack: ["React", "TailwindCSS", "Vercel Optimization"],
     story: {
       title: "Cindy & Jorge",
       spec: "Interactive Core — 2026",
@@ -245,7 +243,6 @@ export default function WeddingServiceGateway({ isActive = false }: { isActive?:
             >
               {project.label}
             </span>
-            <span className={styles.techStackBadge}>{project.stack.join("  |  ")}</span>
           </motion.div>
         </div>
 

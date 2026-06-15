@@ -41,9 +41,27 @@ const PANELS: { id: SequencePanel; label: string }[] = [
   { id: 4, label: "Plebes" },
 ];
 const LAST_PANEL = (PANELS.length - 1) as SequencePanel;
+const PANEL_SCROLLABLE_SELECTOR = "[data-carousel-scrollable='true']";
 
 const clampPanel = (value: number): SequencePanel =>
   Math.max(0, Math.min(LAST_PANEL, value)) as SequencePanel;
+
+const getScrollablePanel = (target: EventTarget | null) => {
+  if (!(target instanceof Element)) return null;
+  return target.closest<HTMLElement>(PANEL_SCROLLABLE_SELECTOR);
+};
+
+const canScrollPanel = (element: HTMLElement, deltaY: number) => {
+  if (deltaY > 0) {
+    return element.scrollTop + element.clientHeight < element.scrollHeight - 1;
+  }
+
+  if (deltaY < 0) {
+    return element.scrollTop > 1;
+  }
+
+  return false;
+};
 
 export default function HeroCarouselSequence() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -69,6 +87,7 @@ export default function HeroCarouselSequence() {
   const [nonamedbotPointerEvents, setNonamedbotPointerEvents] = useState<"none" | "auto">("none");
   const [minecraftPointerEvents, setMinecraftPointerEvents] = useState<"none" | "auto">("none");
   const [plebesPointerEvents, setPlebesPointerEvents] = useState<"none" | "auto">("none");
+  const touchScrollableRef = useRef<HTMLElement | null>(null);
 
   const setNavFontMode = useCallback(
     (mode: "default" | "cafeteria" | "wedding" | "invitation") => {
@@ -247,6 +266,12 @@ export default function HeroCarouselSequence() {
       );
       if (interactiveTarget) return;
 
+      const scrollablePanel = getScrollablePanel(event.target);
+      if (scrollablePanel && canScrollPanel(scrollablePanel, event.deltaY)) {
+        wheelAccumRef.current = 0;
+        return;
+      }
+
       // Bloqueado (gesto en curso, animando o enfriando): tragamos la inercia y
       // mantenemos vivo el temporizador hasta que la rueda quede en silencio.
       if (navLockedRef.current || isAnimatingRef.current) {
@@ -271,12 +296,15 @@ export default function HeroCarouselSequence() {
 
   const handleTouchStart = useCallback((event: TouchEvent<HTMLDivElement>) => {
     touchStartYRef.current = event.touches[0]?.clientY ?? null;
+    touchScrollableRef.current = getScrollablePanel(event.target);
   }, []);
 
   const handleTouchEnd = useCallback(
     (event: TouchEvent<HTMLDivElement>) => {
       const startY = touchStartYRef.current;
       touchStartYRef.current = null;
+      const scrollablePanel = touchScrollableRef.current;
+      touchScrollableRef.current = null;
       if (startY === null) return;
 
       const endY = event.changedTouches[0]?.clientY;
@@ -284,6 +312,8 @@ export default function HeroCarouselSequence() {
 
       const deltaY = startY - endY;
       if (Math.abs(deltaY) < SWIPE_THRESHOLD) return;
+
+      if (scrollablePanel && canScrollPanel(scrollablePanel, deltaY)) return;
 
       stepPanel(deltaY > 0 ? 1 : -1);
     },
@@ -364,7 +394,7 @@ export default function HeroCarouselSequence() {
       onWheel={handleWheel}
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
-      style={{ height: "100svh", position: "relative", zIndex: 1, touchAction: "pan-x" }}
+      style={{ height: "100svh", position: "relative", zIndex: 1, touchAction: activePanel === 4 ? "pan-y" : "pan-x" }}
       className="bg-[var(--gic-night-sky)]"
     >
       <div

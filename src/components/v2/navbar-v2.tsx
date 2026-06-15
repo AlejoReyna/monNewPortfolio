@@ -184,27 +184,27 @@ export default function NavbarV2() {
 
         body.is-cafeteria-panel-active .nav-v2-shell,
         body.is-cafeteria-panel-active .nav-v2-shell * {
-          font-family: var(--font-cormorant), Georgia, 'Times New Roman', serif !important;
+          font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace !important;
           letter-spacing: 0 !important;
         }
 
         body.is-cafeteria-panel-active .nav-v2-shell {
-          color: #2d2421;
-          text-shadow: none;
+          color: #ffffff;
+          text-shadow: 0 8px 18px rgba(0, 0, 0, 0.48);
         }
 
         body.is-cafeteria-panel-active .nav-v2-shell a,
         body.is-cafeteria-panel-active .nav-v2-shell button {
-          color: #2d2421 !important;
+          color: #ffffff !important;
         }
 
         body.is-cafeteria-panel-active .nav-v2-shell a span {
-          color: rgba(45, 36, 33, 0.72) !important;
+          color: rgba(255, 255, 255, 0.82) !important;
         }
 
         body.is-cafeteria-panel-active .nav-contact-pill {
-          background: rgba(255, 253, 249, 0.42) !important;
-          border-color: rgba(45, 36, 33, 0.24) !important;
+          background: rgba(0, 0, 0, 0.28) !important;
+          border-color: rgba(255, 255, 255, 0.38) !important;
         }
 
         body.is-minecraft-panel-active .nav-v2-shell,
@@ -236,7 +236,7 @@ export default function NavbarV2() {
 
         body.is-wedding-panel-active .nav-v2-shell,
         body.is-wedding-panel-active .nav-v2-shell * {
-          font-family: var(--font-cormorant), Georgia, 'Times New Roman', serif !important;
+          font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace !important;
           letter-spacing: 0 !important;
         }
 
@@ -307,8 +307,8 @@ export default function NavbarV2() {
         }
 
         body.is-cafeteria-panel-active .nav-contact-pill:hover {
-          background: rgba(45, 36, 33, 0.08) !important;
-          border-color: rgba(45, 36, 33, 0.38) !important;
+          background: rgba(255, 255, 255, 0.12) !important;
+          border-color: rgba(255, 255, 255, 0.52) !important;
         }
 
         body.is-minecraft-panel-active .nav-contact-pill:hover {
