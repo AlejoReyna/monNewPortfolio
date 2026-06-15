@@ -33,6 +33,14 @@ export default function ThisCafeteriaGateway({ isActive = false }: { isActive?: 
     },
   };
 
+  const badgeContainer = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: { staggerChildren: 0.08, delayChildren: 1.05 },
+    },
+  };
+
   const item = {
     hidden: { opacity: 0, y: 18 },
     show: { opacity: 1, y: 0, transition: { duration: 0.7, ease: [0.16, 1, 0.3, 1] as const } },
@@ -62,6 +70,27 @@ export default function ThisCafeteriaGateway({ isActive = false }: { isActive?: 
         animate={isActive ? { opacity: 1 } : { opacity: 0 }}
         transition={{ duration: 1, delay: 0.1 }}
       />
+
+      <motion.div
+        className={styles.deployBadge}
+        variants={badgeContainer}
+        initial="hidden"
+        animate={isActive ? "show" : "hidden"}
+      >
+        <motion.span className={styles.deployLabel} variants={item}>
+          Deployed on
+        </motion.span>
+        <motion.div className={styles.deployNetwork} variants={item} aria-label="Sepolia">
+          <img
+            className={styles.deployLogo}
+            src="/sepolia_eth.png"
+            alt=""
+            aria-hidden="true"
+            loading="lazy"
+          />
+          <span className={styles.deployName}>Sepolia</span>
+        </motion.div>
+      </motion.div>
 
       <motion.div
         className={styles.foreground}
