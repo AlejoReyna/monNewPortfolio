@@ -97,6 +97,41 @@ export default function PlebesProjectGateway({ isActive = false }: { isActive?: 
 
   return (
     <section className={styles.screen} aria-labelledby="plebes-project-title" data-carousel-scrollable="true">
+      <motion.div
+        className={styles.deployBadge}
+        variants={logoGroup}
+        initial="hidden"
+        animate={isActive ? "show" : "hidden"}
+        aria-label="Deployed on ICP"
+      >
+        <motion.span className={styles.deployLabel} variants={logoItem}>
+          Deployed on
+        </motion.span>
+        <motion.div className={styles.deployNetwork} variants={logoItem}>
+          <img
+            className={styles.deployLogo}
+            src="/icp_logo.png"
+            alt=""
+            aria-hidden="true"
+            loading="lazy"
+          />
+          <span className={styles.deployName}>ICP</span>
+        </motion.div>
+      </motion.div>
+
+      <motion.h2
+        className={styles.mobileTitle}
+        variants={logoItem}
+        initial="hidden"
+        animate={isActive ? "show" : "hidden"}
+      >
+        <span>{isEs ? "Desarrollador del" : "Developer for the"}</span>
+        <span>
+          <img className={styles.logoWord} src="/plebeslogo.svg" alt="plebes" />
+          {isEs ? " Proyecto" : " Project"}
+        </span>
+      </motion.h2>
+
       <div className={styles.inner}>
         <motion.div 
           className={styles.copy}

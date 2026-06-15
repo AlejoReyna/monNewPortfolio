@@ -35,10 +35,10 @@ type SequencePanel = 0 | 1 | 2 | 3 | 4;
 
 const PANELS: { id: SequencePanel; label: string }[] = [
   { id: 0, label: "Inicio" },
-  { id: 1, label: "This Cafetería" },
-  { id: 2, label: "NoNamedBot" },
-  { id: 3, label: "Wedding Service" },
-  { id: 4, label: "Plebes" },
+  { id: 1, label: "NoNamedBot" },
+  { id: 2, label: "Plebes" },
+  { id: 3, label: "This Cafetería" },
+  { id: 4, label: "Wedding Service" },
 ];
 const LAST_PANEL = (PANELS.length - 1) as SequencePanel;
 const PANEL_SCROLLABLE_SELECTOR = "[data-carousel-scrollable='true']";
@@ -153,25 +153,25 @@ export default function HeroCarouselSequence() {
       const currentPanel = activePanelRef.current;
       isAnimatingRef.current = true;
       setNavFontMode(
-        nextPanel === 1 ? "cafeteria" : nextPanel === 3 ? "wedding" : "default"
+        nextPanel === 3 ? "cafeteria" : nextPanel === 4 ? "wedding" : "default"
       );
       setActivePanel(nextPanel);
       isRevealedRef.current = false;
       revealProgress.set(0);
 
       // Pila de paneles deslizantes (índice = panelId - 1).
-      // 1: cafetería · 2: NoNamedBot · 3: boda · 4: plebes
+      // 1: NoNamedBot · 2: plebes · 3: cafetería · 4: boda
       const progresses = [
-        cafeteriaProgress,
         nonamedbotProgress,
-        minecraftProgress,
         plebesProgress,
+        cafeteriaProgress,
+        minecraftProgress,
       ];
       const pointerSetters = [
-        setCafeteriaPointerEvents,
         setNonamedbotPointerEvents,
-        setMinecraftPointerEvents,
         setPlebesPointerEvents,
+        setCafeteriaPointerEvents,
+        setMinecraftPointerEvents,
       ];
 
       // Durante la transición ningún panel deslizante recibe eventos.
@@ -370,13 +370,13 @@ export default function HeroCarouselSequence() {
   }, []);
 
   const heroForegroundOpacity = useTransform(
-    cafeteriaProgress,
+    nonamedbotProgress,
     [0.12, 0.72],
     [1, 0]
   );
-  const heroScale = useTransform(cafeteriaProgress, [0, 1], [1, 0.985]);
-  const cafeteriaY = useTransform(cafeteriaProgress, [0, 1], ["100%", "0%"]);
+  const heroScale = useTransform(nonamedbotProgress, [0, 1], [1, 0.985]);
   const nonamedbotY = useTransform(nonamedbotProgress, [0, 1], ["100%", "0%"]);
+  const cafeteriaY = useTransform(cafeteriaProgress, [0, 1], ["100%", "0%"]);
   const minecraftY = useTransform(minecraftProgress, [0, 1], ["100%", "0%"]);
   const plebesY = useTransform(plebesProgress, [0, 1], ["100%", "0%"]);
   const carouselY = useTransform(revealProgress, [0, 1], ["7%", "0%"]);
@@ -394,7 +394,7 @@ export default function HeroCarouselSequence() {
       onWheel={handleWheel}
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
-      style={{ height: "100svh", position: "relative", zIndex: 1, touchAction: activePanel === 4 ? "pan-y" : "pan-x" }}
+      style={{ height: "100svh", position: "relative", zIndex: 1, touchAction: activePanel === 2 ? "pan-y" : "pan-x" }}
       className="bg-[var(--gic-night-sky)]"
     >
       <div
@@ -425,12 +425,12 @@ export default function HeroCarouselSequence() {
             position: "absolute",
             inset: 0,
             zIndex: 4,
-            y: cafeteriaY,
-            pointerEvents: cafeteriaPointerEvents,
+            y: nonamedbotY,
+            pointerEvents: nonamedbotPointerEvents,
             willChange: "transform",
           }}
         >
-          <ThisCafeteriaGateway isActive={activePanel === 1} />
+          <NoNamedBotGateway isActive={activePanel === 1} />
         </motion.div>
 
         <motion.div
@@ -438,12 +438,12 @@ export default function HeroCarouselSequence() {
             position: "absolute",
             inset: 0,
             zIndex: 5,
-            y: nonamedbotY,
-            pointerEvents: nonamedbotPointerEvents,
+            y: plebesY,
+            pointerEvents: plebesPointerEvents,
             willChange: "transform",
           }}
         >
-          <NoNamedBotGateway isActive={activePanel === 2} />
+          <PlebesProjectGateway isActive={activePanel === 2} />
         </motion.div>
 
         <motion.div
@@ -451,12 +451,12 @@ export default function HeroCarouselSequence() {
             position: "absolute",
             inset: 0,
             zIndex: 6,
-            y: minecraftY,
-            pointerEvents: minecraftPointerEvents,
+            y: cafeteriaY,
+            pointerEvents: cafeteriaPointerEvents,
             willChange: "transform",
           }}
         >
-          <WeddingServiceGateway isActive={activePanel === 3} />
+          <ThisCafeteriaGateway isActive={activePanel === 3} />
         </motion.div>
 
         <motion.div
@@ -464,12 +464,12 @@ export default function HeroCarouselSequence() {
             position: "absolute",
             inset: 0,
             zIndex: 7,
-            y: plebesY,
-            pointerEvents: plebesPointerEvents,
+            y: minecraftY,
+            pointerEvents: minecraftPointerEvents,
             willChange: "transform",
           }}
         >
-          <PlebesProjectGateway isActive={activePanel === 4} />
+          <WeddingServiceGateway isActive={activePanel === 4} />
         </motion.div>
 
         {/* Projects carousel hidden — uncomment import + block to restore
