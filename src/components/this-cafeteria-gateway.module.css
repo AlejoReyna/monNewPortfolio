@@ -1,18 +1,23 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@400;500&display=swap");
+
+@font-face {
+  font-family: 'Playfair Display';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/playfairdisplay/v40/nuFiD-vYSZviVYUb_rj3ij__anPXDTjYgEM86xRbPQ.woff2) format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
 
 .screen {
-  --cafeteria-surface: #fbf9f4;
-  --cafeteria-surface-deep: #f2eee5;
   --cafeteria-ink: #f8f5ea;
-  --cafeteria-muted: rgba(248, 245, 234, 0.78);
-  --cafeteria-line: rgba(248, 245, 234, 0.2);
+  --cafeteria-muted: rgba(248, 245, 234, 0.74);
+  --cafeteria-line: rgba(248, 245, 234, 0.18);
   --cafeteria-accent: #f8f5ea;
-  --cafeteria-blue: #315f73;
-  --cafeteria-green: #4d6d57;
-  --cafeteria-wine: #7a4251;
+  --cafeteria-gold: #c9a15b;
 
   color: var(--cafeteria-ink);
-  background: var(--cafeteria-surface);
+  background: #16110d;
   display: block;
   height: 100%;
   isolation: isolate;
@@ -35,8 +40,8 @@
 
 .backgroundCol::after {
   background:
-    radial-gradient(circle at 52% 42%, rgba(0, 0, 0, 0.12), rgba(0, 0, 0, 0.62) 72%),
-    linear-gradient(180deg, rgba(0, 0, 0, 0.38), rgba(0, 0, 0, 0.68));
+    linear-gradient(180deg, rgba(0, 0, 0, 0.18) 0%, rgba(0, 0, 0, 0.32) 42%, rgba(0, 0, 0, 0.82) 100%),
+    radial-gradient(circle at 40% 28%, rgba(0, 0, 0, 0) 30%, rgba(0, 0, 0, 0.42) 100%);
   content: "";
   inset: 0;
   pointer-events: none;
@@ -44,162 +49,62 @@
 }
 
 .foreground {
-  align-items: center;
-  background: transparent;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
   height: 100%;
-  justify-content: center;
+  justify-content: flex-end;
   min-height: 100dvh;
-  padding: clamp(5rem, 10vh, 6.25rem) clamp(1rem, 4vw, 4.5rem) clamp(2rem, 4vh, 3rem);
+  padding: clamp(2rem, 6vh, 4rem) clamp(1.5rem, 6vw, 5rem);
   position: relative;
   width: 100%;
   z-index: 2;
 }
 
-.contentBlock {
+.content {
   display: grid;
-  gap: clamp(0.75rem, 1.6vh, 1.15rem);
-  margin-inline: auto;
-  max-width: min(62rem, calc(100vw - 8rem));
+  gap: clamp(0.9rem, 2.2vh, 1.5rem);
+  justify-items: end;
+  margin-left: auto;
+  max-width: 40rem;
+  text-align: right;
   width: 100%;
 }
 
-.foreground::after {
-  content: "";
-  display: none;
-  inset: 0;
-  pointer-events: none;
-  position: absolute;
-  z-index: -1;
-}
-
-.title {
+.wordmark {
+  align-items: baseline;
+  column-gap: 0.14em;
   color: var(--cafeteria-ink);
+  display: flex;
+  flex-direction: row;
   font-family: "Playfair Display", Georgia, serif;
-  font-size: clamp(2.35rem, 4.8vw, 3.85rem);
-  font-weight: 400;
-  letter-spacing: -0.035em;
+  font-size: clamp(2.4rem, 7.8vw, 5.2rem);
+  font-weight: 500;
+  letter-spacing: -0.02em;
   line-height: 0.92;
   margin: 0;
-  text-align: center;
-  text-shadow: 0 0.15rem 1.2rem rgba(0, 0, 0, 0.36);
-  word-spacing: 0.08em;
+  max-width: 100%;
+  text-align: right;
+  text-shadow: 0 0.15rem 1.4rem rgba(0, 0, 0, 0.45);
+  white-space: nowrap;
 }
 
-.bodyGrid {
-  display: grid;
-  gap: clamp(1.1rem, 2.2vh, 1.75rem);
-  grid-template-rows: auto auto auto;
-  padding-bottom: 0;
-  padding-top: clamp(1.35rem, 2.8vh, 2rem);
-  position: relative;
-  width: 100%;
+.wordmarkTop,
+.wordmarkBottom {
+  color: inherit;
+  font-size: inherit;
 }
 
-.bodyGrid::before {
-  background: linear-gradient(90deg, transparent, rgba(248, 245, 234, 0.62), transparent);
-  content: "";
-  height: 1px;
-  inset: 0 0 auto;
-  position: absolute;
-}
-
-.carouselShell {
-  align-items: center;
-  display: flex;
-  justify-content: center;
-  width: 100%;
-}
-
-.techRotator {
-  align-items: center;
-  display: flex;
-  justify-content: center;
-  min-height: clamp(8.05rem, 18.4vh, 11.5rem);
-  position: relative;
-  width: 100%;
-}
-
-.techSpotlight {
-  align-items: center;
-  display: flex;
-  flex-direction: column;
-  gap: clamp(0.86rem, 1.84vh, 1.15rem);
-  justify-content: center;
-  text-align: center;
-}
-
-.techSpotlightLogo {
-  display: block;
-  height: clamp(3.16rem, 6.9vh, 4.6rem);
-  object-fit: contain;
-  width: clamp(3.16rem, 6.9vh, 4.6rem);
-}
-
-.techSpotlightLabel {
-  color: var(--cafeteria-ink);
-  font-family: var(--font-geist-sans), "Inter", "Helvetica Neue", Helvetica, Arial, sans-serif;
-  font-size: clamp(0.9rem, 1.27vw, 1.06rem);
-  font-weight: 760;
-  letter-spacing: 0.04em;
-  line-height: 1.2;
-  text-transform: uppercase;
-}
-
-.stackCopy {
-  display: grid;
-  gap: clamp(1rem, 2vh, 1.35rem);
-}
-
-.stackLead {
+.lead {
   color: var(--cafeteria-muted);
   font-family: "Playfair Display", Georgia, serif;
-  font-size: clamp(1rem, 1.55vw, 1.18rem);
+  font-size: clamp(0.98rem, 1.5vw, 1.16rem);
   font-weight: 400;
-  line-height: 1.62;
-  margin: 0;
-  text-align: center;
+  line-height: 1.55;
+  margin: 0 0 0 auto;
+  max-width: 34rem;
+  text-align: right;
   text-shadow: 0 0.08rem 0.8rem rgba(0, 0, 0, 0.42);
-  text-wrap: pretty;
-}
-
-.infraList {
-  border-top: 1px solid var(--cafeteria-line);
-  display: grid;
-  margin: 0;
-}
-
-.infraRow {
-  align-items: baseline;
-  border-bottom: 1px solid var(--cafeteria-line);
-  display: grid;
-  gap: clamp(0.35rem, 1vw, 0.65rem) clamp(1rem, 2vw, 1.75rem);
-  grid-template-columns: minmax(7.5rem, 0.42fr) minmax(0, 1fr);
-  margin: 0;
-  padding: clamp(0.65rem, 1.4vh, 0.85rem) 0;
-}
-
-.infraService {
-  color: var(--cafeteria-ink);
-  font-family: var(--font-geist-sans), "Inter", "Helvetica Neue", Helvetica, Arial, sans-serif;
-  font-size: clamp(0.68rem, 0.95vw, 0.78rem);
-  font-weight: 650;
-  letter-spacing: 0.06em;
-  line-height: 1.35;
-  margin: 0;
-  text-transform: uppercase;
-}
-
-.infraDetail {
-  color: var(--cafeteria-muted);
-  font-family: "Playfair Display", Georgia, serif;
-  font-size: clamp(0.92rem, 1.25vw, 1.05rem);
-  font-weight: 400;
-  line-height: 1.45;
-  margin: 0;
-  text-align: left;
   text-wrap: pretty;
 }
 
@@ -207,25 +112,24 @@
   align-items: center;
   display: flex;
   flex-wrap: wrap;
-  gap: 0.85rem 1rem;
-  justify-content: center;
-  margin: 0;
+  gap: 0.7rem 0.85rem;
+  justify-content: flex-end;
+  margin: clamp(0.15rem, 0.6vh, 0.5rem) 0 0;
 }
 
-.cta {
+.ctaPrimary,
+.ctaSecondary {
   align-items: center;
-  background: rgba(248, 245, 234, 0.92);
-  border: 0.75px solid rgba(248, 245, 234, 0.92);
-  border-radius: 0;
-  color: #2d2421;
+  border-radius: 999px;
   display: inline-flex;
   font-family: var(--font-geist-sans), "Inter", "Helvetica Neue", Helvetica, Arial, sans-serif;
-  font-size: 0.85rem;
+  font-size: 0.72rem;
   font-weight: 700;
+  gap: 0.45rem;
   justify-content: center;
-  letter-spacing: 0;
-  min-height: 3rem;
-  padding: 0.75rem 1.45rem;
+  letter-spacing: 0.07em;
+  min-height: 2.4rem;
+  padding: 0.5rem 1.2rem;
   text-decoration: none;
   text-transform: uppercase;
   transition:
@@ -235,34 +139,105 @@
     transform 160ms ease;
 }
 
-.cta:hover {
+.ctaPrimary {
+  background: rgba(248, 245, 234, 0.94);
+  border: 1px solid rgba(248, 245, 234, 0.94);
+  color: #221b17;
+}
+
+.ctaPrimary:hover {
   background: #ffffff;
   border-color: #ffffff;
-  color: #2d2421;
   transform: translateY(-1px);
 }
 
-.cta:focus-visible {
+.ctaSecondary {
+  background: rgba(248, 245, 234, 0.04);
+  border: 1px solid rgba(248, 245, 234, 0.4);
+  color: var(--cafeteria-ink);
+}
+
+.ctaSecondary:hover {
+  background: rgba(248, 245, 234, 0.12);
+  border-color: var(--cafeteria-ink);
+  transform: translateY(-1px);
+}
+
+.ctaPrimary span,
+.ctaSecondary span {
+  transition: transform 160ms ease;
+}
+
+.ctaPrimary:hover span,
+.ctaSecondary:hover span {
+  transform: translateX(3px);
+}
+
+.ctaPrimary:focus-visible,
+.ctaSecondary:focus-visible {
   outline: 2px solid var(--cafeteria-accent);
   outline-offset: 4px;
 }
 
-@media (max-width: 760px) {
-  .bodyGrid {
-    gap: 1.25rem;
-    padding-bottom: 0;
-    padding-top: 1.75rem;
+.techRow {
+  align-items: center;
+  border-top: 1px solid var(--cafeteria-line);
+  display: flex;
+  flex-wrap: nowrap;
+  gap: clamp(0.6rem, 2.6vw, 1.1rem);
+  justify-content: center;
+  list-style: none;
+  margin: clamp(0.4rem, 1.4vh, 0.9rem) 0 0;
+  padding: clamp(0.85rem, 2vh, 1.1rem) 0 0;
+  width: 100%;
+}
+
+.techChip {
+  display: inline-flex;
+}
+
+.techLogo {
+  display: block;
+  height: clamp(1rem, 2.9vw, 1.2rem);
+  object-fit: contain;
+  opacity: 0.8;
+  transition: opacity 160ms ease, transform 160ms ease;
+  width: auto;
+}
+
+.techLogoTint {
+  filter: brightness(0) saturate(0) invert(0.97);
+}
+
+.techChip:hover .techLogo {
+  opacity: 1;
+  transform: translateY(-2px);
+}
+
+@media (max-width: 768px) {
+  .foreground {
+    justify-content: flex-end;
+    padding: 2.25rem 1.5rem clamp(2.25rem, 6vh, 3rem);
   }
 
-  .stackLead {
-    font-size: 0.92rem;
+  .content {
+    gap: 1.1rem;
+    max-width: 100%;
+  }
+
+  .wordmark {
+    font-size: clamp(2.3rem, 10.2vw, 4.35rem);
+  }
+
+  .lead {
+    font-size: 1rem;
     line-height: 1.5;
+    max-width: 30rem;
   }
 
-  .infraDetail {
-    font-size: 0.88rem;
+  .techRow {
+    gap: clamp(0.55rem, 2.6vw, 0.95rem);
   }
-
 }
 
 @media (max-width: 560px) {
@@ -275,51 +250,25 @@
   }
 
   .foreground {
-    height: auto;
-    justify-content: flex-start;
     min-height: 100svh;
-    padding: clamp(4.75rem, 9svh, 5.75rem) clamp(1rem, 4vw, 1.25rem) 1.25rem;
-    width: 100%;
+    padding: 2rem 1.35rem 2.25rem;
   }
 
-  .contentBlock {
-    max-width: 100%;
+  .lead {
+    font-size: 0.96rem;
   }
 
-  .title {
-    font-size: clamp(2.15rem, 11vw, 3.25rem);
+  .wordmark {
+    font-size: clamp(2.15rem, 10.8vw, 3.35rem);
   }
+}
 
-  .bodyGrid {
-    gap: 1.25rem;
-    padding-bottom: 0;
-    padding-top: 1.35rem;
+@media (prefers-reduced-motion: reduce) {
+  .ctaPrimary,
+  .ctaSecondary,
+  .ctaPrimary span,
+  .ctaSecondary span,
+  .techLogo {
+    transition: none;
   }
-
-  .stackLead {
-    text-align: center;
-  }
-
-  .infraRow {
-    grid-template-columns: 1fr;
-    text-align: center;
-  }
-
-  .infraDetail {
-    text-align: center;
-  }
-
-  .techRotator {
-    min-height: clamp(11.5rem, 29.9vh, 16.1rem);
-  }
-
-  .techSpotlightLogo {
-    height: 2.875rem;
-    width: 2.875rem;
-  }
-
-  .techSpotlightLabel {
-    font-size: 0.828rem;
-  }
-
 }
