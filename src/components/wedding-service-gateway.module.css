@@ -54,10 +54,9 @@
 
 .previewGrid {
   align-items: stretch;
-  display: grid;
+  display: flex;
+  flex-direction: row;
   gap: 0;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  grid-template-rows: minmax(100dvh, 1fr);
   height: 100%;
   min-height: 100dvh;
   pointer-events: auto;
@@ -66,14 +65,27 @@
 
 .previewCol {
   color: inherit;
+  cursor: pointer;
   display: block;
+  flex: 1 1 0;
   height: 100%;
   isolation: isolate;
   min-height: 100%;
+  min-width: 0;
   overflow: hidden;
   position: relative;
   text-decoration: none;
-  width: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Columna expandida: levantamos el velo y mostramos el preview completo */
+.previewColOpen::after {
+  opacity: 0 !important;
+}
+
+.previewColOpen .heroShell {
+  opacity: 1;
+  pointer-events: auto;
 }
 
 .previewCol::after {
@@ -434,7 +446,7 @@
 }
 
 .andreaCol {
-  background-image: url("https://aldoyandrea.com/hero.jpeg");
+  background-image: url("/andrea_hero.jpeg");
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
@@ -446,7 +458,7 @@
 
 .cindyCol {
   background: #f9f5e9;
-  background-image: url("https://cindy-s-wedding.vercel.app/assets/hero-0624.jpg");
+  background-image: url("/cindy_hero.jpg");
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
@@ -763,6 +775,92 @@
   color: rgba(249, 246, 238, 0.7);
   font-size: clamp(0.38rem, 1.3vw, 0.72rem);
   text-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
+}
+
+/* ── CTA de la columna expandida ── */
+.expandOverlay {
+  align-items: center;
+  bottom: clamp(1.5rem, 9vh, 3.5rem);
+  display: flex;
+  flex-direction: column;
+  gap: clamp(0.6rem, 1.6vh, 1rem);
+  left: 50%;
+  position: absolute;
+  transform: translateX(-50%);
+  width: min(92%, 22rem);
+  z-index: 35;
+}
+
+.expandSpec {
+  color: rgba(255, 255, 255, 0.55);
+  font-family: system-ui, -apple-system, sans-serif;
+  font-size: 0.62rem;
+  letter-spacing: 0.22em;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.5);
+  text-transform: uppercase;
+}
+
+.expandCta {
+  align-items: center;
+  backdrop-filter: blur(6px);
+  background: rgba(0, 0, 0, 0.42);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  color: #fff;
+  display: inline-flex;
+  font-family: var(--font-cormorant), Georgia, "Times New Roman", serif;
+  font-size: clamp(0.74rem, 1.4vw, 0.95rem);
+  gap: 0.5em;
+  justify-content: center;
+  letter-spacing: 0.16em;
+  padding: clamp(0.65rem, 1.4vw, 0.85rem) clamp(1.2rem, 2.6vw, 1.9rem);
+  text-decoration: none;
+  text-transform: uppercase;
+  transition: background 0.35s ease, border-color 0.35s ease, transform 0.35s ease;
+}
+
+.expandCta:hover {
+  background: rgba(0, 0, 0, 0.62);
+  border-color: #fff;
+  transform: translateY(-2px);
+}
+
+/* ── Control "Volver" ── */
+.backControl {
+  align-items: center;
+  backdrop-filter: blur(6px);
+  background: rgba(0, 0, 0, 0.38);
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  color: #fff;
+  cursor: pointer;
+  display: inline-flex;
+  font-family: var(--font-cormorant), Georgia, "Times New Roman", serif;
+  font-size: 0.78rem;
+  gap: 0.4em;
+  left: clamp(1rem, 4vw, 2.25rem);
+  letter-spacing: 0.14em;
+  padding: 0.5rem 1rem;
+  position: absolute;
+  text-transform: uppercase;
+  top: clamp(4.75rem, 11vh, 6.5rem);
+  transition: background 0.3s ease, border-color 0.3s ease;
+  z-index: 40;
+}
+
+.backControl:hover {
+  background: rgba(0, 0, 0, 0.58);
+  border-color: rgba(255, 255, 255, 0.75);
+}
+
+/* ── Pista de interacción bajo la copy central ── */
+.swipeHint {
+  color: rgba(255, 255, 255, 0.55);
+  font-family: system-ui, -apple-system, sans-serif;
+  font-size: clamp(0.62rem, 1vw, 0.72rem);
+  font-weight: 400;
+  letter-spacing: 0.2em;
+  margin: clamp(1.5rem, 3.5vh, 2.5rem) 0 0;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.5);
+  text-transform: uppercase;
 }
 
 @media (max-width: 760px) {

@@ -1,35 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
+import { useEffect, useRef, useState, type PointerEvent as ReactPointerEvent, type ReactElement } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import styles from "./wedding-service-gateway.module.css";
-
-const simpleIcon = (slug: string, color: string) => `https://cdn.simpleicons.org/${slug}/${color}`;
-
-const techRowVariants = {
-  hidden: {},
-  show: {
-    transition: { staggerChildren: 0.12, delayChildren: 0.2 },
-  },
-};
-
-const techItemVariants = {
-  hidden: { opacity: 0, y: 14 },
-  show: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.35, ease: [0.16, 1, 0.3, 1] as const },
-  },
-};
-
-// Shared stack across Andrea-y-Aldo and Cindy-y-Jorge (weddings package.json).
-const weddingTechStack = [
-  { label: "Next.js", logo: simpleIcon("nextdotjs", "FFFFFF") },
-  { label: "React", logo: simpleIcon("react", "FFFFFF") },
-  { label: "TypeScript", logo: simpleIcon("typescript", "FFFFFF") },
-  { label: "Tailwind CSS", logo: simpleIcon("tailwindcss", "FFFFFF") },
-  { label: "Vercel", logo: simpleIcon("vercel", "FFFFFF") },
-] as const;
 
 const previewProjects = [
   {
@@ -45,7 +18,7 @@ const previewProjects = [
   },
   {
     id: "cindy" as const,
-    href: "https://cindy-s-wedding.vercel.app",
+    href: "https://cindyjorge.com",
     label: "REVEALING IN AUGUST",
     stack: ["React", "TailwindCSS", "Vercel Optimization"],
     story: {
@@ -173,144 +146,185 @@ function Countdown({ targetDate, variant }: { targetDate: string; variant: "andr
   );
 }
 
+type ExpandedId = "andrea" | "cindy" | null;
+const SWIPE_DISTANCE = 45;
+const EXPAND_TRANSITION = { duration: 0.6, ease: [0.16, 1, 0.3, 1] as const };
+
 export default function WeddingServiceGateway({ isActive = false }: { isActive?: boolean }) {
-  const [hoveredId, setHoveredId] = useState<"andrea" | "cindy" | null>(null);
-  const shouldReduceMotion = useReducedMotion();
+  const [expanded, setExpanded] = useState<ExpandedId>(null);
+
+  const pointerStartX = useRef<number | null>(null);
+  const pointerStartY = useRef<number | null>(null);
+  const draggedRef = useRef(false);
+
+  // Al abandonar el panel, restauramos la rejilla de 2 columnas.
+  useEffect(() => {
+    if (!isActive) setExpanded(null);
+  }, [isActive]);
+
+  // ── Swipe / drag horizontal (Pointer Events: cubre touch y ratón) ──────
+  const applySwipe = (dir: "left" | "right") => {
+    setExpanded((prev) => {
+      if (prev === null) return dir === "left" ? "andrea" : "cindy";
+      if (prev === "andrea" && dir === "right") return null;
+      if (prev === "cindy" && dir === "left") return null;
+      return prev;
+    });
+  };
+
+  const handlePointerDown = (event: ReactPointerEvent<HTMLElement>) => {
+    pointerStartX.current = event.clientX;
+    pointerStartY.current = event.clientY;
+    draggedRef.current = false;
+  };
+
+  const handlePointerUp = (event: ReactPointerEvent<HTMLElement>) => {
+    const startX = pointerStartX.current;
+    const startY = pointerStartY.current;
+    pointerStartX.current = null;
+    pointerStartY.current = null;
+    if (startX === null || startY === null) return;
+
+    const dx = event.clientX - startX;
+    const dy = event.clientY - startY;
+    if (Math.abs(dx) > SWIPE_DISTANCE && Math.abs(dx) > Math.abs(dy)) {
+      draggedRef.current = true;
+      applySwipe(dx < 0 ? "left" : "right");
+    }
+  };
+
+  // Clic/tap en una columna (cuando no fue un arrastre): la expande.
+  const handleColumnActivate = (id: "andrea" | "cindy") => {
+    if (draggedRef.current) {
+      draggedRef.current = false;
+      return;
+    }
+    setExpanded((prev) => (prev === null ? id : prev));
+  };
+
+  const columnGrow = (id: "andrea" | "cindy") =>
+    expanded === null ? 1 : expanded === id ? 1 : 0;
+
+  const renderColumn = (
+    id: "andrea" | "cindy",
+    colClass: string,
+    project: (typeof previewProjects)[number],
+    Preview: () => ReactElement,
+    wideHint = false
+  ) => {
+    const open = expanded === id;
+    return (
+      <motion.div
+        className={`${styles.previewCol} ${colClass}${open ? ` ${styles.previewColOpen}` : ""}`}
+        style={{ flexBasis: 0, minWidth: 0 }}
+        animate={{ flexGrow: columnGrow(id) }}
+        transition={EXPAND_TRANSITION}
+        role="button"
+        tabIndex={expanded === null || open ? 0 : -1}
+        aria-label={`${project.story.title} — abrir invitación`}
+        onClick={() => handleColumnActivate(id)}
+        onKeyDown={(event) => {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            handleColumnActivate(id);
+          }
+        }}
+      >
+        <div className={styles.innerPreviewWrapper}>
+          <Preview />
+          <motion.div
+            className={styles.colFooter}
+            animate={{ opacity: expanded ? 0 : 1 }}
+            transition={{ duration: 0.3 }}
+            style={{ pointerEvents: "none" }}
+          >
+            <span
+              className={`${styles.colHint} ${styles.colHintAction}${
+                wideHint ? ` ${styles.colHintActionWide}` : ""
+              }`}
+            >
+              {project.label}
+            </span>
+            <span className={styles.techStackBadge}>{project.stack.join("  |  ")}</span>
+          </motion.div>
+        </div>
+
+        {/* CTA visible solo cuando la columna está expandida */}
+        <AnimatePresence>
+          {open && (
+            <motion.div
+              className={styles.expandOverlay}
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 16 }}
+              transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1], delay: 0.15 }}
+            >
+              <span className={styles.expandSpec}>{project.story.spec}</span>
+              <a
+                className={styles.expandCta}
+                href={project.href}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Ver invitación <span aria-hidden="true">→</span>
+              </a>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </motion.div>
+    );
+  };
 
   return (
-    <section className={styles.screen} aria-labelledby="wedding-service-title">
-      <motion.div 
-        className={styles.previewLayer} 
+    <section
+      className={styles.screen}
+      aria-labelledby="wedding-service-title"
+      onPointerDown={handlePointerDown}
+      onPointerUp={handlePointerUp}
+    >
+      <motion.div
+        className={styles.previewLayer}
         aria-label="Wedding invitation mobile hero previews"
         initial={{ opacity: 0 }}
         animate={isActive ? { opacity: 1 } : { opacity: 0 }}
         transition={{ duration: 1, delay: 0.1 }}
       >
         <div className={styles.previewGrid}>
-          
-          {/* COLUMNA IZQUIERDA: ANDREA */}
-          <a
-            className={`${styles.previewCol} ${styles.andreaCol}`}
-            href={previewProjects[0].href}
-            target="_blank"
-            rel="noopener noreferrer"
-            onMouseEnter={() => setHoveredId("andrea")}
-            onMouseLeave={() => setHoveredId(null)}
-          >
-            {/* Contenido original: Se desvanece por completo si la derecha (Cindy) tiene hover */}
-            <motion.div 
-              className={styles.innerPreviewWrapper}
-              animate={{ opacity: hoveredId === "cindy" ? 0 : 1 }}
-              transition={{ duration: 0.35, ease: "easeInOut" }}
-              style={{ pointerEvents: hoveredId === "cindy" ? "none" : "auto" }}
-            >
-              <AndreaHeroPreview />
-              <div className={styles.colFooter}>
-                <span className={`${styles.colHint} ${styles.colHintAction}`}>
-                  {previewProjects[0].label}
-                </span>
-                <span className={styles.techStackBadge}>
-                  {previewProjects[0].stack.join("  |  ")}
-                </span>
-              </div>
-            </motion.div>
-
-            {/* GRID OPUESTO: Muestra la info de CINDY cuando CINDY tiene hover */}
-            <AnimatePresence>
-              {hoveredId === "cindy" && (
-                <motion.div 
-                  className={styles.storyGrid}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-                >
-                  <div className={styles.gridHeader}>
-                    <span className={styles.gridSpec}>{previewProjects[1].story.spec}</span>
-                    <h4 className={styles.gridTitle}>{previewProjects[1].story.title}</h4>
-                  </div>
-                  <div className={styles.gridBody}>
-                    <p className={styles.gridDescription}>{previewProjects[1].story.description}</p>
-                    <div className={styles.gridFooterStack}>
-                      {previewProjects[1].stack.map((tech) => (
-                        <span key={tech} className={styles.gridTechTag}>{tech}</span>
-                      ))}
-                    </div>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </a>
-
-          {/* COLUMNA DERECHA: CINDY */}
-          <a
-            className={`${styles.previewCol} ${styles.cindyCol}`}
-            href={previewProjects[1].href}
-            target="_blank"
-            rel="noopener noreferrer"
-            onMouseEnter={() => setHoveredId("cindy")}
-            onMouseLeave={() => setHoveredId(null)}
-          >
-            {/* Contenido original: Se desvanece por completo si la izquierda (Andrea) tiene hover */}
-            <motion.div 
-              className={styles.innerPreviewWrapper}
-              animate={{ opacity: hoveredId === "andrea" ? 0 : 1 }}
-              transition={{ duration: 0.35, ease: "easeInOut" }}
-              style={{ pointerEvents: hoveredId === "andrea" ? "none" : "auto" }}
-            >
-              <CindyHeroPreview />
-              <div className={styles.colFooter}>
-                <span className={`${styles.colHint} ${styles.colHintAction} ${styles.colHintActionWide}`}>
-                  {previewProjects[1].label}
-                </span>
-                <span className={styles.techStackBadge}>
-                  {previewProjects[1].stack.join("  |  ")}
-                </span>
-              </div>
-            </motion.div>
-
-            {/* GRID OPUESTO: Muestra la info de ANDREA cuando ANDREA tiene hover */}
-            <AnimatePresence>
-              {hoveredId === "andrea" && (
-                <motion.div 
-                  className={styles.storyGrid}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-                >
-                  <div className={styles.gridHeader}>
-                    <span className={styles.gridSpec}>{previewProjects[0].story.spec}</span>
-                    <h4 className={styles.gridTitle}>{previewProjects[0].story.title}</h4>
-                  </div>
-                  <div className={styles.gridBody}>
-                    <p className={styles.gridDescription}>{previewProjects[0].story.description}</p>
-                    <div className={styles.gridFooterStack}>
-                      {previewProjects[0].stack.map((tech) => (
-                        <span key={tech} className={styles.gridTechTag}>{tech}</span>
-                      ))}
-                    </div>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </a>
-
+          {renderColumn("andrea", styles.andreaCol, previewProjects[0], AndreaHeroPreview)}
+          {renderColumn("cindy", styles.cindyCol, previewProjects[1], CindyHeroPreview, true)}
         </div>
       </motion.div>
 
-      {/* FOREGROUND CENTRAL: Desaparece completamente al hacer hover */}
+      {/* Control para volver a la rejilla de 2 columnas */}
+      <AnimatePresence>
+        {expanded && (
+          <motion.button
+            type="button"
+            className={styles.backControl}
+            onClick={() => setExpanded(null)}
+            initial={{ opacity: 0, x: -10 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -10 }}
+            transition={{ duration: 0.35 }}
+            aria-label="Volver a las dos invitaciones"
+          >
+            <span aria-hidden="true">‹</span> Volver
+          </motion.button>
+        )}
+      </AnimatePresence>
+
+      {/* FOREGROUND CENTRAL: se oculta al expandir una columna */}
       <motion.div
         className={styles.foreground}
         initial={{ clipPath: "circle(0% at 50% 50%)" }}
         animate={isActive ? { clipPath: "circle(150% at 50% 50%)" } : { clipPath: "circle(0% at 50% 50%)" }}
         transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
-        style={{ pointerEvents: "none" }} 
+        style={{ pointerEvents: "none" }}
       >
-        <div className={styles.foregroundInner}>
-          <motion.div 
+        <div className={styles.foregroundInner} style={{ pointerEvents: expanded ? "none" : "auto" }}>
+          <motion.div
             className={styles.copyBlock}
-            animate={{ opacity: hoveredId ? 0 : 1, y: hoveredId ? -15 : 0 }}
+            animate={{ opacity: expanded ? 0 : 1, y: expanded ? -15 : 0 }}
             transition={{ duration: 0.35, ease: "easeInOut" }}
           >
             <h2 id="wedding-service-title" className={styles.title}>
@@ -320,29 +334,7 @@ export default function WeddingServiceGateway({ isActive = false }: { isActive?:
               Fluidly animated Single Page Applications featuring high-performance image optimization & strict mobile-first UI architecture.
             </p>
 
-            <motion.ul
-              className={styles.techRow}
-              aria-label="Wedding invitation technical stack"
-              variants={
-                shouldReduceMotion
-                  ? undefined
-                  : techRowVariants
-              }
-              initial={shouldReduceMotion ? false : "hidden"}
-              animate={isActive ? "show" : "hidden"}
-            >
-              {weddingTechStack.map((tech) => (
-                <motion.li
-                  key={tech.label}
-                  className={styles.techItem}
-                  variants={shouldReduceMotion ? undefined : techItemVariants}
-                  initial={shouldReduceMotion ? false : undefined}
-                >
-                  <img className={styles.techItemLogo} src={tech.logo} alt="" aria-hidden="true" />
-                  <span className={styles.techItemLabel}>{tech.label}</span>
-                </motion.li>
-              ))}
-            </motion.ul>
+            <p className={styles.swipeHint}>Desliza o toca para ver cada invitación</p>
           </motion.div>
         </div>
       </motion.div>
