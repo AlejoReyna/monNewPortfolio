@@ -1,9 +1,13 @@
 "use client";
 
-import { useCallback, useRef, useState, type TouchEvent, type WheelEvent } from "react";
+import { useCallback, useEffect, useRef, useState, type TouchEvent, type WheelEvent } from "react";
 import { animate, motion, useMotionValue, useMotionValueEvent, useTransform } from "framer-motion";
 import HeroV2 from "@/components/v2/hero-v2";
-import ProjectsCarousel from "@/components/v3/projects-carousel";
+// import ProjectsCarousel from "@/components/v3/projects-carousel";
+import ThisCafeteriaGateway from "@/components/this-cafeteria-gateway";
+import NoNamedBotGateway from "@/components/nonamedbot-gateway";
+import WeddingServiceGateway from "@/components/wedding-service-gateway";
+import PlebesProjectGateway from "@/components/plebes-project-gateway";
 import "@/components/v3/v3.css";
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -16,17 +20,103 @@ const PHASE = {
   cardsEnterAt: 0.58,
 } as const;
 
-const WHEEL_THRESHOLD = 16;
-const SWIPE_THRESHOLD = 36;
+// Delta a acumular antes de disparar UN salto de panel.
+const WHEEL_THRESHOLD = 30;
+// Tras un gesto, la rueda debe quedar en silencio este tiempo (ms) antes de
+// permitir el siguiente salto. Esto "absorbe" la inercia del trackpad que, de
+// otro modo, encadenaba 2 secciones con un solo swipe.
+const WHEEL_IDLE_MS = 240;
+const SWIPE_THRESHOLD = 44;
+const PANEL_TRANSITION = {
+  duration: 0.62,
+  ease: [0.16, 1, 0.3, 1] as const, // expo-out: arranque firme, asentado suave
+};
+type SequencePanel = 0 | 1 | 2 | 3 | 4;
+
+const PANELS: { id: SequencePanel; label: string }[] = [
+  { id: 0, label: "Inicio" },
+  { id: 1, label: "This Cafetería" },
+  { id: 2, label: "NoNamedBot" },
+  { id: 3, label: "Wedding Service" },
+  { id: 4, label: "Plebes" },
+];
+const LAST_PANEL = (PANELS.length - 1) as SequencePanel;
+
+const clampPanel = (value: number): SequencePanel =>
+  Math.max(0, Math.min(LAST_PANEL, value)) as SequencePanel;
 
 export default function HeroCarouselSequence() {
   const containerRef = useRef<HTMLDivElement>(null);
+  const cafeteriaProgress = useMotionValue(0);
+  const nonamedbotProgress = useMotionValue(0);
+  const minecraftProgress = useMotionValue(0);
+  const plebesProgress = useMotionValue(0);
   const revealProgress = useMotionValue(0);
   const isAnimatingRef = useRef(false);
   const isRevealedRef = useRef(false);
+  const activePanelRef = useRef<SequencePanel>(0);
+  const [activePanel, setActivePanelState] = useState<SequencePanel>(0);
+  const [hasInteracted, setHasInteracted] = useState(false);
   const touchStartYRef = useRef<number | null>(null);
+
+  // ── Control de gesto de rueda (anti doble-salto por inercia) ──────────────
+  const navLockedRef = useRef(false); // true mientras dura un gesto + enfriamiento
+  const wheelAccumRef = useRef(0); // acumulador de deltaY hacia el umbral
+  const idleTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [carouselPointerEvents, setCarouselPointerEvents] = useState<"none" | "auto">("none");
   const [carouselIntroActive, setCarouselIntroActive] = useState(false);
+  const [cafeteriaPointerEvents, setCafeteriaPointerEvents] = useState<"none" | "auto">("none");
+  const [nonamedbotPointerEvents, setNonamedbotPointerEvents] = useState<"none" | "auto">("none");
+  const [minecraftPointerEvents, setMinecraftPointerEvents] = useState<"none" | "auto">("none");
+  const [plebesPointerEvents, setPlebesPointerEvents] = useState<"none" | "auto">("none");
+
+  const setNavFontMode = useCallback(
+    (mode: "default" | "cafeteria" | "wedding" | "invitation") => {
+      document.body.classList.toggle("is-cafeteria-panel-active", mode === "cafeteria");
+      document.body.classList.toggle("is-wedding-panel-active", mode === "wedding");
+      document.body.classList.toggle("is-invitation-panel-active", mode === "invitation");
+    },
+    []
+  );
+
+  useEffect(() => {
+    document.body.classList.remove("is-cafeteria-panel-active");
+    document.body.classList.remove("is-wedding-panel-active");
+    document.body.classList.remove("is-invitation-panel-active");
+    document.body.classList.remove("is-nav-font-transitioning");
+
+    return () => {
+      document.body.classList.remove("is-cafeteria-panel-active");
+      document.body.classList.remove("is-wedding-panel-active");
+      document.body.classList.remove("is-invitation-panel-active");
+      document.body.classList.remove("is-nav-font-transitioning");
+    };
+  }, []);
+
+  const setActivePanel = useCallback((panel: SequencePanel) => {
+    activePanelRef.current = panel;
+    setActivePanelState(panel);
+  }, []);
+
+  useMotionValueEvent(cafeteriaProgress, "change", (latest) => {
+    const next = latest >= 0.98 ? "auto" : "none";
+    setCafeteriaPointerEvents((prev) => (prev === next ? prev : next));
+  });
+
+  useMotionValueEvent(nonamedbotProgress, "change", (latest) => {
+    const next = latest >= 0.98 ? "auto" : "none";
+    setNonamedbotPointerEvents((prev) => (prev === next ? prev : next));
+  });
+
+  useMotionValueEvent(minecraftProgress, "change", (latest) => {
+    const next = latest >= 0.98 ? "auto" : "none";
+    setMinecraftPointerEvents((prev) => (prev === next ? prev : next));
+  });
+
+  useMotionValueEvent(plebesProgress, "change", (latest) => {
+    const next = latest >= 0.98 ? "auto" : "none";
+    setPlebesPointerEvents((prev) => (prev === next ? prev : next));
+  });
 
   useMotionValueEvent(revealProgress, "change", (latest) => {
     const next = latest >= 0.98 ? "auto" : "none";
@@ -37,39 +127,146 @@ export default function HeroCarouselSequence() {
     });
   });
 
-  const animateReveal = useCallback(
-    (next: 0 | 1) => {
-      if (isAnimatingRef.current || Number(isRevealedRef.current) === next) return;
+  const animateToPanel = useCallback(
+    (nextPanel: SequencePanel) => {
+      if (isAnimatingRef.current || activePanelRef.current === nextPanel) return;
 
+      const currentPanel = activePanelRef.current;
       isAnimatingRef.current = true;
-      setCarouselPointerEvents("none");
-      if (next === 0) setCarouselIntroActive(false);
+      setNavFontMode(
+        nextPanel === 1 ? "cafeteria" : nextPanel === 3 ? "wedding" : "default"
+      );
+      setActivePanel(nextPanel);
+      isRevealedRef.current = false;
+      revealProgress.set(0);
 
-      animate(revealProgress, next, {
-        duration: 1.35,
-        ease: [0.16, 1, 0.3, 1],
-        onComplete: () => {
-          isRevealedRef.current = next === 1;
-          isAnimatingRef.current = false;
-          setCarouselPointerEvents(next === 1 ? "auto" : "none");
-          setCarouselIntroActive(next === 1);
-        },
-      });
+      // Pila de paneles deslizantes (índice = panelId - 1).
+      // 1: cafetería · 2: NoNamedBot · 3: boda · 4: plebes
+      const progresses = [
+        cafeteriaProgress,
+        nonamedbotProgress,
+        minecraftProgress,
+        plebesProgress,
+      ];
+      const pointerSetters = [
+        setCafeteriaPointerEvents,
+        setNonamedbotPointerEvents,
+        setMinecraftPointerEvents,
+        setPlebesPointerEvents,
+      ];
+
+      // Durante la transición ningún panel deslizante recibe eventos.
+      pointerSetters.forEach((setter) => setter("none"));
+      setCarouselPointerEvents("none");
+      setCarouselIntroActive(false);
+
+      const finishPanelTransition = () => {
+        isAnimatingRef.current = false;
+      };
+
+      // Panel 0 (hero base): bajamos toda la pila y revelamos el hero.
+      if (nextPanel === 0) {
+        for (let i = 1; i < progresses.length; i++) progresses[i].set(0);
+        animate(progresses[0], 0, {
+          ...PANEL_TRANSITION,
+          onComplete: finishPanelTransition,
+        });
+        return;
+      }
+
+      const onComplete = () => {
+        pointerSetters[nextPanel - 1]("auto");
+        finishPanelTransition();
+      };
+
+      if (nextPanel > currentPanel) {
+        // Avance: los paneles inferiores quedan asentados (1), los superiores
+        // ocultos (0), y el panel destino sube de 0 → 1.
+        for (let p = 1; p <= LAST_PANEL; p++) {
+          if (p === nextPanel) continue;
+          progresses[p - 1].set(p < nextPanel ? 1 : 0);
+        }
+        animate(progresses[nextPanel - 1], 1, { ...PANEL_TRANSITION, onComplete });
+      } else {
+        // Retroceso: el panel inmediatamente superior al destino baja de 1 → 0,
+        // revelando el destino. El resto se ajusta al instante.
+        for (let p = 1; p <= LAST_PANEL; p++) {
+          if (p === nextPanel + 1) continue;
+          progresses[p - 1].set(p <= nextPanel ? 1 : 0);
+        }
+        animate(progresses[nextPanel], 0, { ...PANEL_TRANSITION, onComplete });
+      }
     },
-    [revealProgress]
+    [
+      cafeteriaProgress,
+      nonamedbotProgress,
+      minecraftProgress,
+      plebesProgress,
+      revealProgress,
+      setActivePanel,
+      setNavFontMode,
+    ]
   );
+
+  // Salto a un panel concreto (rueda, teclado, swipe o clic en los puntos).
+  const goToPanel = useCallback(
+    (next: SequencePanel) => {
+      setHasInteracted((prev) => (prev ? prev : true));
+      animateToPanel(next);
+    },
+    [animateToPanel]
+  );
+
+  const stepPanel = useCallback(
+    (dir: 1 | -1) => {
+      goToPanel(clampPanel(activePanelRef.current + dir));
+    },
+    [goToPanel]
+  );
+
+  // Libera el bloqueo SOLO cuando la rueda lleva WHEEL_IDLE_MS en silencio y la
+  // animación ya terminó. Mientras llega inercia, el temporizador se reinicia,
+  // de modo que un único flick = un único salto por mucha inercia que arrastre.
+  const scheduleUnlock = useCallback(() => {
+    if (idleTimerRef.current) clearTimeout(idleTimerRef.current);
+    idleTimerRef.current = setTimeout(function unlock() {
+      if (isAnimatingRef.current) {
+        idleTimerRef.current = setTimeout(unlock, WHEEL_IDLE_MS);
+        return;
+      }
+      navLockedRef.current = false;
+      wheelAccumRef.current = 0;
+      idleTimerRef.current = null;
+    }, WHEEL_IDLE_MS);
+  }, []);
 
   const handleWheel = useCallback(
     (event: WheelEvent<HTMLDivElement>) => {
-      if (Math.abs(event.deltaY) < WHEEL_THRESHOLD) return;
+      const interactiveTarget = (event.target as HTMLElement | null)?.closest(
+        "input, textarea, select, button, a"
+      );
+      if (interactiveTarget) return;
 
-      if (event.deltaY > 0) {
-        animateReveal(1);
-      } else {
-        animateReveal(0);
+      // Bloqueado (gesto en curso, animando o enfriando): tragamos la inercia y
+      // mantenemos vivo el temporizador hasta que la rueda quede en silencio.
+      if (navLockedRef.current || isAnimatingRef.current) {
+        scheduleUnlock();
+        return;
       }
+
+      wheelAccumRef.current += event.deltaY;
+      if (Math.abs(wheelAccumRef.current) < WHEEL_THRESHOLD) {
+        scheduleUnlock(); // si el usuario pausa, el acumulador se resetea
+        return;
+      }
+
+      const dir: 1 | -1 = wheelAccumRef.current > 0 ? 1 : -1;
+      navLockedRef.current = true;
+      wheelAccumRef.current = 0;
+      stepPanel(dir);
+      scheduleUnlock();
     },
-    [animateReveal]
+    [scheduleUnlock, stepPanel]
   );
 
   const handleTouchStart = useCallback((event: TouchEvent<HTMLDivElement>) => {
@@ -88,21 +285,70 @@ export default function HeroCarouselSequence() {
       const deltaY = startY - endY;
       if (Math.abs(deltaY) < SWIPE_THRESHOLD) return;
 
-      if (deltaY > 0) {
-        animateReveal(1);
-      } else {
-        animateReveal(0);
-      }
+      stepPanel(deltaY > 0 ? 1 : -1);
     },
-    [animateReveal]
+    [stepPanel]
   );
 
+  // ── Navegación por teclado (flechas, Página, Inicio/Fin, Espacio) ─────────
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      const target = event.target as HTMLElement | null;
+      if (
+        target?.closest("input, textarea, select, [contenteditable='true']")
+      ) {
+        return;
+      }
+
+      switch (event.key) {
+        case "ArrowDown":
+        case "PageDown":
+          event.preventDefault();
+          stepPanel(1);
+          break;
+        case "ArrowUp":
+        case "PageUp":
+          event.preventDefault();
+          stepPanel(-1);
+          break;
+        case " ": // barra espaciadora (Shift = hacia arriba)
+          event.preventDefault();
+          stepPanel(event.shiftKey ? -1 : 1);
+          break;
+        case "Home":
+          event.preventDefault();
+          goToPanel(0);
+          break;
+        case "End":
+          event.preventDefault();
+          goToPanel(LAST_PANEL);
+          break;
+        default:
+          break;
+      }
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [stepPanel, goToPanel]);
+
+  // Limpieza del temporizador de inercia al desmontar.
+  useEffect(() => {
+    return () => {
+      if (idleTimerRef.current) clearTimeout(idleTimerRef.current);
+    };
+  }, []);
+
   const heroForegroundOpacity = useTransform(
-    revealProgress,
+    cafeteriaProgress,
     [0.12, 0.72],
     [1, 0]
   );
-  const heroScale = useTransform(revealProgress, [0, 1], [1, 0.985]);
+  const heroScale = useTransform(cafeteriaProgress, [0, 1], [1, 0.985]);
+  const cafeteriaY = useTransform(cafeteriaProgress, [0, 1], ["100%", "0%"]);
+  const nonamedbotY = useTransform(nonamedbotProgress, [0, 1], ["100%", "0%"]);
+  const minecraftY = useTransform(minecraftProgress, [0, 1], ["100%", "0%"]);
+  const plebesY = useTransform(plebesProgress, [0, 1], ["100%", "0%"]);
   const carouselY = useTransform(revealProgress, [0, 1], ["7%", "0%"]);
 
   const carouselClip = useTransform(
@@ -145,11 +391,64 @@ export default function HeroCarouselSequence() {
         </motion.div>
 
         <motion.div
-          className="v3-root"
+          style={{
+            position: "absolute",
+            inset: 0,
+            zIndex: 4,
+            y: cafeteriaY,
+            pointerEvents: cafeteriaPointerEvents,
+            willChange: "transform",
+          }}
+        >
+          <ThisCafeteriaGateway isActive={activePanel === 1} />
+        </motion.div>
+
+        <motion.div
           style={{
             position: "absolute",
             inset: 0,
             zIndex: 5,
+            y: nonamedbotY,
+            pointerEvents: nonamedbotPointerEvents,
+            willChange: "transform",
+          }}
+        >
+          <NoNamedBotGateway isActive={activePanel === 2} />
+        </motion.div>
+
+        <motion.div
+          style={{
+            position: "absolute",
+            inset: 0,
+            zIndex: 6,
+            y: minecraftY,
+            pointerEvents: minecraftPointerEvents,
+            willChange: "transform",
+          }}
+        >
+          <WeddingServiceGateway isActive={activePanel === 3} />
+        </motion.div>
+
+        <motion.div
+          style={{
+            position: "absolute",
+            inset: 0,
+            zIndex: 7,
+            y: plebesY,
+            pointerEvents: plebesPointerEvents,
+            willChange: "transform",
+          }}
+        >
+          <PlebesProjectGateway isActive={activePanel === 4} />
+        </motion.div>
+
+        {/* Projects carousel hidden — uncomment import + block to restore
+        <motion.div
+          className="v3-root"
+          style={{
+            position: "absolute",
+            inset: 0,
+            zIndex: 9,
             clipPath: carouselClip,
             pointerEvents: carouselPointerEvents,
             y: carouselY,
@@ -158,9 +457,45 @@ export default function HeroCarouselSequence() {
           }}
         >
           <div className="relative z-[1] flex flex-col justify-center h-full w-full overflow-hidden">
-            <ProjectsCarousel transparentBackdrop introActive={carouselIntroActive} />
+            <ProjectsCarousel introActive={carouselIntroActive} />
           </div>
         </motion.div>
+        */}
+      </div>
+
+      {/* ── Indicador de progreso / navegación por secciones ──────────────── */}
+      <nav className="hcs-progress" aria-label="Secciones del portafolio">
+        <ul className="hcs-progress__list">
+          {PANELS.map((panel) => {
+            const isCurrent = panel.id === activePanel;
+            return (
+              <li key={panel.id} className="hcs-progress__item">
+                <button
+                  type="button"
+                  className={`hcs-progress__dot${isCurrent ? " is-active" : ""}`}
+                  aria-label={panel.label}
+                  aria-current={isCurrent ? "true" : undefined}
+                  onClick={() => goToPanel(panel.id)}
+                >
+                  <span className="hcs-progress__label">{panel.label}</span>
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+      </nav>
+
+      {/* ── Pista "scroll para explorar" (se desvanece tras interactuar) ──── */}
+      <div
+        className={`hcs-scroll-cue${
+          hasInteracted || activePanel !== 0 ? " is-hidden" : ""
+        }`}
+        aria-hidden="true"
+      >
+        <span className="hcs-scroll-cue__text">Desliza para explorar</span>
+        <span className="hcs-scroll-cue__mouse">
+          <span className="hcs-scroll-cue__wheel" />
+        </span>
       </div>
     </div>
   );

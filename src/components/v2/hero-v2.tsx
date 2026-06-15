@@ -31,12 +31,12 @@ type HeroV2Props = {
   /** When embedded, fades hero chrome (not the BG) during the carousel wipe. */
   embedContentOpacity?: MotionValue<number>;
   /**
-   * When true, strips the background image, vignette and dot grid so the
+   * When true, strips the background image and vignette so the
    * section inherits a flat `#08080a` base — used by the v3 page which wants
    * a uniform background throughout.
    */
   noBgImage?: boolean;
-  /** Keeps the BG image/grid, but removes the dark translucent vignette layer. */
+  /** Keeps the BG image, but removes the dark translucent vignette layer. */
   disableBgVignette?: boolean;
 };
 
@@ -100,15 +100,15 @@ export default function HeroV2({
       {/* ── Background image + parallax ── */}
       {!noBgImage && (
         <motion.div
-          className="absolute inset-0 z-0 scale-110"
+          className="absolute inset-0 z-0 scale-[1.02] md:scale-110"
           style={{ y: bgY }}
         >
           <Image
-            src="/shadersmine.png"
+            src="/racoons_linux.webp"
             alt="Architectural night backdrop"
             fill
             priority
-            className="object-cover"
+            className="object-cover object-[center_18%] md:object-center"
             style={{ opacity: 0.28, mixBlendMode: "luminosity" }}
           />
           {/* Multi-layer vignette */}
@@ -124,22 +124,6 @@ export default function HeroV2({
         </motion.div>
       )}
 
-      {/* ── Subtle grid pattern ── */}
-      {!noBgImage && (
-        <div
-          className="absolute inset-0 z-0 pointer-events-none"
-          style={{
-            backgroundImage:
-              "radial-gradient(circle, rgba(255,255,255,0.08) 1px, transparent 1px)",
-            backgroundSize: "36px 36px",
-            maskImage:
-              "radial-gradient(ellipse 70% 80% at 50% 50%, black 40%, transparent 100%)",
-            WebkitMaskImage:
-              "radial-gradient(ellipse 70% 80% at 50% 50%, black 40%, transparent 100%)",
-          }}
-        />
-      )}
-
       {/* ── Main content ── */}
       <motion.div
         className="relative z-10 w-full h-screen px-6 md:px-10 lg:px-16 flex flex-col"
@@ -153,7 +137,7 @@ export default function HeroV2({
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_minmax(380px,min(640px,52vw))] gap-10 lg:gap-12 items-start lg:items-stretch w-full flex-1">
 
           {/* ── Left column: layout placeholder ── */}
-          <div className={`relative w-full h-full min-h-[min(70vh,520px)] lg:min-h-[min(88vh,780px)] ${devBorder ? "border-2 border-rose-400" : ""}`}>
+          <div className={`hidden lg:block relative w-full h-full min-h-[min(70vh,520px)] lg:min-h-[min(88vh,780px)] ${devBorder ? "border-2 border-rose-400" : ""}`}>
             {/* ── Dev: horizontal line at 45% ── */}
             {devBorder && (
               <div
@@ -168,7 +152,7 @@ export default function HeroV2({
             initial={{ opacity: embed ? 1 : 0, y: embed ? 0 : 16 }}
             animate={{ y: 0 }}
             transition={{ duration: 0.75, delay: 0.45, ease: [0.22, 1, 0.36, 1] as const }}
-            className={`hidden lg:block relative lg:ml-[15%] w-full h-full min-h-[min(83.6vh,665px)] pt-16 mt-[60px] overflow-hidden pointer-events-none origin-top rounded-lg ${devBorder ? "border-2 border-rose-400" : ""}`}
+            className={`relative lg:ml-[15%] w-full h-full min-h-[50vh] lg:min-h-[min(83.6vh,665px)] pt-0 lg:pt-16 mt-[-3vh] lg:mt-[60px] overflow-hidden pointer-events-none origin-top rounded-lg ${devBorder ? "border-2 border-rose-400" : ""}`}
             style={{ opacity: gifOpacity, scale: gifScale }}
             aria-hidden
           >
@@ -260,20 +244,17 @@ export default function HeroV2({
         dragMomentum={false}
         dragConstraints={heroRef}
         dragElastic={0}
-        className="absolute z-30 cursor-grab active:cursor-grabbing comic-terminal"
+        className="absolute z-30 cursor-grab active:cursor-grabbing comic-terminal bottom-0 lg:bottom-auto lg:top-[22%] left-1/2 -translate-x-1/2 lg:translate-x-0 lg:left-[8%] w-[96vw] lg:w-[min(546px,44.1vw)]"
         style={{
-          top: "22%",
-          left: "8%",
-          width: "min(546px, 44.1vw)",
           opacity: contentOpacity,
           fontFamily: "'Comic Sans MS', 'Comic Sans', cursive",
         }}
       >
-        <div style={{ width: "100%", height: "min(472.5px, 52.5vh)" }}>
+        <div className="w-full h-[min(425.25px,40.5vh)] lg:h-[min(472.5px,52.5vh)]">
           <ChatInterface variant="panel" className="!w-full !h-full max-w-none" />
         </div>
         <motion.div
-          className="pointer-events-none select-none"
+          className="pointer-events-none select-none absolute lg:relative -top-[19vh] left-[2vw] lg:top-auto lg:left-auto w-[120px] lg:w-auto"
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.55, delay: 0.75, ease: [0.22, 1, 0.36, 1] as const }}
@@ -300,12 +281,10 @@ export default function HeroV2({
             {SCROLL_PROMPT}
           </span>
           <svg
-            width="54"
-            height="78"
             viewBox="0 0 54 78"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
-            style={{ display: "block", opacity: 0.9 }}
+            className="block opacity-90 w-[43px] h-[62px] lg:w-[54px] lg:h-[78px]"
           >
             <path
               d="M17 4 C17 36, 38 38, 38 68"

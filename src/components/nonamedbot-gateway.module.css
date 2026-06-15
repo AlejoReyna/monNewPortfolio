@@ -1,0 +1,388 @@
+@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap");
+
+.screen {
+  --bot-ink: #e8f0ea;
+  --bot-muted: rgba(232, 240, 234, 0.7);
+  --bot-line: rgba(232, 240, 234, 0.16);
+  --bot-accent: #f0b90b; /* BNB chain gold */
+  --bot-green: #4ade80;
+
+  color: var(--bot-ink);
+  background: #000000;
+  display: block;
+  height: 100%;
+  isolation: isolate;
+  min-height: 100vh;
+  min-height: 100dvh;
+  overflow: hidden;
+  position: relative;
+}
+
+/* ── Terminal background (same treatment as the dashboard Intel section) ── */
+.backgroundCol {
+  background: #000000;
+  height: 100%;
+  inset: 0;
+  min-height: 100dvh;
+  overflow: hidden;
+  position: absolute;
+  width: 100%;
+  z-index: 1;
+}
+
+/* ASCII raccoon watermark with the dashboard glitch animation */
+.watermark {
+  background: url("/ascii-raccoon.png") center / contain no-repeat;
+  height: min(280px, 36vh);
+  left: 54%;
+  mix-blend-mode: screen;
+  pointer-events: none;
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%) scale(2.35);
+  width: min(280px, 48vw);
+  z-index: 1;
+  --wm-scale: 2.6;
+  --wm-opacity: 0.5;
+  opacity: var(--wm-opacity);
+  animation: bot-glitch-slice 6s infinite steps(1);
+}
+
+@media (max-width: 1023px) {
+  .watermark {
+    left: 50%;
+    height: min(260px, 30vh);
+    width: min(260px, 46vw);
+    --wm-scale: 1.8;
+    --wm-opacity: 0.55;
+  }
+}
+
+@keyframes bot-glitch-slice {
+  0%,
+  91%,
+  100% {
+    clip-path: inset(0 0 0 0);
+    transform: translate(-50%, -50%) scale(var(--wm-scale));
+    opacity: var(--wm-opacity);
+  }
+  92% {
+    clip-path: inset(10% 0 80% 0);
+    transform: translate(calc(-50% + 3px), -50%) scale(var(--wm-scale));
+    opacity: calc(var(--wm-opacity) * 0.6);
+  }
+  93% {
+    clip-path: inset(65% 0 12% 0);
+    transform: translate(calc(-50% - 4px), -50%) scale(var(--wm-scale));
+    opacity: calc(var(--wm-opacity) * 1.3);
+  }
+  94% {
+    clip-path: inset(35% 0 50% 0);
+    transform: translate(calc(-50% + 2px), -50%) scale(var(--wm-scale));
+    opacity: calc(var(--wm-opacity) * 0.8);
+  }
+  95% {
+    clip-path: inset(0 0 0 0);
+    transform: translate(-50%, -50%) scale(var(--wm-scale));
+    opacity: var(--wm-opacity);
+  }
+}
+
+.foreground {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  justify-content: flex-end;
+  min-height: 100dvh;
+  padding: clamp(2rem, 6vh, 4rem) clamp(1.5rem, 6vw, 5rem);
+  position: relative;
+  width: 100%;
+  z-index: 2;
+}
+
+/* ── Content: left aligned ── */
+.content {
+  display: grid;
+  gap: clamp(0.9rem, 2.2vh, 1.5rem);
+  justify-items: start;
+  margin-right: auto;
+  max-width: 44rem;
+  text-align: left;
+  width: 100%;
+}
+
+/* ── "Deployed on" badge + tech stack — top-left corner ── */
+.deployBadge {
+  align-items: flex-start;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  left: clamp(1.5rem, 6vw, 5rem);
+  margin-top: clamp(3rem, 8vh, 5rem);
+  max-width: min(20rem, 70vw);
+  position: absolute;
+  top: clamp(1.25rem, 4.5vh, 2.5rem);
+  z-index: 3;
+}
+
+.deployLabel {
+  color: var(--bot-muted);
+  font-family: "IBM Plex Sans", "Inter", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: clamp(0.6rem, 1.1vw, 0.72rem);
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-shadow: 0 0.08rem 0.6rem rgba(0, 0, 0, 0.6);
+  text-transform: uppercase;
+}
+
+.deployLogo {
+  display: block;
+  height: clamp(1.4rem, 3.6vw, 2.1rem);
+  object-fit: contain;
+  width: auto;
+}
+
+.wordmark {
+  color: var(--bot-ink);
+  font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: clamp(2.4rem, 7.8vw, 5.2rem);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 0.95;
+  margin: 0;
+  max-width: 100%;
+  text-align: left;
+  text-shadow: 0 0.15rem 1.4rem rgba(0, 0, 0, 0.6);
+}
+
+.wordmarkAccent {
+  color: var(--bot-accent);
+}
+
+.subtitle {
+  color: var(--bot-accent);
+  font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: clamp(0.95rem, 2.4vw, 1.5rem);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+  margin: 0;
+  text-align: left;
+  text-shadow: 0 0.1rem 1rem rgba(0, 0, 0, 0.6);
+}
+
+.leadAccent {
+  color: var(--bot-accent);
+  font-weight: 600;
+}
+
+.lead {
+  color: var(--bot-muted);
+  font-family: var(--font-geist-sans), "Inter", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: clamp(0.98rem, 1.5vw, 1.16rem);
+  font-weight: 400;
+  line-height: 1.6;
+  margin: 0 auto 0 0;
+  max-width: 38rem;
+  text-align: left;
+  text-shadow: 0 0.08rem 0.8rem rgba(0, 0, 0, 0.55);
+  text-wrap: pretty;
+}
+
+.actions {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7rem 0.85rem;
+  justify-content: flex-start;
+  margin: clamp(0.15rem, 0.6vh, 0.5rem) 0 0;
+}
+
+.ctaPrimary,
+.ctaSecondary {
+  align-items: center;
+  border-radius: 999px;
+  display: inline-flex;
+  font-family: var(--font-geist-sans), "Inter", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  gap: 0.45rem;
+  justify-content: center;
+  letter-spacing: 0.07em;
+  min-height: 2.4rem;
+  padding: 0.5rem 1.2rem;
+  text-decoration: none;
+  text-transform: uppercase;
+  transition:
+    background 160ms ease,
+    border-color 160ms ease,
+    color 160ms ease,
+    transform 160ms ease;
+}
+
+.ctaPrimary {
+  background: var(--bot-accent);
+  border: 1px solid var(--bot-accent);
+  color: #1a1400;
+}
+
+.ctaPrimary:hover {
+  background: #ffcb33;
+  border-color: #ffcb33;
+  transform: translateY(-1px);
+}
+
+.ctaSecondary {
+  background: rgba(232, 240, 234, 0.04);
+  border: 1px solid rgba(232, 240, 234, 0.4);
+  color: var(--bot-ink);
+}
+
+.ctaSecondary:hover {
+  background: rgba(232, 240, 234, 0.12);
+  border-color: var(--bot-ink);
+  transform: translateY(-1px);
+}
+
+.ctaPrimary span,
+.ctaSecondary span {
+  transition: transform 160ms ease;
+}
+
+.ctaPrimary:hover span,
+.ctaSecondary:hover span {
+  transform: translateX(3px);
+}
+
+.ctaPrimary:focus-visible,
+.ctaSecondary:focus-visible {
+  outline: 2px solid var(--bot-accent);
+  outline-offset: 4px;
+}
+
+.techRow {
+  align-items: center;
+  border-top: 1px solid var(--bot-line);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 0.95rem;
+  justify-content: flex-start;
+  list-style: none;
+  margin: 0.35rem 0 0;
+  padding: 0.7rem 0 0;
+  width: 100%;
+}
+
+/* Desktop: tech stack lives under the "Deployed on" badge (top-left). */
+.techRowTop {
+  display: flex;
+}
+
+/* Mobile: tech stack moves back to the bottom of the content block. */
+.techRowBottom {
+  display: none;
+}
+
+.techChip {
+  display: inline-flex;
+}
+
+.techLogo {
+  display: block;
+  height: clamp(1rem, 2.9vw, 1.2rem);
+  object-fit: contain;
+  opacity: 0.8;
+  transition: opacity 160ms ease, transform 160ms ease;
+  width: auto;
+}
+
+.techLogoTint {
+  filter: brightness(0) saturate(0) invert(0.97);
+}
+
+.techChip:hover .techLogo {
+  opacity: 1;
+  transform: translateY(-2px);
+}
+
+@media (max-width: 768px) {
+  .foreground {
+    justify-content: flex-end;
+    padding: 2.25rem 1.5rem clamp(2.25rem, 6vh, 3rem);
+  }
+
+  .content {
+    gap: 1.1rem;
+    max-width: 100%;
+  }
+
+  .wordmark {
+    font-size: clamp(2.3rem, 10.2vw, 4.35rem);
+  }
+
+  .lead {
+    font-size: 1rem;
+    line-height: 1.55;
+    max-width: 32rem;
+  }
+
+  .techRow {
+    gap: clamp(0.55rem, 2.6vw, 0.95rem);
+  }
+
+  /* On mobile the badge only carries the "Deployed on" logo … */
+  .deployBadge {
+    margin-top: clamp(2rem, 6vh, 3.5rem);
+    max-width: none;
+  }
+
+  .techRowTop {
+    display: none;
+  }
+
+  /* … and the tech stack returns to the bottom of the content, centered. */
+  .techRowBottom {
+    display: flex;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 560px) {
+  .screen {
+    min-height: 100svh;
+  }
+
+  .backgroundCol {
+    min-height: 100svh;
+  }
+
+  .foreground {
+    min-height: 100svh;
+    padding: 2rem 1.35rem 2.25rem;
+  }
+
+  .lead {
+    font-size: 0.96rem;
+  }
+
+  .wordmark {
+    font-size: clamp(2.15rem, 10.8vw, 3.35rem);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .watermark {
+    animation: none;
+    transform: translate(-50%, -50%) scale(var(--wm-scale));
+    opacity: var(--wm-opacity);
+  }
+
+  .ctaPrimary,
+  .ctaSecondary,
+  .ctaPrimary span,
+  .ctaSecondary span,
+  .techLogo {
+    transition: none;
+  }
+}

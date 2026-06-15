@@ -210,22 +210,6 @@ export default function MiniGame() {
       ctx2.fillStyle = gradient;
       ctx2.fillRect(0, 0, BASE_WIDTH, BASE_HEIGHT);
 
-      // decorative grid lines
-      ctx2.strokeStyle = "rgba(255,255,255,0.05)";
-      ctx2.lineWidth = 1;
-      for (let x = 0; x <= BASE_WIDTH; x += 32) {
-        ctx2.beginPath();
-        ctx2.moveTo(x, 0);
-        ctx2.lineTo(x, BASE_HEIGHT);
-        ctx2.stroke();
-      }
-      for (let y = 0; y <= BASE_HEIGHT; y += 32) {
-        ctx2.beginPath();
-        ctx2.moveTo(0, y);
-        ctx2.lineTo(BASE_WIDTH, y);
-        ctx2.stroke();
-      }
-
       // player
       const playerWidth = 56;
       const playerHeight = 12;

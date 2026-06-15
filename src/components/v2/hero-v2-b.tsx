@@ -80,20 +80,6 @@ export default function HeroV2B({
         />
       </motion.div>
 
-      {/* ── Subtle grid pattern ── */}
-      <div
-        className="absolute inset-0 z-0 pointer-events-none"
-        style={{
-          backgroundImage:
-            "radial-gradient(circle, rgba(255,255,255,0.08) 1px, transparent 1px)",
-          backgroundSize: "36px 36px",
-          maskImage:
-            "radial-gradient(ellipse 70% 80% at 50% 50%, black 40%, transparent 100%)",
-          WebkitMaskImage:
-            "radial-gradient(ellipse 70% 80% at 50% 50%, black 40%, transparent 100%)",
-        }}
-      />
-
       {/* ── Main content ── */}
       <motion.div
         className="relative z-10 w-full px-6 md:px-10 lg:px-16 pt-24 pb-36 flex flex-col"

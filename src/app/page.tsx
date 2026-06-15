@@ -1,5 +1,3 @@
-"use client";
-
 import HeroCarouselSequence from "@/components/v3/hero-carousel-sequence";
 
 export default function Home() {
