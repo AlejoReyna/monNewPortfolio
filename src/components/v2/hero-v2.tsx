@@ -152,7 +152,7 @@ export default function HeroV2({
             initial={{ opacity: embed ? 1 : 0, y: embed ? 0 : 16 }}
             animate={{ y: 0 }}
             transition={{ duration: 0.75, delay: 0.45, ease: [0.22, 1, 0.36, 1] as const }}
-            className={`relative lg:ml-[15%] w-full h-full min-h-[40vh] lg:min-h-[min(83.6vh,665px)] pt-4 lg:pt-16 mt-[5vh] lg:mt-[60px] overflow-hidden pointer-events-none origin-top rounded-lg ${devBorder ? "border-2 border-rose-400" : ""}`}
+            className={`relative lg:ml-[15%] w-full h-full min-h-[50vh] lg:min-h-[min(83.6vh,665px)] pt-0 lg:pt-16 mt-[-3vh] lg:mt-[60px] overflow-hidden pointer-events-none origin-top rounded-lg ${devBorder ? "border-2 border-rose-400" : ""}`}
             style={{ opacity: gifOpacity, scale: gifScale }}
             aria-hidden
           >
@@ -250,11 +250,11 @@ export default function HeroV2({
           fontFamily: "'Comic Sans MS', 'Comic Sans', cursive",
         }}
       >
-        <div className="w-full h-[min(472.5px,45vh)] lg:h-[min(472.5px,52.5vh)]">
+        <div className="w-full h-[min(425.25px,40.5vh)] lg:h-[min(472.5px,52.5vh)]">
           <ChatInterface variant="panel" className="!w-full !h-full max-w-none" />
         </div>
         <motion.div
-          className="pointer-events-none select-none absolute lg:relative -top-[32vh] left-[2vw] lg:top-auto lg:left-auto w-[120px] lg:w-auto"
+          className="pointer-events-none select-none absolute lg:relative -top-[19vh] left-[2vw] lg:top-auto lg:left-auto w-[120px] lg:w-auto"
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.55, delay: 0.75, ease: [0.22, 1, 0.36, 1] as const }}
@@ -281,12 +281,10 @@ export default function HeroV2({
             {SCROLL_PROMPT}
           </span>
           <svg
-            width="54"
-            height="78"
             viewBox="0 0 54 78"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
-            style={{ display: "block", opacity: 0.9 }}
+            className="block opacity-90 w-[43px] h-[62px] lg:w-[54px] lg:h-[78px]"
           >
             <path
               d="M17 4 C17 36, 38 38, 38 68"

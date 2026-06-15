@@ -21,6 +21,10 @@ const PHASE = {
 
 const WHEEL_THRESHOLD = 16;
 const SWIPE_THRESHOLD = 36;
+const PANEL_TRANSITION = {
+  duration: 0.34,
+  ease: [0.22, 1, 0.36, 1] as const,
+};
 type SequencePanel = 0 | 1 | 2 | 3; // | 4 — carousel hidden; minecraft + uanl panels removed
 
 export default function HeroCarouselSequence() {
@@ -33,7 +37,6 @@ export default function HeroCarouselSequence() {
   const isRevealedRef = useRef(false);
   const activePanelRef = useRef<SequencePanel>(0);
   const [activePanel, setActivePanelState] = useState<SequencePanel>(0);
-  const navTransitionTimeoutRef = useRef<number | null>(null);
   const touchStartYRef = useRef<number | null>(null);
   const [carouselPointerEvents, setCarouselPointerEvents] = useState<"none" | "auto">("none");
   const [carouselIntroActive, setCarouselIntroActive] = useState(false);
@@ -42,18 +45,8 @@ export default function HeroCarouselSequence() {
   const [plebesPointerEvents, setPlebesPointerEvents] = useState<"none" | "auto">("none");
 
   const setNavFontMode = useCallback((mode: "default" | "cafeteria" | "wedding") => {
-    if (navTransitionTimeoutRef.current !== null) {
-      window.clearTimeout(navTransitionTimeoutRef.current);
-    }
-
     document.body.classList.toggle("is-cafeteria-panel-active", mode === "cafeteria");
     document.body.classList.toggle("is-wedding-panel-active", mode === "wedding");
-    document.body.classList.add("is-nav-font-transitioning");
-
-    navTransitionTimeoutRef.current = window.setTimeout(() => {
-      document.body.classList.remove("is-nav-font-transitioning");
-      navTransitionTimeoutRef.current = null;
-    }, 560);
   }, []);
 
   useEffect(() => {
@@ -62,9 +55,6 @@ export default function HeroCarouselSequence() {
     document.body.classList.remove("is-nav-font-transitioning");
 
     return () => {
-      if (navTransitionTimeoutRef.current !== null) {
-        window.clearTimeout(navTransitionTimeoutRef.current);
-      }
       document.body.classList.remove("is-cafeteria-panel-active");
       document.body.classList.remove("is-wedding-panel-active");
       document.body.classList.remove("is-nav-font-transitioning");
@@ -104,82 +94,91 @@ export default function HeroCarouselSequence() {
     (nextPanel: SequencePanel) => {
       if (isAnimatingRef.current || activePanelRef.current === nextPanel) return;
 
+      const currentPanel = activePanelRef.current;
       isAnimatingRef.current = true;
       setNavFontMode(nextPanel === 1 ? "cafeteria" : nextPanel === 2 ? "wedding" : "default");
+      setActivePanel(nextPanel);
+      isRevealedRef.current = false;
+      revealProgress.set(0);
+
+      const finishPanelTransition = () => {
+        isAnimatingRef.current = false;
+      };
 
       if (nextPanel === 0) {
+        minecraftProgress.set(0);
+        plebesProgress.set(0);
         setCafeteriaPointerEvents("none");
         setMinecraftPointerEvents("none");
         setPlebesPointerEvents("none");
         setCarouselPointerEvents("none");
         setCarouselIntroActive(false);
-
         animate(cafeteriaProgress, 0, {
-          duration: 1.05,
-          ease: [0.16, 1, 0.3, 1],
-          onComplete: () => {
-            isRevealedRef.current = false;
-            setActivePanel(0);
-            isAnimatingRef.current = false;
-          },
+          ...PANEL_TRANSITION,
+          onComplete: finishPanelTransition,
         });
         return;
       }
 
       if (nextPanel === 1) {
+        const motionValue = currentPanel === 2 ? minecraftProgress : cafeteriaProgress;
+        if (currentPanel === 2) {
+          cafeteriaProgress.set(1);
+        } else {
+          minecraftProgress.set(0);
+        }
+        plebesProgress.set(0);
+        setCafeteriaPointerEvents("none");
         setMinecraftPointerEvents("none");
         setPlebesPointerEvents("none");
         setCarouselPointerEvents("none");
         setCarouselIntroActive(false);
-
-        const motionValue = activePanelRef.current === 2 ? minecraftProgress : cafeteriaProgress;
-        animate(motionValue, activePanelRef.current === 2 ? 0 : 1, {
-          duration: activePanelRef.current === 2 ? 0.95 : 1.15,
-          ease: [0.16, 1, 0.3, 1],
+        animate(motionValue, currentPanel === 2 ? 0 : 1, {
+          ...PANEL_TRANSITION,
           onComplete: () => {
-            isRevealedRef.current = false;
-            setActivePanel(1);
-            isAnimatingRef.current = false;
             setCafeteriaPointerEvents("auto");
+            finishPanelTransition();
           },
         });
         return;
       }
 
       if (nextPanel === 2) {
+        const motionValue = currentPanel === 3 ? plebesProgress : minecraftProgress;
+        cafeteriaProgress.set(1);
+        if (currentPanel === 3) {
+          minecraftProgress.set(1);
+        } else {
+          plebesProgress.set(0);
+        }
+        setCafeteriaPointerEvents("none");
+        setMinecraftPointerEvents("none");
         setPlebesPointerEvents("none");
         setCarouselPointerEvents("none");
         setCarouselIntroActive(false);
-
-        const motionValue = activePanelRef.current === 3 ? plebesProgress : minecraftProgress;
-        animate(motionValue, activePanelRef.current === 3 ? 0 : 1, {
-          duration: activePanelRef.current === 3 ? 0.95 : 1.15,
-          ease: [0.16, 1, 0.3, 1],
+        animate(motionValue, currentPanel === 3 ? 0 : 1, {
+          ...PANEL_TRANSITION,
           onComplete: () => {
-            isRevealedRef.current = false;
-            setActivePanel(2);
-            isAnimatingRef.current = false;
-            setCafeteriaPointerEvents("none");
             setMinecraftPointerEvents("auto");
+            finishPanelTransition();
           },
         });
         return;
       }
 
       if (nextPanel === 3) {
+        cafeteriaProgress.set(1);
+        minecraftProgress.set(1);
         setCafeteriaPointerEvents("none");
         setMinecraftPointerEvents("none");
+        setPlebesPointerEvents("none");
         setCarouselPointerEvents("none");
         setCarouselIntroActive(false);
-
         animate(plebesProgress, 1, {
-          duration: 1.15,
-          ease: [0.16, 1, 0.3, 1],
+          ...PANEL_TRANSITION,
           onComplete: () => {
-            isRevealedRef.current = false;
-            setActivePanel(3);
-            isAnimatingRef.current = false;
             setPlebesPointerEvents("auto");
+            finishPanelTransition();
           },
         });
         return;

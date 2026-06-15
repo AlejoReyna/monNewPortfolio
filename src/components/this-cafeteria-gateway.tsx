@@ -33,31 +33,6 @@ const infraItems = [
   { service: "IAM", detail: "Role-based service access" },
 ] as const;
 
-function CafeteriaHeroPreview({ animate = false }: { animate?: boolean }) {
-  return (
-    <section
-      className={`${styles.editorialHero} ${animate ? styles.editorialHeroReady : ""}`}
-      aria-hidden="true"
-    >
-      <div className={styles.heroMedia} aria-hidden="true" />
-      <div className={styles.heroContent}>
-        <p className={styles.heroEyebrow}>Est. 2024</p>
-        <h1>
-          A sanctuary for the <span className={styles.headlineItalic}>patient brewer.</span>
-        </h1>
-        <p className={styles.heroLede}>
-          Embrace the slow living movement with seasonal coffee, manual brewing, and pastry made for
-          lingering.
-        </p>
-        <div className={styles.heroActions}>
-          <span className={`${styles.heroButton} ${styles.heroButtonDark}`}>Explore the menu</span>
-          <span className={`${styles.heroButton} ${styles.heroButtonGhost}`}>Our story</span>
-        </div>
-      </div>
-    </section>
-  );
-}
-
 export default function ThisCafeteriaGateway({ isActive = false }: { isActive?: boolean }) {
   const [techIndex, setTechIndex] = useState(0);
   const activeTech = techStack[techIndex];
@@ -93,23 +68,6 @@ export default function ThisCafeteriaGateway({ isActive = false }: { isActive?: 
 
   return (
     <section className={styles.screen} aria-labelledby="this-cafeteria-title">
-      <motion.div
-        className={styles.previewLayer}
-        aria-label="Artisanal Brew mobile hero preview"
-        initial={{ opacity: 0 }}
-        animate={isActive ? { opacity: 1 } : { opacity: 0 }}
-        transition={{ duration: 1, delay: 0.1 }}
-      >
-        <a
-          className={styles.previewCol}
-          href="https://cafe.alexisreyna.dev"
-          target="_blank"
-          rel="noreferrer"
-        >
-          <CafeteriaHeroPreview animate={isActive} />
-        </a>
-      </motion.div>
-
       <motion.div
         className={styles.foreground}
         variants={container}
@@ -164,6 +122,14 @@ export default function ThisCafeteriaGateway({ isActive = false }: { isActive?: 
           </motion.div>
         </div>
       </motion.div>
+
+      <motion.div
+        className={styles.backgroundCol}
+        aria-hidden="true"
+        initial={{ opacity: 0 }}
+        animate={isActive ? { opacity: 1 } : { opacity: 0 }}
+        transition={{ duration: 1, delay: 0.1 }}
+      />
     </section>
   );
 }

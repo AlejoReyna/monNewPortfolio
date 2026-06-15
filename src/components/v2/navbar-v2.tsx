@@ -2,13 +2,11 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { useNavigation } from "@/contexts/navigation-context";
 import { useLanguage } from "@/components/lang-context";
 
 export default function NavbarV2() {
-  const pathname  = usePathname();
-  const { navigateToSection, currentSection } = useNavigation();
+  const { navigateToSection } = useNavigation();
   const { language } = useLanguage();
   const isEs = language === "es";
 
@@ -45,18 +43,6 @@ export default function NavbarV2() {
     cursor: "pointer",
     padding: "10px 18px",
     transition: "border-color 0.2s, background 0.2s",
-  };
-
-  const navButtonStyle: React.CSSProperties = {
-    fontFamily: "var(--font-space-mono, ui-monospace, monospace)",
-    fontSize: "0.76rem",
-    letterSpacing: "0.22em",
-    textTransform: "uppercase",
-    color: "#ffffff",
-    background: "none",
-    border: "none",
-    cursor: "pointer",
-    padding: "4px 0",
   };
 
   return (
@@ -103,21 +89,6 @@ export default function NavbarV2() {
             <span style={{ color: navTag }}>&gt;</span>
           </Link>
 
-          <div style={{ display: "flex", alignItems: "center", gap: 32 }}>
-            <button
-              onClick={() => handleNav("projects")}
-              style={navButtonStyle}
-            >
-              {isEs ? "Proyectos" : "Projects"}
-            </button>
-            <button
-              onClick={() => handleNav("about")}
-              style={navButtonStyle}
-            >
-              {isEs ? "Sobre mí" : "About me"}
-            </button>
-          </div>
-
           {/* CTA */}
           <button
             onClick={() => handleNav("contact")}
@@ -143,7 +114,7 @@ export default function NavbarV2() {
             onClick={() => handleNav("home")}
             style={{
               fontFamily: "var(--font-bebas, sans-serif)",
-              fontSize: "1.15rem",
+              fontSize: "0.98rem",
               letterSpacing: "0.08em",
               color: navInk,
               textDecoration: "none",
@@ -202,6 +173,13 @@ export default function NavbarV2() {
         .nav-contact-pill {
           background: rgba(255, 255, 255, 0.09) !important;
           border-color: rgba(255, 255, 255, 0.38) !important;
+        }
+
+        /* Smaller pill on mobile only */
+        .nav-mobile .nav-contact-pill {
+          font-size: 0.66rem !important;
+          letter-spacing: 0.18em !important;
+          padding: 7px 13px !important;
         }
 
         body.is-cafeteria-panel-active .nav-v2-shell,
