@@ -5,7 +5,9 @@ import { animate, motion, useMotionValue, useMotionValueEvent, useTransform } fr
 import HeroV2 from "@/components/v2/hero-v2";
 // import ProjectsCarousel from "@/components/v3/projects-carousel";
 import ThisCafeteriaGateway from "@/components/this-cafeteria-gateway";
+import NoNamedBotGateway from "@/components/nonamedbot-gateway";
 import WeddingServiceGateway from "@/components/wedding-service-gateway";
+import WeddingCommissionGateway from "@/components/wedding-commission-gateway";
 import PlebesProjectGateway from "@/components/plebes-project-gateway";
 import "@/components/v3/v3.css";
 
@@ -30,13 +32,15 @@ const PANEL_TRANSITION = {
   duration: 0.62,
   ease: [0.16, 1, 0.3, 1] as const, // expo-out: arranque firme, asentado suave
 };
-type SequencePanel = 0 | 1 | 2 | 3; // | 4 — carousel hidden; minecraft + uanl panels removed
+type SequencePanel = 0 | 1 | 2 | 3 | 4 | 5;
 
 const PANELS: { id: SequencePanel; label: string }[] = [
   { id: 0, label: "Inicio" },
   { id: 1, label: "This Cafetería" },
-  { id: 2, label: "Wedding Service" },
-  { id: 3, label: "Plebes" },
+  { id: 2, label: "NoNamedBot" },
+  { id: 3, label: "Wedding Service" },
+  { id: 4, label: "Tu Invitación" },
+  { id: 5, label: "Plebes" },
 ];
 const LAST_PANEL = (PANELS.length - 1) as SequencePanel;
 
@@ -46,7 +50,9 @@ const clampPanel = (value: number): SequencePanel =>
 export default function HeroCarouselSequence() {
   const containerRef = useRef<HTMLDivElement>(null);
   const cafeteriaProgress = useMotionValue(0);
+  const nonamedbotProgress = useMotionValue(0);
   const minecraftProgress = useMotionValue(0);
+  const commissionProgress = useMotionValue(0);
   const plebesProgress = useMotionValue(0);
   const revealProgress = useMotionValue(0);
   const isAnimatingRef = useRef(false);
@@ -63,22 +69,30 @@ export default function HeroCarouselSequence() {
   const [carouselPointerEvents, setCarouselPointerEvents] = useState<"none" | "auto">("none");
   const [carouselIntroActive, setCarouselIntroActive] = useState(false);
   const [cafeteriaPointerEvents, setCafeteriaPointerEvents] = useState<"none" | "auto">("none");
+  const [nonamedbotPointerEvents, setNonamedbotPointerEvents] = useState<"none" | "auto">("none");
   const [minecraftPointerEvents, setMinecraftPointerEvents] = useState<"none" | "auto">("none");
+  const [commissionPointerEvents, setCommissionPointerEvents] = useState<"none" | "auto">("none");
   const [plebesPointerEvents, setPlebesPointerEvents] = useState<"none" | "auto">("none");
 
-  const setNavFontMode = useCallback((mode: "default" | "cafeteria" | "wedding") => {
-    document.body.classList.toggle("is-cafeteria-panel-active", mode === "cafeteria");
-    document.body.classList.toggle("is-wedding-panel-active", mode === "wedding");
-  }, []);
+  const setNavFontMode = useCallback(
+    (mode: "default" | "cafeteria" | "wedding" | "invitation") => {
+      document.body.classList.toggle("is-cafeteria-panel-active", mode === "cafeteria");
+      document.body.classList.toggle("is-wedding-panel-active", mode === "wedding");
+      document.body.classList.toggle("is-invitation-panel-active", mode === "invitation");
+    },
+    []
+  );
 
   useEffect(() => {
     document.body.classList.remove("is-cafeteria-panel-active");
     document.body.classList.remove("is-wedding-panel-active");
+    document.body.classList.remove("is-invitation-panel-active");
     document.body.classList.remove("is-nav-font-transitioning");
 
     return () => {
       document.body.classList.remove("is-cafeteria-panel-active");
       document.body.classList.remove("is-wedding-panel-active");
+      document.body.classList.remove("is-invitation-panel-active");
       document.body.classList.remove("is-nav-font-transitioning");
     };
   }, []);
@@ -93,9 +107,19 @@ export default function HeroCarouselSequence() {
     setCafeteriaPointerEvents((prev) => (prev === next ? prev : next));
   });
 
+  useMotionValueEvent(nonamedbotProgress, "change", (latest) => {
+    const next = latest >= 0.98 ? "auto" : "none";
+    setNonamedbotPointerEvents((prev) => (prev === next ? prev : next));
+  });
+
   useMotionValueEvent(minecraftProgress, "change", (latest) => {
     const next = latest >= 0.98 ? "auto" : "none";
     setMinecraftPointerEvents((prev) => (prev === next ? prev : next));
+  });
+
+  useMotionValueEvent(commissionProgress, "change", (latest) => {
+    const next = latest >= 0.98 ? "auto" : "none";
+    setCommissionPointerEvents((prev) => (prev === next ? prev : next));
   });
 
   useMotionValueEvent(plebesProgress, "change", (latest) => {
@@ -118,99 +142,83 @@ export default function HeroCarouselSequence() {
 
       const currentPanel = activePanelRef.current;
       isAnimatingRef.current = true;
-      setNavFontMode(nextPanel === 1 ? "cafeteria" : nextPanel === 2 ? "wedding" : "default");
+      setNavFontMode(
+        nextPanel === 1
+          ? "cafeteria"
+          : nextPanel === 3
+            ? "wedding"
+            : nextPanel === 4
+              ? "invitation"
+              : "default"
+      );
       setActivePanel(nextPanel);
       isRevealedRef.current = false;
       revealProgress.set(0);
+
+      // Pila de paneles deslizantes (índice = panelId - 1).
+      // 1: cafetería · 2: NoNamedBot · 3: boda · 4: invitación · 5: plebes
+      const progresses = [
+        cafeteriaProgress,
+        nonamedbotProgress,
+        minecraftProgress,
+        commissionProgress,
+        plebesProgress,
+      ];
+      const pointerSetters = [
+        setCafeteriaPointerEvents,
+        setNonamedbotPointerEvents,
+        setMinecraftPointerEvents,
+        setCommissionPointerEvents,
+        setPlebesPointerEvents,
+      ];
+
+      // Durante la transición ningún panel deslizante recibe eventos.
+      pointerSetters.forEach((setter) => setter("none"));
+      setCarouselPointerEvents("none");
+      setCarouselIntroActive(false);
 
       const finishPanelTransition = () => {
         isAnimatingRef.current = false;
       };
 
+      // Panel 0 (hero base): bajamos toda la pila y revelamos el hero.
       if (nextPanel === 0) {
-        minecraftProgress.set(0);
-        plebesProgress.set(0);
-        setCafeteriaPointerEvents("none");
-        setMinecraftPointerEvents("none");
-        setPlebesPointerEvents("none");
-        setCarouselPointerEvents("none");
-        setCarouselIntroActive(false);
-        animate(cafeteriaProgress, 0, {
+        for (let i = 1; i < progresses.length; i++) progresses[i].set(0);
+        animate(progresses[0], 0, {
           ...PANEL_TRANSITION,
           onComplete: finishPanelTransition,
         });
         return;
       }
 
-      if (nextPanel === 1) {
-        const motionValue = currentPanel === 2 ? minecraftProgress : cafeteriaProgress;
-        if (currentPanel === 2) {
-          cafeteriaProgress.set(1);
-        } else {
-          minecraftProgress.set(0);
+      const onComplete = () => {
+        pointerSetters[nextPanel - 1]("auto");
+        finishPanelTransition();
+      };
+
+      if (nextPanel > currentPanel) {
+        // Avance: los paneles inferiores quedan asentados (1), los superiores
+        // ocultos (0), y el panel destino sube de 0 → 1.
+        for (let p = 1; p <= LAST_PANEL; p++) {
+          if (p === nextPanel) continue;
+          progresses[p - 1].set(p < nextPanel ? 1 : 0);
         }
-        plebesProgress.set(0);
-        setCafeteriaPointerEvents("none");
-        setMinecraftPointerEvents("none");
-        setPlebesPointerEvents("none");
-        setCarouselPointerEvents("none");
-        setCarouselIntroActive(false);
-        animate(motionValue, currentPanel === 2 ? 0 : 1, {
-          ...PANEL_TRANSITION,
-          onComplete: () => {
-            setCafeteriaPointerEvents("auto");
-            finishPanelTransition();
-          },
-        });
-        return;
-      }
-
-      if (nextPanel === 2) {
-        const motionValue = currentPanel === 3 ? plebesProgress : minecraftProgress;
-        cafeteriaProgress.set(1);
-        if (currentPanel === 3) {
-          minecraftProgress.set(1);
-        } else {
-          plebesProgress.set(0);
+        animate(progresses[nextPanel - 1], 1, { ...PANEL_TRANSITION, onComplete });
+      } else {
+        // Retroceso: el panel inmediatamente superior al destino baja de 1 → 0,
+        // revelando el destino. El resto se ajusta al instante.
+        for (let p = 1; p <= LAST_PANEL; p++) {
+          if (p === nextPanel + 1) continue;
+          progresses[p - 1].set(p <= nextPanel ? 1 : 0);
         }
-        setCafeteriaPointerEvents("none");
-        setMinecraftPointerEvents("none");
-        setPlebesPointerEvents("none");
-        setCarouselPointerEvents("none");
-        setCarouselIntroActive(false);
-        animate(motionValue, currentPanel === 3 ? 0 : 1, {
-          ...PANEL_TRANSITION,
-          onComplete: () => {
-            setMinecraftPointerEvents("auto");
-            finishPanelTransition();
-          },
-        });
-        return;
+        animate(progresses[nextPanel], 0, { ...PANEL_TRANSITION, onComplete });
       }
-
-      if (nextPanel === 3) {
-        cafeteriaProgress.set(1);
-        minecraftProgress.set(1);
-        setCafeteriaPointerEvents("none");
-        setMinecraftPointerEvents("none");
-        setPlebesPointerEvents("none");
-        setCarouselPointerEvents("none");
-        setCarouselIntroActive(false);
-        animate(plebesProgress, 1, {
-          ...PANEL_TRANSITION,
-          onComplete: () => {
-            setPlebesPointerEvents("auto");
-            finishPanelTransition();
-          },
-        });
-        return;
-      }
-
-      // Panel 4 (projects carousel) hidden — restore block + import to re-enable
     },
     [
       cafeteriaProgress,
+      nonamedbotProgress,
       minecraftProgress,
+      commissionProgress,
       plebesProgress,
       revealProgress,
       setActivePanel,
@@ -356,7 +364,9 @@ export default function HeroCarouselSequence() {
   );
   const heroScale = useTransform(cafeteriaProgress, [0, 1], [1, 0.985]);
   const cafeteriaY = useTransform(cafeteriaProgress, [0, 1], ["100%", "0%"]);
+  const nonamedbotY = useTransform(nonamedbotProgress, [0, 1], ["100%", "0%"]);
   const minecraftY = useTransform(minecraftProgress, [0, 1], ["100%", "0%"]);
+  const commissionY = useTransform(commissionProgress, [0, 1], ["100%", "0%"]);
   const plebesY = useTransform(plebesProgress, [0, 1], ["100%", "0%"]);
   const carouselY = useTransform(revealProgress, [0, 1], ["7%", "0%"]);
 
@@ -417,12 +427,12 @@ export default function HeroCarouselSequence() {
             position: "absolute",
             inset: 0,
             zIndex: 5,
-            y: minecraftY,
-            pointerEvents: minecraftPointerEvents,
+            y: nonamedbotY,
+            pointerEvents: nonamedbotPointerEvents,
             willChange: "transform",
           }}
         >
-          <WeddingServiceGateway isActive={activePanel === 2} />
+          <NoNamedBotGateway isActive={activePanel === 2} />
         </motion.div>
 
         <motion.div
@@ -430,12 +440,38 @@ export default function HeroCarouselSequence() {
             position: "absolute",
             inset: 0,
             zIndex: 6,
+            y: minecraftY,
+            pointerEvents: minecraftPointerEvents,
+            willChange: "transform",
+          }}
+        >
+          <WeddingServiceGateway isActive={activePanel === 3} />
+        </motion.div>
+
+        <motion.div
+          style={{
+            position: "absolute",
+            inset: 0,
+            zIndex: 7,
+            y: commissionY,
+            pointerEvents: commissionPointerEvents,
+            willChange: "transform",
+          }}
+        >
+          <WeddingCommissionGateway isActive={activePanel === 4} />
+        </motion.div>
+
+        <motion.div
+          style={{
+            position: "absolute",
+            inset: 0,
+            zIndex: 8,
             y: plebesY,
             pointerEvents: plebesPointerEvents,
             willChange: "transform",
           }}
         >
-          <PlebesProjectGateway isActive={activePanel === 3} />
+          <PlebesProjectGateway isActive={activePanel === 5} />
         </motion.div>
 
         {/* Projects carousel hidden — uncomment import + block to restore

@@ -260,6 +260,38 @@ export default function NavbarV2() {
           border-color: rgba(255, 255, 255, 0.38) !important;
         }
 
+        /* Panel claro de invitación: texto oscuro serif sobre marfil */
+        body.is-invitation-panel-active .nav-v2-shell,
+        body.is-invitation-panel-active .nav-v2-shell * {
+          font-family: var(--font-cormorant), Georgia, 'Times New Roman', serif !important;
+          letter-spacing: 0 !important;
+        }
+
+        body.is-invitation-panel-active .nav-v2-shell {
+          color: #4a4039;
+          text-shadow: none;
+        }
+
+        body.is-invitation-panel-active .nav-v2-shell a,
+        body.is-invitation-panel-active .nav-v2-shell button {
+          color: #4a4039 !important;
+          text-shadow: none;
+        }
+
+        body.is-invitation-panel-active .nav-v2-shell a span {
+          color: rgba(139, 115, 85, 0.82) !important;
+        }
+
+        body.is-invitation-panel-active .nav-contact-pill {
+          background: rgba(196, 152, 91, 0.1) !important;
+          border-color: rgba(139, 115, 85, 0.34) !important;
+        }
+
+        body.is-invitation-panel-active .nav-contact-pill:hover {
+          background: rgba(196, 152, 91, 0.18) !important;
+          border-color: rgba(139, 115, 85, 0.5) !important;
+        }
+
         body.is-nav-font-transitioning .nav-v2-shell a,
         body.is-nav-font-transitioning .nav-v2-shell button {
           animation: nav-font-crossfade 520ms cubic-bezier(0.16, 1, 0.3, 1) both;

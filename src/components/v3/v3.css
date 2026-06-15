@@ -998,13 +998,16 @@
 }
 
 /* En el panel claro de boda, aclaramos los puntos inactivos */
-body.is-wedding-panel-active .hcs-progress__list {
+body.is-wedding-panel-active .hcs-progress__list,
+body.is-invitation-panel-active .hcs-progress__list {
   background: rgba(255, 255, 255, 0.32);
 }
-body.is-wedding-panel-active .hcs-progress__dot {
+body.is-wedding-panel-active .hcs-progress__dot,
+body.is-invitation-panel-active .hcs-progress__dot {
   background: rgba(20, 18, 16, 0.32);
 }
-body.is-wedding-panel-active .hcs-progress__dot:hover {
+body.is-wedding-panel-active .hcs-progress__dot:hover,
+body.is-invitation-panel-active .hcs-progress__dot:hover {
   background: rgba(20, 18, 16, 0.7);
 }
 
