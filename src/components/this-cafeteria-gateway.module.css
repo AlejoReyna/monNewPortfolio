@@ -15,6 +15,7 @@
   --cafeteria-line: rgba(248, 245, 234, 0.18);
   --cafeteria-accent: #f8f5ea;
   --cafeteria-gold: #c9a15b;
+  --cafeteria-sepolia: #8fd8f2;
 
   color: var(--cafeteria-ink);
   background: #16110d;
@@ -69,6 +70,61 @@
   max-width: 40rem;
   text-align: right;
   width: 100%;
+}
+
+.deployBadge {
+  align-items: flex-start;
+  background: rgba(14, 11, 9, 0.38);
+  border: 1px solid rgba(248, 245, 234, 0.2);
+  border-radius: 0.9rem;
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  left: clamp(1.5rem, 6vw, 5rem);
+  margin-top: clamp(3rem, 8vh, 5rem);
+  max-width: min(20rem, 70vw);
+  padding: 0.65rem 0.8rem;
+  pointer-events: none;
+  position: absolute;
+  top: clamp(1.25rem, 4.5vh, 2.5rem);
+  z-index: 3;
+}
+
+.deployLabel {
+  color: var(--cafeteria-muted);
+  font-family: "Inter", var(--font-geist-sans), "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: clamp(0.6rem, 1.1vw, 0.72rem);
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-shadow: 0 0.08rem 0.6rem rgba(0, 0, 0, 0.6);
+  text-transform: uppercase;
+}
+
+.deployNetwork {
+  align-items: center;
+  display: inline-flex;
+  gap: clamp(0.45rem, 1.2vw, 0.7rem);
+}
+
+.deployLogo {
+  display: block;
+  height: clamp(2.35rem, 6vw, 3.5rem);
+  object-fit: contain;
+  width: auto;
+}
+
+.deployName {
+  color: var(--cafeteria-ink);
+  font-family: "Inter", var(--font-geist-sans), "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: clamp(1.1rem, 3.2vw, 1.85rem);
+  font-weight: 600;
+  letter-spacing: 0;
+  line-height: 1;
+  text-shadow:
+    0 0.08rem 0.65rem rgba(0, 0, 0, 0.65),
+    0 0 1rem color-mix(in srgb, var(--cafeteria-sepolia) 34%, transparent);
 }
 
 .wordmark {
@@ -237,6 +293,12 @@
 
   .techRow {
     gap: clamp(0.55rem, 2.6vw, 0.95rem);
+  }
+
+  .deployBadge {
+    left: 1.1rem;
+    margin-top: clamp(2rem, 6vh, 3.5rem);
+    max-width: none;
   }
 }
 
