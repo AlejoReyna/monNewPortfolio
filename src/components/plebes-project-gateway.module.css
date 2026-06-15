@@ -4,6 +4,14 @@
   src: url("/munro_narrow.ttf") format("truetype");
 }
 
+@font-face {
+  font-display: swap;
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 300;
+  src: url("/fonts/inter-v20-latin-300.woff2") format("woff2");
+}
+
 .screen {
   --plebes-ink: #fff7ff;
   --plebes-soft: rgba(255, 247, 255, 0.76);
@@ -43,6 +51,7 @@
 
 .inner {
   align-items: center;
+  box-sizing: border-box;
   display: grid;
   gap: clamp(0.6rem, 1.8vh, 1.25rem) clamp(1.5rem, 4vw, 4rem);
   grid-template-areas:
@@ -54,9 +63,61 @@
   margin-inline: auto;
   max-height: 100%;
   max-width: 1240px;
+  padding-top: clamp(2.75rem, 6vh, 4.25rem);
   position: relative;
   width: 100%;
   z-index: 1;
+}
+
+.deployBadge {
+  align-items: flex-start;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  left: clamp(1.5rem, 6vw, 5rem);
+  margin-top: clamp(3rem, 8vh, 5rem);
+  max-width: min(20rem, 70vw);
+  pointer-events: none;
+  position: absolute;
+  top: clamp(1.25rem, 4.5vh, 2.5rem);
+  z-index: 3;
+}
+
+.deployLabel {
+  color: var(--plebes-soft);
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+  font-size: clamp(0.6rem, 1.1vw, 0.72rem);
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  line-height: 1.2;
+  text-shadow: 0 8px 24px rgba(34, 7, 60, 0.46);
+  text-transform: uppercase;
+}
+
+.deployLogo {
+  display: block;
+  height: clamp(1.55rem, 4vw, 2.15rem);
+  object-fit: contain;
+  width: auto;
+}
+
+.deployNetwork {
+  align-items: center;
+  display: inline-flex;
+  gap: clamp(0.55rem, 1.2vw, 0.75rem);
+}
+
+.deployName {
+  color: #ffffff;
+  font-family: "Inter", var(--font-geist-sans), "Helvetica Neue", Arial, sans-serif;
+  font-size: clamp(0.95rem, 2.4vw, 1.3rem);
+  font-weight: 500;
+  letter-spacing: 0.32em;
+  line-height: 1;
+}
+
+.mobileTitle {
+  display: none;
 }
 
 .copy {
@@ -257,6 +318,38 @@
     grid-template-columns: 1fr;
     grid-template-rows: auto auto auto auto auto;
     max-height: none;
+    padding-top: clamp(4rem, 10svh, 5.5rem);
+  }
+
+  .deployBadge {
+    align-items: flex-start;
+    display: flex;
+    gap: 0.5rem;
+    margin-top: clamp(2rem, 6vh, 3.5rem);
+    max-width: min(9rem, 34vw);
+  }
+
+  .mobileTitle {
+    display: grid;
+    font-family: "Munro Narrow", var(--font-space-mono), ui-monospace, monospace;
+    font-size: clamp(2rem, 7.8vw, 3rem);
+    font-weight: 400;
+    letter-spacing: 0;
+    line-height: 0.88;
+    margin: 0;
+    max-width: none;
+    pointer-events: none;
+    position: absolute;
+    right: clamp(1.5rem, 6vw, 5rem);
+    text-align: left;
+    text-shadow: 0 8px 28px rgba(34, 7, 60, 0.5);
+    top: clamp(5.1rem, 9svh, 6.4rem);
+    z-index: 3;
+  }
+
+  .mobileTitle span {
+    display: block;
+    white-space: nowrap;
   }
 
   .copy {
@@ -274,6 +367,7 @@
 
   .title {
     font-size: clamp(3.1rem, 16vw, 5.7rem);
+    display: none;
     max-width: 9.2ch;
   }
 
@@ -309,6 +403,25 @@
 
   .title {
     font-size: clamp(2.65rem, 17vw, 4.35rem);
+  }
+
+  .deployBadge {
+    max-width: min(8rem, 36vw);
+  }
+
+  .deployName {
+    font-size: 0.95rem;
+    letter-spacing: 0.28em;
+  }
+
+  .deployLogo {
+    height: 1.45rem;
+  }
+
+  .mobileTitle {
+    font-size: clamp(1.7rem, 7.4vw, 2.25rem);
+    right: 1.25rem;
+    top: clamp(4.9rem, 8.6svh, 6.1rem);
   }
 
   .lead {
