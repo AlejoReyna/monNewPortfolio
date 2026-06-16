@@ -219,7 +219,7 @@ export default function HeroV2({
                     transition={{ duration: 0.4 }}
                     style={{
                       display: "block",
-                      fontFamily: "'Comic Sans MS', 'Comic Sans', cursive",
+                      fontFamily: "var(--gic-font-comic)",
                       fontSize: "0.78rem",
                       color: "white",
                       transform: "rotate(-3deg)",
@@ -238,7 +238,7 @@ export default function HeroV2({
 
 
       {/* ── Draggable terminal ── */}
-      <style>{`.comic-terminal, .comic-terminal * { font-family: 'Comic Sans MS', 'Comic Sans', cursive !important; }`}</style>
+      <style>{`.comic-terminal, .comic-terminal * { font-family: var(--gic-font-comic) !important; }`}</style>
       <motion.div
         drag
         dragMomentum={false}
@@ -247,7 +247,7 @@ export default function HeroV2({
         className="absolute z-30 cursor-grab active:cursor-grabbing comic-terminal bottom-0 lg:bottom-auto lg:top-[22%] left-1/2 -translate-x-1/2 lg:translate-x-0 lg:left-[8%] w-[96vw] lg:w-[min(546px,44.1vw)]"
         style={{
           opacity: contentOpacity,
-          fontFamily: "'Comic Sans MS', 'Comic Sans', cursive",
+          fontFamily: "var(--gic-font-comic)",
         }}
       >
         <div className="w-full h-[min(425.25px,40.5vh)] lg:h-[min(472.5px,52.5vh)]">

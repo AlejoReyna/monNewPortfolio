@@ -41,6 +41,7 @@
   /* Typography — Font Families (fallback system fonts) */
   --gic-font-serif: Georgia, 'Times New Roman', 'Palatino Linotype', serif;
   --gic-font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --gic-font-comic: 'Comic Sans MS', 'Comic Sans', 'Chalkboard SE', 'Comic Neue', 'Marker Felt', ui-rounded, system-ui, sans-serif;
 
   /* Typography — Scale */
   --gic-text-caption: 13px;

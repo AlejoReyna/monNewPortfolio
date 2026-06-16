@@ -145,7 +145,7 @@ export default function NavbarV2() {
 
         .nav-v2-shell,
         .nav-v2-shell * {
-          font-family: 'Comic Sans MS', 'Comic Sans', cursive !important;
+          font-family: var(--gic-font-comic) !important;
         }
 
         .nav-v2-shell {
