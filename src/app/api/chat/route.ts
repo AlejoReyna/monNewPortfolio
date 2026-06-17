@@ -3,14 +3,53 @@ import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
 import { cookies } from 'next/headers';
 
+// ---------------------------------------------------------------------------
+// Provider resolution — mirrors the BNBHacks cascade-ai pattern
+// ---------------------------------------------------------------------------
+
+type ChatProvider = 'openai' | 'kimi';
+
+type ProviderConfig = {
+  provider: ChatProvider;
+  apiKey: string | undefined;
+  baseURL?: string;
+  model: string;
+  maxTokens?: number;
+};
+
+function resolveProvider(): ChatProvider {
+  const env = process.env.CHAT_PROVIDER?.trim().toLowerCase();
+  if (env === 'kimi') return 'kimi';
+  if (env === 'openai') return 'openai';
+  // Auto-detect: if a Kimi/Moonshot key is present, use Kimi
+  return process.env.MOONSHOT_API_KEY || process.env.KIMI_API_KEY ? 'kimi' : 'openai';
+}
+
+function resolveProviderConfig(): ProviderConfig {
+  const provider = resolveProvider();
+  if (provider === 'kimi') {
+    return {
+      provider,
+      apiKey: process.env.MOONSHOT_API_KEY ?? process.env.KIMI_API_KEY,
+      baseURL: process.env.KIMI_BASE_URL ?? 'https://api.moonshot.ai/v1',
+      model: process.env.KIMI_MODEL ?? 'kimi-k2-0711-preview',
+      maxTokens: 900,
+    };
+  }
+  return {
+    provider,
+    apiKey: process.env.OPENAI_API_KEY,
+    baseURL: process.env.OPENAI_BASE_URL,
+    model: process.env.OPENAI_MODEL ?? 'gpt-5-nano',
+  };
+}
+
 /**
- * Lazily create OpenAI client to avoid build-time crashes when the API key
- * is not present in the environment. We only instantiate at request time.
+ * Lazily create AI client (OpenAI-compatible for both providers).
  */
-function createOpenAIClient(): OpenAI | null {
-  const apiKey = process.env.OPENAI_API_KEY;
-  if (!apiKey) return null;
-  return new OpenAI({ apiKey });
+function createClient(config: ProviderConfig): OpenAI | null {
+  if (!config.apiKey) return null;
+  return new OpenAI({ apiKey: config.apiKey, baseURL: config.baseURL });
 }
 
 /**
@@ -81,9 +120,10 @@ function getOutputText(response: { output_text?: string }): string {
 
 export async function POST(req: NextRequest) {
   // 0) Validaciones de entorno
-  if (!process.env.OPENAI_API_KEY) {
+  const config = resolveProviderConfig();
+  if (!config.apiKey) {
     return NextResponse.json(
-      { error: 'OPENAI_API_KEY no configurada' },
+      { error: `API key no configurada (provider: ${config.provider})` },
       { status: 503 }
     );
   }
@@ -167,31 +207,49 @@ export async function POST(req: NextRequest) {
   const input = `${developerContent}\n\n${conversationHistory}`;
 
   try {
-    const client = createOpenAIClient();
+    const client = createClient(config);
     if (!client) {
       return NextResponse.json(
-        { error: 'OPENAI_API_KEY no configurada' },
+        { error: `API key no configurada (provider: ${config.provider})` },
         { status: 503 }
       );
     }
-    // 5) Llamada a Responses API
-    const resp = await client.responses.create({
-      model: 'gpt-5-nano',
-      input: input,
-      // Nota: gpt-5-nano no soporta temperature/max_tokens por defecto
-      // Si tu cuenta los soporta, puedes descomentar:
-      // max_output_tokens: 900,
-      // temperature: 0.5,
-    });
 
-    const text = getOutputText(resp);
+    let text: string;
+    let usage: unknown = null;
+
+    if (config.provider === 'kimi') {
+      // 5a) Kimi uses chat.completions (OpenAI-compatible)
+      const messages: OpenAI.ChatCompletionMessageParam[] = [
+        { role: 'system', content: DEVELOPER_PERSONA + (userName ? `\n\nEl usuario se llama ${userName}. Usa su nombre naturalmente.` : '') },
+        ...SHORT_HISTORY
+          .filter(msg => msg.role !== 'system')
+          .map(msg => ({ role: msg.role as 'user' | 'assistant', content: msg.content })),
+      ];
+      const completion = await client.chat.completions.create({
+        model: config.model,
+        messages,
+        max_tokens: config.maxTokens,
+      });
+      text = completion.choices[0]?.message?.content ?? 'No obtuve contenido.';
+      usage = completion.usage ?? null;
+    } else {
+      // 5b) OpenAI Responses API
+      const resp = await client.responses.create({
+        model: config.model,
+        input,
+      });
+      text = getOutputText(resp);
+      usage = resp.usage ?? null;
+    }
 
     // 6) Decrementar cuota y setear cookie (solo si NO hay bypass)
     const res = NextResponse.json({
       success: true,
-      model: 'gpt-5-nano',
+      model: config.model,
+      provider: config.provider,
       message: text,
-      usage: resp.usage ?? null,
+      usage,
       quota: { remaining: quota.remaining, resetAt: quota.resetAt },
     });
 
@@ -246,15 +304,17 @@ export async function POST(req: NextRequest) {
  * Si quieres validar conectividad real, puedes hacer un create() con input "test".
  */
 export async function GET() {
-  if (!process.env.OPENAI_API_KEY) {
+  const config = resolveProviderConfig();
+  if (!config.apiKey) {
     return NextResponse.json(
-      { status: 'unhealthy', error: 'OPENAI_API_KEY no configurada' },
+      { status: 'unhealthy', error: `API key no configurada (provider: ${config.provider})` },
       { status: 503 }
     );
   }
   return NextResponse.json({
     status: 'healthy',
-    model: 'gpt-5-nano',
+    provider: config.provider,
+    model: config.model,
     timestamp: new Date().toISOString(),
   });
 }

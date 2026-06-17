@@ -115,7 +115,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
                   border: "1px solid rgba(248,245,234,0.2)",
                   borderRadius: 999,
                   color: "rgba(248,245,234,0.82)",
-                  fontFamily: "'Comic Sans MS', 'Comic Sans', cursive",
+                  fontFamily: "var(--gic-font-comic)",
                   fontSize: "0.64rem",
                   letterSpacing: "0.14em",
                   padding: "6px 12px",
@@ -182,7 +182,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
                   border: "1px solid rgba(248,245,234,0.28)",
                   borderRadius: 999,
                   color: "rgba(248,245,234,0.76)",
-                  fontFamily: "'Comic Sans MS', 'Comic Sans', cursive",
+                  fontFamily: "var(--gic-font-comic)",
                   fontSize: "0.62rem",
                   letterSpacing: "0.14em",
                   padding: "6px 12px",
@@ -252,7 +252,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
       <style>{`
         .project-detail-link {
           color: rgba(248,245,234,0.82);
-          font-family: 'Comic Sans MS', 'Comic Sans', cursive;
+          font-family: var(--gic-font-comic);
           font-size: 0.68rem;
           letter-spacing: 0.16em;
           text-decoration: none;
