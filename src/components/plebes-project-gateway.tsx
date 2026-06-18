@@ -85,6 +85,14 @@ export default function PlebesProjectGateway({ isActive = false }: { isActive?: 
     show: { opacity: 1, transition: { staggerChildren: 0.09, delayChildren: 0.15 } },
   };
 
+  const badgeReveal = {
+    hidden: { clipPath: "inset(0 100% 0 0)" },
+    show: {
+      clipPath: "inset(0 0% 0 0)",
+      transition: { duration: 0.7, ease: [0.16, 1, 0.3, 1] as const },
+    },
+  };
+
   const logoItem = {
     hidden: { opacity: 0, y: 12, scale: 0.85 },
     show: {
@@ -99,15 +107,14 @@ export default function PlebesProjectGateway({ isActive = false }: { isActive?: 
     <section className={styles.screen} aria-labelledby="plebes-project-title" data-carousel-scrollable="true">
       <motion.div
         className={styles.deployBadge}
-        variants={logoGroup}
+        variants={badgeReveal}
         initial="hidden"
         animate={isActive ? "show" : "hidden"}
-        aria-label="Deployed on ICP"
+        style={{ transformOrigin: "left" }}
+        aria-label="As seen on ICP"
       >
-        <motion.span className={styles.deployLabel} variants={logoItem}>
-          Deployed on
-        </motion.span>
-        <motion.div className={styles.deployNetwork} variants={logoItem}>
+        <span className={styles.deployLabel}>as seen on</span>
+        <div className={styles.deployNetwork}>
           <img
             className={styles.deployLogo}
             src="/icp_logo.png"
@@ -115,8 +122,8 @@ export default function PlebesProjectGateway({ isActive = false }: { isActive?: 
             aria-hidden="true"
             loading="lazy"
           />
-          <span className={styles.deployName}>ICP</span>
-        </motion.div>
+          <span className={styles.deployName}>ICP!</span>
+        </div>
       </motion.div>
 
       <motion.h2
@@ -125,7 +132,17 @@ export default function PlebesProjectGateway({ isActive = false }: { isActive?: 
         initial="hidden"
         animate={isActive ? "show" : "hidden"}
       >
-        <span>{isEs ? "Desarrollador del" : "Developer for the"}</span>
+        <span>
+          {isEs ? (
+            <>
+              Desarrollador<br />del
+            </>
+          ) : (
+            <>
+              Developer<br />for the
+            </>
+          )}
+        </span>
         <span>
           <img className={styles.logoWord} src="/plebeslogo.svg" alt="plebes" />
           {isEs ? " Proyecto" : " Project"}
